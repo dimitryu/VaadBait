@@ -18,7 +18,7 @@
 // ╔══════════════════════════════════════════════════════════╗
 // ║  APP CONFIGURATION                                        ║
 // ╚══════════════════════════════════════════════════════════╝
-const APP_VERSION = "1.0.2";
+const APP_VERSION = "1.0.3";
 const APP_NAME = "וועד בית";
 const GITHUB_REPO = "dimitryu/VaadBait";
 
@@ -478,22 +478,22 @@ body {
 <!-- Screens -->
 <div id="screenDashboard" class="screen active">
   <div class="balance-banner">
-    <div class="balance-label">יתרה נוכחית</div>
+    <div class="balance-label" data-i18n="balance_label">יתרה נוכחית</div>
     <div class="balance-amount" id="balanceAmount">₪0</div>
     <div class="balance-sub" id="balanceSub"></div>
   </div>
   <div class="quick-actions">
-    <button class="qa-btn qa-income" onclick="openTxModal('income')">➕ הכנסה</button>
-    <button class="qa-btn qa-expense" onclick="openTxModal('expense')">➖ הוצאה</button>
+    <button class="qa-btn qa-income" onclick="openTxModal('income')" data-i18n="btn_income">➕ הכנסה</button>
+    <button class="qa-btn qa-expense" onclick="openTxModal('expense')" data-i18n="btn_expense">➖ הוצאה</button>
   </div>
   <div class="section-header" style="margin-top:8px">
-    <span class="section-title">תשלומי החודש</span>
+    <span class="section-title" data-i18n="monthly_payments">תשלומים</span>
     <span id="monthLabel" style="font-size:0.8rem;color:var(--text-2)"></span>
   </div>
   <div class="card" id="monthlyCard"></div>
   <div class="section-header">
-    <span class="section-title">תנועות אחרונות</span>
-    <span style="font-size:0.8rem;color:var(--accent);cursor:pointer;" onclick="showScreen('screenTransactions')">הכל ›</span>
+    <span class="section-title" data-i18n="recent_tx">תנועות אחרונות</span>
+    <span style="font-size:0.8rem;color:var(--accent);cursor:pointer;" onclick="showScreen('screenTransactions')" data-i18n="view_all">הכל ›</span>
   </div>
   <div class="card" id="recentTxCard"></div>
 </div>
@@ -506,8 +506,8 @@ body {
 
 <div id="screenTransactions" class="screen">
   <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px 2px">
-    <span class="section-title">תנועות</span>
-    <button class="btn btn-ghost btn-sm" onclick="openReportModal()" style="display:flex;align-items:center;gap:4px">📊 דוח</button>
+    <span class="section-title" data-i18n="tx_title">תנועות</span>
+    <button class="btn btn-ghost btn-sm" onclick="openReportModal()" style="display:flex;align-items:center;gap:4px;padding:4px 9px;font-size:0.75rem" data-i18n="btn_report">📊 דוח</button>
   </div>
   <div class="filter-bar" id="txFilterBar"></div>
   <div id="txList" style="padding:0 12px 8px;"></div>
@@ -515,70 +515,79 @@ body {
 
 <div id="screenContacts" class="screen">
   <div class="section-header">
-    <span class="section-title">דירות</span>
-    <button class="btn btn-primary btn-sm" onclick="openAptModal()">+ הוסף</button>
+    <span class="section-title" data-i18n="apts_title">דירות</span>
+    <button class="btn btn-primary btn-sm" onclick="openAptModal()" style="padding:4px 9px;font-size:0.75rem" data-i18n="btn_add">+ הוסף</button>
   </div>
   <div id="contactsList"></div>
   <div class="section-header" style="margin-top:8px">
-    <span class="section-title">נותני שירות</span>
-    <button class="btn btn-primary btn-sm" onclick="openProviderModal()">+ הוסף</button>
+    <span class="section-title" data-i18n="providers_title">נותני שירות</span>
+    <button class="btn btn-primary btn-sm" onclick="openProviderModal()" style="padding:4px 9px;font-size:0.75rem" data-i18n="btn_add">+ הוסף</button>
   </div>
   <div id="providersList" style="padding:0 12px 8px;"></div>
 </div>
 
 <div id="screenSettings" class="screen">
-  <div class="settings-group-title">פרטי הבניין</div>
+  <div class="settings-group-title" data-i18n="grp_building">פרטי הבניין</div>
   <div class="settings-group" id="buildingSettingsGroup"></div>
 
-  <div class="settings-group-title" style="margin-top:12px">מראה</div>
+  <div class="settings-group-title" style="margin-top:12px" data-i18n="grp_appearance">מראה</div>
   <div class="settings-group">
     <div class="settings-row">
-      <div><div class="settings-lbl">מצב כהה</div></div>
+      <div><div class="settings-lbl" data-i18n="dark_mode">מצב כהה</div></div>
       <label class="toggle"><input type="checkbox" id="darkToggle" onchange="toggleTheme()"><span class="toggle-slider"></span></label>
     </div>
   </div>
 
-  <div class="settings-group-title" style="margin-top:12px">גודל גופן</div>
+  <div class="settings-group-title" style="margin-top:12px" data-i18n="grp_font">גודל גופן</div>
   <div class="settings-group">
     <div class="font-btns">
-      <button class="font-btn" data-scale="0.85" onclick="setFontSize('0.85')">קטן</button>
-      <button class="font-btn" data-scale="1" onclick="setFontSize('1')">בינוני</button>
-      <button class="font-btn" data-scale="1.15" onclick="setFontSize('1.15')">גדול</button>
-      <button class="font-btn" data-scale="1.3" onclick="setFontSize('1.3')">גדול מאוד</button>
+      <button class="font-btn" data-scale="0.85" onclick="setFontSize('0.85')" data-i18n="font_small">קטן</button>
+      <button class="font-btn" data-scale="1" onclick="setFontSize('1')" data-i18n="font_med">בינוני</button>
+      <button class="font-btn" data-scale="1.15" onclick="setFontSize('1.15')" data-i18n="font_large">גדול</button>
+      <button class="font-btn" data-scale="1.3" onclick="setFontSize('1.3')" data-i18n="font_xl">גדול מאוד</button>
     </div>
   </div>
 
-  <div class="settings-group-title" style="margin-top:12px">גיבוי ושחזור</div>
+  <div class="settings-group-title" style="margin-top:12px" data-i18n="grp_lang">שפת ממשק</div>
+  <div class="settings-group">
+    <div class="lang-btns">
+      <button class="lang-btn active" data-lang="he" onclick="setLang('he')">עברית</button>
+      <button class="lang-btn" data-lang="en" onclick="setLang('en')">English</button>
+      <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">Русский</button>
+    </div>
+  </div>
+
+  <div class="settings-group-title" style="margin-top:12px" data-i18n="grp_backup">גיבוי ושחזור</div>
   <div class="settings-group">
     <div class="settings-row">
-      <div class="settings-lbl">ייצוא נתונים (JSON)</div>
-      <button class="btn btn-ghost btn-sm" onclick="exportData()">ייצא</button>
+      <div class="settings-lbl" data-i18n="export_lbl">ייצוא נתונים (JSON)</div>
+      <button class="btn btn-ghost btn-sm" onclick="exportData()" data-i18n="btn_export">ייצא</button>
     </div>
     <div class="settings-row">
-      <div class="settings-lbl">ייבוא נתונים</div>
-      <button class="btn btn-ghost btn-sm" onclick="importData()">ייבא</button>
+      <div class="settings-lbl" data-i18n="import_lbl">ייבוא נתונים</div>
+      <button class="btn btn-ghost btn-sm" onclick="importData()" data-i18n="btn_import">ייבא</button>
     </div>
   </div>
 
-  <div class="settings-group-title" style="margin-top:12px">התקנה על הטלפון</div>
+  <div class="settings-group-title" style="margin-top:12px" data-i18n="grp_install">התקנה על הטלפון</div>
   <div class="settings-group">
     <div class="settings-row" style="cursor:pointer" onclick="showInstallHelp()">
-      <div><div class="settings-lbl">📲 התקן כאפליקציה</div><div class="settings-sub">עבוד ללא דפדפן, כמו אפליקציה אמיתית</div></div>
+      <div><div class="settings-lbl" data-i18n="install_lbl">📲 התקן כאפליקציה</div><div class="settings-sub" data-i18n="install_sub">עבוד ללא דפדפן, כמו אפליקציה אמיתית</div></div>
       <span style="color:var(--accent)">›</span>
     </div>
   </div>
 
-  <div class="settings-group-title" style="margin-top:12px">אודות</div>
+  <div class="settings-group-title" style="margin-top:12px" data-i18n="grp_about">אודות</div>
   <div class="settings-group">
     <div class="settings-row">
-      <div class="settings-lbl">גרסה</div>
+      <div class="settings-lbl" data-i18n="version_lbl">גרסה</div>
       <span style="color:var(--text-2);font-size:0.85rem;">v<span id="settingsVersion"></span></span>
     </div>
     <div class="settings-row" style="cursor:pointer" onclick="switchUser()">
-      <div><div class="settings-lbl" style="color:var(--warning)">🔄 החלף מנהל / בניין</div><div class="settings-sub">חזור למסך הכניסה</div></div>
+      <div><div class="settings-lbl" style="color:var(--warning)" data-i18n="switch_user">🔄 החלף מנהל / בניין</div><div class="settings-sub" data-i18n="switch_sub">חזור למסך הכניסה</div></div>
     </div>
     <div class="settings-row" style="cursor:pointer" onclick="resetData()">
-      <div><div class="settings-lbl" style="color:var(--danger)">🗑️ מחק את כל הנתונים</div><div class="settings-sub">פעולה בלתי הפיכה</div></div>
+      <div><div class="settings-lbl" style="color:var(--danger)" data-i18n="delete_all">🗑️ מחק את כל הנתונים</div><div class="settings-sub" data-i18n="delete_all_sub">פעולה בלתי הפיכה</div></div>
     </div>
   </div>
 </div>
@@ -588,19 +597,19 @@ body {
 <!-- Bottom Navigation -->
 <nav class="bottom-nav" id="bottomNav" style="display:none">
   <div class="nav-item active" data-screen="screenDashboard" onclick="showScreen('screenDashboard')">
-    <span class="ni">🏠</span><span>ראשי</span>
+    <span class="ni">🏠</span><span data-i18n="nav_home">ראשי</span>
   </div>
   <div class="nav-item" data-screen="screenDues" onclick="showScreen('screenDues')">
-    <span class="ni">📋</span><span>תשלומים</span>
+    <span class="ni">📋</span><span data-i18n="nav_dues">תשלומים</span>
   </div>
   <div class="nav-item" data-screen="screenTransactions" onclick="showScreen('screenTransactions')">
-    <span class="ni">💰</span><span>תנועות</span>
+    <span class="ni">💰</span><span data-i18n="nav_tx">תנועות</span>
   </div>
   <div class="nav-item" data-screen="screenContacts" onclick="showScreen('screenContacts')">
-    <span class="ni">👥</span><span>אנשי קשר</span>
+    <span class="ni">👥</span><span data-i18n="nav_contacts">אנשי קשר</span>
   </div>
   <div class="nav-item" data-screen="screenSettings" onclick="showScreen('screenSettings')">
-    <span class="ni">⚙️</span><span>הגדרות</span>
+    <span class="ni">⚙️</span><span data-i18n="nav_settings">הגדרות</span>
   </div>
 </nav>
 
@@ -776,17 +785,17 @@ body {
 <div class="modal-overlay" id="payModal">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title" id="payModalTitle">בחר חודשים לתשלום</div>
+    <div class="modal-title" id="payModalTitle"></div>
     <input type="hidden" id="payAptId">
     <div class="month-check-grid" id="payMonthsGrid"></div>
     <div class="form-group">
-      <label class="form-label">תאריך תשלום</label>
+      <label class="form-label" data-i18n="pay_date_lbl">תאריך תשלום</label>
       <input type="date" class="form-input" id="payDate">
     </div>
     <div id="payAmountPreview" style="text-align:center;font-size:1rem;font-weight:800;color:var(--success);padding:4px 0 8px;"></div>
     <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="closeModal('payModal')">ביטול</button>
-      <button class="btn btn-primary" onclick="savePayModal()">✓ אשר תשלום</button>
+      <button class="btn btn-ghost" onclick="closeModal('payModal')" data-i18n="btn_cancel">ביטול</button>
+      <button class="btn btn-primary" onclick="savePayModal()" data-i18n="pay_confirm">✓ אשר תשלום</button>
     </div>
   </div>
 </div>
@@ -795,39 +804,39 @@ body {
 <div class="modal-overlay" id="reportModal">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">📊 הפקת דוח תנועות</div>
+    <div class="modal-title" data-i18n="rpt_title">📊 הפקת דוח תנועות</div>
     <div class="report-type-btns">
-      <div class="report-type-btn active" id="rTypeAll" onclick="setReportType('all')">כל הדירות</div>
-      <div class="report-type-btn" id="rTypeApt" onclick="setReportType('apt')">דירה מסויימת</div>
+      <div class="report-type-btn active" id="rTypeAll" onclick="setReportType('all')" data-i18n="rpt_all_apts">כל הדירות</div>
+      <div class="report-type-btn" id="rTypeApt" onclick="setReportType('apt')" data-i18n="rpt_spec_apt">דירה מסויימת</div>
     </div>
     <div id="reportAptSection" style="display:none">
-      <label class="form-label" style="margin-bottom:6px">בחר דירה</label>
+      <label class="form-label" style="margin-bottom:6px" data-i18n="rpt_sel_apt">בחר דירה</label>
       <div class="report-apt-select" id="reportAptSelect"></div>
     </div>
-    <label class="form-label">טווח תאריכים</label>
+    <label class="form-label" data-i18n="rpt_date_range">טווח תאריכים</label>
     <div class="form-row" style="margin-bottom:12px">
       <div class="form-group">
-        <label class="form-label">מתאריך</label>
+        <label class="form-label" data-i18n="rpt_from">מתאריך</label>
         <input type="date" class="form-input" id="reportFrom">
       </div>
       <div class="form-group">
-        <label class="form-label">עד תאריך</label>
+        <label class="form-label" data-i18n="rpt_to">עד תאריך</label>
         <input type="date" class="form-input" id="reportTo">
       </div>
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">סוג תנועה</label>
+        <label class="form-label" data-i18n="rpt_tx_type">סוג תנועה</label>
         <select class="form-select" id="reportTxType">
-          <option value="all">הכל</option>
-          <option value="income">הכנסות בלבד</option>
-          <option value="expense">הוצאות בלבד</option>
+          <option value="all" data-i18n="rpt_all">הכל</option>
+          <option value="income" data-i18n="rpt_income_only">הכנסות בלבד</option>
+          <option value="expense" data-i18n="rpt_expense_only">הוצאות בלבד</option>
         </select>
       </div>
     </div>
     <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="closeModal('reportModal')">ביטול</button>
-      <button class="btn btn-primary" onclick="generateReport()">📥 הפק דוח</button>
+      <button class="btn btn-ghost" onclick="closeModal('reportModal')" data-i18n="btn_cancel">ביטול</button>
+      <button class="btn btn-primary" onclick="generateReport()" data-i18n="btn_gen">📥 הפק דוח</button>
     </div>
   </div>
 </div>
@@ -839,8 +848,150 @@ body {
 //  CONSTANTS
 // ═══════════════════════════════════════════════
 const MONTHS_HE = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+const MONTHS = {
+  he: MONTHS_HE,
+  en: ['January','February','March','April','May','June','July','August','September','October','November','December'],
+  ru: ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь']
+};
 const expenseCategories = ['חשמל','גנן','ניקיון','ציוד','תיקון','אחר'];
 const incomeCategories = ['וועד בית','החזר','אחר'];
+const CATEGORY_KEYS = {'חשמל':'cat_elec','גנן':'cat_garden','ניקיון':'cat_clean','ציוד':'cat_equip','תיקון':'cat_repair','אחר':'cat_other','וועד בית':'cat_dues','החזר':'cat_refund'};
+
+let appLang = localStorage.getItem('vb_lang') || 'he';
+
+const STRINGS = {
+  he: {
+    nav_home:'ראשי', nav_dues:'תשלומים', nav_tx:'תנועות', nav_contacts:'אנשי קשר', nav_settings:'הגדרות',
+    balance_label:'יתרה נוכחית', collection:'גבייה', monthly_payments:'תשלומים', recent_tx:'תנועות אחרונות',
+    view_all:'הכל ›', all_paid:'✅ כל הדירות שילמו החודש!', unpaid_lbl:'לא שילמו', paid_lbl:'שולם',
+    btn_income:'➕ הכנסה', btn_expense:'➖ הוצאה',
+    year_lbl:'שנה', dues_paid:'שולמו', dues_missing:'חסרים', dues_collected:'נגבה', dues_remaining:'יתרה לגבות', month_col:'חודש',
+    tx_title:'תנועות', btn_report:'📊 דוח', filter_income:'הכנסות', filter_expense:'הוצאות', filter_all:'הכל', empty_tx:'אין תנועות עדיין', empty_tx2:'אין תנועות',
+    apts_title:'דירות', providers_title:'נותני שירות', btn_add:'+ הוסף', lbl_tenant:'דייר', lbl_owner:'בעלים', lbl_phone:'טלפון', lbl_email:'אימייל', per_month:'/חודש',
+    grp_building:'פרטי הבניין', grp_appearance:'מראה', dark_mode:'מצב כהה',
+    grp_font:'גודל גופן', font_small:'קטן', font_med:'בינוני', font_large:'גדול', font_xl:'גדול מאוד',
+    grp_lang:'שפת ממשק', grp_backup:'גיבוי ושחזור', export_lbl:'ייצוא נתונים (JSON)', import_lbl:'ייבוא נתונים', btn_export:'ייצא', btn_import:'ייבא',
+    grp_install:'התקנה על הטלפון', install_lbl:'📲 התקן כאפליקציה', install_sub:'עבוד ללא דפדפן, כמו אפליקציה אמיתית',
+    grp_about:'אודות', version_lbl:'גרסה', switch_user:'🔄 החלף מנהל / בניין', switch_sub:'חזור למסך הכניסה', delete_all:'🗑️ מחק את כל הנתונים', delete_all_sub:'פעולה בלתי הפיכה',
+    mgr_lbl:'מנהל', init_balance:'יתרה פתיחה', num_apts:'מספר דירות',
+    tx_add:'הוסף תנועה', tx_edit:'עריכת תנועה', lbl_type:'סוג', lbl_amount:'סכום (₪)', lbl_desc:'תיאור', lbl_cat:'קטגוריה', lbl_date:'תאריך',
+    opt_income:'הכנסה', opt_expense:'הוצאה',
+    btn_cancel:'ביטול', btn_delete:'מחק', btn_save:'שמור',
+    pay_title:'תשלום', pay_date_lbl:'תאריך תשלום', pay_amount_lbl:'סכום לתשלום', pay_months_unit:'חודשים', pay_confirm:'✓ אשר תשלום',
+    rpt_title:'📊 הפקת דוח תנועות', rpt_all_apts:'כל הדירות', rpt_spec_apt:'דירה מסויימת', rpt_sel_apt:'בחר דירה', rpt_date_range:'טווח תאריכים',
+    rpt_from:'מתאריך', rpt_to:'עד תאריך', rpt_tx_type:'סוג תנועה', rpt_all:'הכל', rpt_income_only:'הכנסות בלבד', rpt_expense_only:'הוצאות בלבד', btn_gen:'📥 הפק דוח',
+    rpt_doc_income:'סה"כ הכנסות', rpt_doc_expense:'סה"כ הוצאות', rpt_doc_balance:'מאזן תקופה', col_date:'תאריך', col_desc:'תיאור', col_cat:'קטגוריה', col_amount:'סכום', btn_print:'🖨️ הדפס',
+    cat_elec:'חשמל', cat_garden:'גנן', cat_clean:'ניקיון', cat_equip:'ציוד', cat_repair:'תיקון', cat_other:'אחר', cat_dues:'וועד בית', cat_refund:'החזר',
+    confirm_del_tx:'למחוק תנועה זו?', confirm_del_apt:'למחוק?', confirm_del_provider:'למחוק?', confirm_del_bld:'למחוק בניין זה וכל נתוניו?',
+    confirm_switch:'לחזור למסך הכניסה?\n(הנתונים נשמרים)', confirm_reset:'למחוק את כל הנתונים לחלוטין?\n\nגיבוי יוצא אוטומטית לפני המחיקה.',
+    snk_paid:'סומן כשולם ✓', snk_unpaid:'סומן כלא שולם', snk_saved:'נשמר ✓', snk_deleted:'נמחק', snk_bld_updated:'הבניין עודכן ✓',
+    snk_exported:'ייצוא הצליח ✓', snk_imported:'ייבוא הצליח ✓', snk_import_err:'קובץ לא תקין', snk_update:'עדכון זמין — סגור ופתח מחדש להתקנה',
+    snk_no_dates:'יש לבחור טווח תאריכים', snk_no_apt:'יש לבחור דירה', snk_no_tx:'לא נמצאו תנועות בטווח הזה',
+    snk_sel_month:'יש לבחור לפחות חודש אחד', snk_no_amount:'יש להזין סכום תקין', snk_no_desc:'יש להזין תיאור',
+    snk_no_name:'יש להזין שם', snk_no_role:'יש להזין תפקיד', snk_no_bld:'יש להזין שם בניין',
+    snk_installed:'האפליקציה הותקנה! ✓', snk_install_chrome:'פתח בדפדפן Chrome והשתמש בתפריט "הוסף למסך הבית"',
+    bld_name_lbl:'שם / כתובת הבניין', bld_name_ph:"לדוג': רחוב הרצל 12", bld_mgr_lbl:'שם המנהל', bld_due_lbl:'סכום חודשי לדירה (₪)', bld_bal_lbl:'יתרה פתיחה (₪)', bld_add_title:'הוסף בניין', bld_edit_title:'עריכת בניין',
+    apt_new:'דירה חדשה', apt_edit:'עריכת דירה', apt_name_lbl:'שם הדירה', apt_apt_ph:'דירה 1', apt_resident:'דייר נוכחי', apt_owner1:'בעל הדירה', apt_owner2:'בעל דירה נוסף (אופציונלי)', apt_wa:'WhatsApp',
+    prov_title:'נותן שירות', prov_role_lbl:'תפקיד', prov_name_lbl:'שם', prov_phone_lbl:'טלפון', prov_cost_lbl:'עלות חודשית (₪)',
+    pay_months_suffix: (n) => `${n} חודשים שולמו ✓`,
+  },
+  en: {
+    nav_home:'Home', nav_dues:'Dues', nav_tx:'Transactions', nav_contacts:'Contacts', nav_settings:'Settings',
+    balance_label:'Current Balance', collection:'Collection', monthly_payments:'Payments', recent_tx:'Recent Transactions',
+    view_all:'All ›', all_paid:'✅ All apartments paid this month!', unpaid_lbl:'Unpaid', paid_lbl:'Paid',
+    btn_income:'➕ Income', btn_expense:'➖ Expense',
+    year_lbl:'Year', dues_paid:'Paid', dues_missing:'Missing', dues_collected:'Collected', dues_remaining:'Remaining', month_col:'Month',
+    tx_title:'Transactions', btn_report:'📊 Report', filter_income:'Income', filter_expense:'Expenses', filter_all:'All', empty_tx:'No transactions yet', empty_tx2:'No transactions',
+    apts_title:'Apartments', providers_title:'Service Providers', btn_add:'+ Add', lbl_tenant:'Tenant', lbl_owner:'Owner', lbl_phone:'Phone', lbl_email:'Email', per_month:'/month',
+    grp_building:'Building Details', grp_appearance:'Appearance', dark_mode:'Dark Mode',
+    grp_font:'Font Size', font_small:'Small', font_med:'Medium', font_large:'Large', font_xl:'X-Large',
+    grp_lang:'Interface Language', grp_backup:'Backup & Restore', export_lbl:'Export Data (JSON)', import_lbl:'Import Data', btn_export:'Export', btn_import:'Import',
+    grp_install:'Install on Phone', install_lbl:'📲 Install App', install_sub:'Works without browser, like a real app',
+    grp_about:'About', version_lbl:'Version', switch_user:'🔄 Switch Manager / Building', switch_sub:'Return to login', delete_all:'🗑️ Delete All Data', delete_all_sub:'Irreversible action',
+    mgr_lbl:'Manager', init_balance:'Initial Balance', num_apts:'Apartments Count',
+    tx_add:'Add Transaction', tx_edit:'Edit Transaction', lbl_type:'Type', lbl_amount:'Amount (₪)', lbl_desc:'Description', lbl_cat:'Category', lbl_date:'Date',
+    opt_income:'Income', opt_expense:'Expense',
+    btn_cancel:'Cancel', btn_delete:'Delete', btn_save:'Save',
+    pay_title:'Payment', pay_date_lbl:'Payment Date', pay_amount_lbl:'Amount to Pay', pay_months_unit:'months', pay_confirm:'✓ Confirm Payment',
+    rpt_title:'📊 Generate Report', rpt_all_apts:'All Apartments', rpt_spec_apt:'Specific Apartment', rpt_sel_apt:'Select Apartment', rpt_date_range:'Date Range',
+    rpt_from:'From', rpt_to:'To', rpt_tx_type:'Transaction Type', rpt_all:'All', rpt_income_only:'Income Only', rpt_expense_only:'Expenses Only', btn_gen:'📥 Generate Report',
+    rpt_doc_income:'Total Income', rpt_doc_expense:'Total Expenses', rpt_doc_balance:'Period Balance', col_date:'Date', col_desc:'Description', col_cat:'Category', col_amount:'Amount', btn_print:'🖨️ Print',
+    cat_elec:'Electricity', cat_garden:'Gardener', cat_clean:'Cleaning', cat_equip:'Equipment', cat_repair:'Repair', cat_other:'Other', cat_dues:'HOA Dues', cat_refund:'Refund',
+    confirm_del_tx:'Delete this transaction?', confirm_del_apt:'Delete?', confirm_del_provider:'Delete?', confirm_del_bld:'Delete this building and all its data?',
+    confirm_switch:'Return to login?\n(Data is saved)', confirm_reset:'Delete all data permanently?\n\nA backup will be exported automatically.',
+    snk_paid:'Marked as paid ✓', snk_unpaid:'Marked as unpaid', snk_saved:'Saved ✓', snk_deleted:'Deleted', snk_bld_updated:'Building updated ✓',
+    snk_exported:'Export successful ✓', snk_imported:'Import successful ✓', snk_import_err:'Invalid file', snk_update:'Update available — close and reopen',
+    snk_no_dates:'Please select a date range', snk_no_apt:'Please select an apartment', snk_no_tx:'No transactions found in this range',
+    snk_sel_month:'Please select at least one month', snk_no_amount:'Please enter a valid amount', snk_no_desc:'Please enter a description',
+    snk_no_name:'Please enter a name', snk_no_role:'Please enter a role', snk_no_bld:'Please enter a building name',
+    snk_installed:'App installed! ✓', snk_install_chrome:'Open in Chrome and use "Add to Home Screen"',
+    bld_name_lbl:'Building Name / Address', bld_name_ph:'e.g.: 12 Herzl St', bld_mgr_lbl:'Manager Name', bld_due_lbl:'Monthly Amount per Apt (₪)', bld_bal_lbl:'Opening Balance (₪)', bld_add_title:'Add Building', bld_edit_title:'Edit Building',
+    apt_new:'New Apartment', apt_edit:'Edit Apartment', apt_name_lbl:'Apartment Name', apt_apt_ph:'Apt 1', apt_resident:'Current Tenant', apt_owner1:'Owner', apt_owner2:'Additional Owner (optional)', apt_wa:'WhatsApp',
+    prov_title:'Service Provider', prov_role_lbl:'Role', prov_name_lbl:'Name', prov_phone_lbl:'Phone', prov_cost_lbl:'Monthly Cost (₪)',
+    pay_months_suffix: (n) => `${n} month(s) paid ✓`,
+  },
+  ru: {
+    nav_home:'Главная', nav_dues:'Взносы', nav_tx:'Операции', nav_contacts:'Контакты', nav_settings:'Настройки',
+    balance_label:'Текущий баланс', collection:'Сбор', monthly_payments:'Платежи', recent_tx:'Последние операции',
+    view_all:'Все ›', all_paid:'✅ Все квартиры оплатили в этом месяце!', unpaid_lbl:'Не оплатили', paid_lbl:'Оплачено',
+    btn_income:'➕ Доход', btn_expense:'➖ Расход',
+    year_lbl:'Год', dues_paid:'Оплачено', dues_missing:'Не оплачено', dues_collected:'Собрано', dues_remaining:'Остаток', month_col:'Месяц',
+    tx_title:'Операции', btn_report:'📊 Отчёт', filter_income:'Доходы', filter_expense:'Расходы', filter_all:'Все', empty_tx:'Нет операций', empty_tx2:'Нет операций',
+    apts_title:'Квартиры', providers_title:'Подрядчики', btn_add:'+ Добавить', lbl_tenant:'Жилец', lbl_owner:'Владелец', lbl_phone:'Телефон', lbl_email:'Email', per_month:'/мес',
+    grp_building:'Данные здания', grp_appearance:'Внешний вид', dark_mode:'Тёмный режим',
+    grp_font:'Размер шрифта', font_small:'Малый', font_med:'Средний', font_large:'Большой', font_xl:'Очень большой',
+    grp_lang:'Язык интерфейса', grp_backup:'Резервное копирование', export_lbl:'Экспорт данных (JSON)', import_lbl:'Импорт данных', btn_export:'Экспорт', btn_import:'Импорт',
+    grp_install:'Установить на телефон', install_lbl:'📲 Установить приложение', install_sub:'Работает без браузера, как обычное приложение',
+    grp_about:'О приложении', version_lbl:'Версия', switch_user:'🔄 Сменить управляющего / здание', switch_sub:'Вернуться на экран входа', delete_all:'🗑️ Удалить все данные', delete_all_sub:'Необратимое действие',
+    mgr_lbl:'Управляющий', init_balance:'Начальный баланс', num_apts:'Количество квартир',
+    tx_add:'Добавить операцию', tx_edit:'Изменить операцию', lbl_type:'Тип', lbl_amount:'Сумма (₪)', lbl_desc:'Описание', lbl_cat:'Категория', lbl_date:'Дата',
+    opt_income:'Доход', opt_expense:'Расход',
+    btn_cancel:'Отмена', btn_delete:'Удалить', btn_save:'Сохранить',
+    pay_title:'Оплата', pay_date_lbl:'Дата оплаты', pay_amount_lbl:'Сумма к оплате', pay_months_unit:'мес', pay_confirm:'✓ Подтвердить оплату',
+    rpt_title:'📊 Создание отчёта', rpt_all_apts:'Все квартиры', rpt_spec_apt:'Конкретная квартира', rpt_sel_apt:'Выбрать квартиру', rpt_date_range:'Диапазон дат',
+    rpt_from:'С даты', rpt_to:'По дату', rpt_tx_type:'Тип операции', rpt_all:'Все', rpt_income_only:'Только доходы', rpt_expense_only:'Только расходы', btn_gen:'📥 Создать отчёт',
+    rpt_doc_income:'Итого доходов', rpt_doc_expense:'Итого расходов', rpt_doc_balance:'Баланс периода', col_date:'Дата', col_desc:'Описание', col_cat:'Категория', col_amount:'Сумма', btn_print:'🖨️ Печать',
+    cat_elec:'Электричество', cat_garden:'Садовник', cat_clean:'Уборка', cat_equip:'Оборудование', cat_repair:'Ремонт', cat_other:'Другое', cat_dues:'Взносы ТСЖ', cat_refund:'Возврат',
+    confirm_del_tx:'Удалить эту операцию?', confirm_del_apt:'Удалить?', confirm_del_provider:'Удалить?', confirm_del_bld:'Удалить это здание и все данные?',
+    confirm_switch:'Вернуться на экран входа?\n(Данные сохраняются)', confirm_reset:'Удалить все данные безвозвратно?\n\nРезервная копия создаётся автоматически.',
+    snk_paid:'Отмечено как оплачено ✓', snk_unpaid:'Отмечено как неоплаченное', snk_saved:'Сохранено ✓', snk_deleted:'Удалено', snk_bld_updated:'Здание обновлено ✓',
+    snk_exported:'Экспорт выполнен ✓', snk_imported:'Импорт выполнен ✓', snk_import_err:'Неверный файл', snk_update:'Обновление доступно — закройте и откройте заново',
+    snk_no_dates:'Выберите диапазон дат', snk_no_apt:'Выберите квартиру', snk_no_tx:'Операции не найдены в этом диапазоне',
+    snk_sel_month:'Выберите хотя бы один месяц', snk_no_amount:'Введите корректную сумму', snk_no_desc:'Введите описание',
+    snk_no_name:'Введите имя', snk_no_role:'Введите должность', snk_no_bld:'Введите название здания',
+    snk_installed:'Приложение установлено! ✓', snk_install_chrome:'Откройте в Chrome и используйте "Добавить на главный экран"',
+    bld_name_lbl:'Название / адрес здания', bld_name_ph:'Напр.: ул. Герцля 12', bld_mgr_lbl:'Имя управляющего', bld_due_lbl:'Ежемесячная сумма за квартиру (₪)', bld_bal_lbl:'Начальный баланс (₪)', bld_add_title:'Добавить здание', bld_edit_title:'Редактировать здание',
+    apt_new:'Новая квартира', apt_edit:'Редактировать квартиру', apt_name_lbl:'Название квартиры', apt_apt_ph:'Кв. 1', apt_resident:'Текущий жилец', apt_owner1:'Владелец', apt_owner2:'Доп. владелец (опц.)', apt_wa:'WhatsApp',
+    prov_title:'Подрядчик', prov_role_lbl:'Должность', prov_name_lbl:'Имя', prov_phone_lbl:'Телефон', prov_cost_lbl:'Ежемесячная стоимость (₪)',
+    pay_months_suffix: (n) => `Оплачено ${n} мес. ✓`,
+  }
+};
+
+function t(key) { return (STRINGS[appLang] && STRINGS[appLang][key] != null ? STRINGS[appLang][key] : (STRINGS.he[key] != null ? STRINGS.he[key] : key)); }
+function getMonths() { return MONTHS[appLang] || MONTHS.he; }
+function getCatLabel(heKey) { const k = CATEGORY_KEYS[heKey]; return k ? t(k) : heKey; }
+
+function setLang(lang) {
+  appLang = lang;
+  localStorage.setItem('vb_lang', lang);
+  const isRTL = lang === 'he';
+  document.documentElement.setAttribute('lang', lang);
+  document.documentElement.setAttribute('dir', isRTL ? 'rtl' : 'ltr');
+  document.body.style.direction = isRTL ? 'rtl' : 'ltr';
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+  updateModalLabels();
+  renderBuildingSelector();
+  renderScreen(currentScreen);
+}
+
+function updateModalLabels() {
+  // TX modal
+  const txTitle = document.getElementById('txModalTitle');
+  if (txTitle && !document.getElementById('txEditId').value) txTitle.textContent = t('tx_add');
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+}
 
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
 
@@ -999,6 +1150,16 @@ function initApp() {
   const savedScale = localStorage.getItem('vb_fontScale') || '1';
   document.documentElement.style.setProperty('--font-scale', savedScale);
 
+  // Apply saved language
+  const savedLang = localStorage.getItem('vb_lang') || 'he';
+  appLang = savedLang;
+  const isRTL = savedLang === 'he';
+  document.documentElement.setAttribute('lang', savedLang);
+  document.documentElement.setAttribute('dir', isRTL ? 'rtl' : 'ltr');
+  document.body.style.direction = isRTL ? 'rtl' : 'ltr';
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === savedLang));
+
   const index = getIndex();
   const lastId = getCurrentBuildingId();
 
@@ -1066,7 +1227,7 @@ function showApp() {
 }
 
 function switchUser() {
-  if (!confirm('לחזור למסך הכניסה?\n(הנתונים נשמרים)')) return;
+  if (!confirm(t('confirm_switch'))) return;
   document.getElementById('appShell').style.display = 'none';
   document.getElementById('bottomNav').style.display = 'none';
   document.getElementById('welcomeScreen').style.display = 'flex';
@@ -1159,32 +1320,40 @@ function renderDashboard() {
   document.getElementById('balanceAmount').textContent = fmt(bal);
 
   const { month, year } = nowMY();
-  document.getElementById('monthLabel').textContent = MONTHS_HE[month-1] + ' ' + year;
+  document.getElementById('monthLabel').textContent = getMonths()[month-1] + ' ' + year;
 
   const apts = b.apartments || [];
   const paid = apts.filter(a => b.dues?.[a.id]?.[year]?.[month]);
-  const unpaid = apts.filter(a => !b.dues?.[a.id]?.[year]?.[month]);
   const collected = paid.length * (b.monthlyDue || 100);
   const target = apts.length * (b.monthlyDue || 100);
   const pct = apts.length ? Math.round(paid.length / apts.length * 100) : 0;
-  document.getElementById('balanceSub').textContent = `גבייה: ${fmt(collected)} / ${fmt(target)} (${pct}%)`;
+  document.getElementById('balanceSub').textContent = `${t('collection')}: ${fmt(collected)} / ${fmt(target)} (${pct}%)`;
 
   const mCard = document.getElementById('monthlyCard');
-  if (unpaid.length === 0) {
-    mCard.innerHTML = `<div style="text-align:center;padding:12px 0;color:var(--success);font-weight:700">✅ כל הדירות שילמו החודש!</div>`;
-  } else {
-    mCard.innerHTML = `<div class="card-title">לא שילמו (${unpaid.length}/${apts.length})</div>
-      <div class="month-progress"><div class="month-progress-bar" style="width:${pct}%"></div></div>
-      <div style="margin-top:10px">${unpaid.map(a => `<div class="unpaid-apt">
+  let html = `<div class="card-title">${paid.length}/${apts.length}</div>
+    <div class="month-progress"><div class="month-progress-bar" style="width:${pct}%"></div></div>
+    <div style="margin-top:10px">`;
+  apts.forEach(a => {
+    const isPaid = !!(b.dues?.[a.id]?.[year]?.[month]);
+    if (isPaid) {
+      html += `<div class="unpaid-apt">
         <div><div class="apt-name">${a.name}</div><div class="apt-info">${a.owners?.[0]?.name||''}</div></div>
-        <button class="pay-btn" onclick="openPayModal('${a.id}')">✓ שולם</button>
-      </div>`).join('')}</div>`;
-  }
+        <span style="color:var(--success);font-weight:700;font-size:0.82rem">✓ ${t('paid_lbl')}</span>
+      </div>`;
+    } else {
+      html += `<div class="unpaid-apt">
+        <div><div class="apt-name">${a.name}</div><div class="apt-info">${a.owners?.[0]?.name||''}</div></div>
+        <button class="pay-btn" onclick="openPayModal('${a.id}')">✓ ${t('paid_lbl')}</button>
+      </div>`;
+    }
+  });
+  html += '</div>';
+  mCard.innerHTML = html;
 
   const txs = [...(b.transactions||[])].sort((a,c) => c.date.localeCompare(a.date)).slice(0,5);
   const rCard = document.getElementById('recentTxCard');
   rCard.innerHTML = txs.length === 0
-    ? `<div class="empty-state"><div class="empty-icon">📭</div><p>אין תנועות עדיין</p></div>`
+    ? `<div class="empty-state"><div class="empty-icon">📭</div><p>${t('empty_tx')}</p></div>`
     : txs.map(tx => txRowHTML(tx)).join('');
 }
 
@@ -1194,7 +1363,7 @@ function quickPay(aptId, year, month) {
   if (!b.dues[aptId]) b.dues[aptId] = {};
   if (!b.dues[aptId][year]) b.dues[aptId][year] = {};
   b.dues[aptId][year][month] = true;
-  saveBuilding(); renderDashboard(); showSnack('סומן כשולם ✓');
+  saveBuilding(); renderDashboard(); showSnack(t('snk_paid'));
 }
 
 function txRowHTML(tx) {
@@ -1213,7 +1382,7 @@ function renderDues() {
   const b = getBuilding(); if (!b) return;
   const years = [2024,2025,2026,2027].filter(y => y <= new Date().getFullYear()+1);
   document.getElementById('yearBtns').innerHTML =
-    `<span style="font-size:0.85rem;font-weight:700;color:var(--text-2)">שנה:</span>` +
+    `<span style="font-size:0.85rem;font-weight:700;color:var(--text-2)">${t('year_lbl')}:</span>` +
     years.map(y => `<button class="year-btn ${y===duesYear?'active':''}" onclick="setDuesYear(${y})">${y}</button>`).join('');
 
   const apts = b.apartments || [];
@@ -1222,15 +1391,16 @@ function renderDues() {
   apts.forEach(a => { for(let m=1;m<=12;m++) if(b.dues?.[a.id]?.[duesYear]?.[m]) totalPaid++; });
   const totalUnpaid = apts.length * 12 - totalPaid;
   document.getElementById('duesSummary').innerHTML = `
-    <div class="dues-stat"><div class="dues-stat-val" style="color:var(--success)">${totalPaid}</div><div class="dues-stat-lbl">שולמו</div></div>
-    <div class="dues-stat"><div class="dues-stat-val" style="color:var(--danger)">${totalUnpaid}</div><div class="dues-stat-lbl">חסרים</div></div>
-    <div class="dues-stat"><div class="dues-stat-val">${fmt(totalPaid*due)}</div><div class="dues-stat-lbl">נגבה</div></div>
-    <div class="dues-stat"><div class="dues-stat-val" style="color:var(--text-2)">${fmt(totalUnpaid*due)}</div><div class="dues-stat-lbl">יתרה לגבות</div></div>`;
+    <div class="dues-stat"><div class="dues-stat-val" style="color:var(--success)">${totalPaid}</div><div class="dues-stat-lbl">${t('dues_paid')}</div></div>
+    <div class="dues-stat"><div class="dues-stat-val" style="color:var(--danger)">${totalUnpaid}</div><div class="dues-stat-lbl">${t('dues_missing')}</div></div>
+    <div class="dues-stat"><div class="dues-stat-val">${fmt(totalPaid*due)}</div><div class="dues-stat-lbl">${t('dues_collected')}</div></div>
+    <div class="dues-stat"><div class="dues-stat-val" style="color:var(--text-2)">${fmt(totalUnpaid*due)}</div><div class="dues-stat-lbl">${t('dues_remaining')}</div></div>`;
 
-  let html = `<thead><tr><th class="month-col">חודש</th>${apts.map(a=>`<th class="apt-col">${a.name}</th>`).join('')}</tr></thead><tbody>`;
+  const months = getMonths();
+  let html = `<thead><tr><th class="month-col">${t('month_col')}</th>${apts.map(a=>`<th class="apt-col">${a.name}</th>`).join('')}</tr></thead><tbody>`;
   for(let m=1;m<=12;m++) {
     const cells = apts.map(a => { const p=!!(b.dues?.[a.id]?.[duesYear]?.[m]); return `<td class="${p?'paid':'unpaid'}">${p?'✓':'✗'}</td>`; });
-    html += `<tr><td style="font-weight:700;background:var(--bg-card);cursor:default">${MONTHS_HE[m-1]}</td>${cells.join('')}</tr>`;
+    html += `<tr><td style="font-weight:700;background:var(--bg-card);cursor:default">${months[m-1]}</td>${cells.join('')}</tr>`;
   }
   html += '</tbody>';
   document.getElementById('duesGrid').innerHTML = html;
@@ -1253,32 +1423,27 @@ function toggleDue(aptId, year, month) {
 // ═══════════════════════════════════════════════
 function renderTransactions() {
   const b = getBuilding(); if (!b) return;
-  const years = [...new Set((b.transactions||[]).map(t=>t.date.slice(0,4)))].sort().reverse();
+  const years = [...new Set((b.transactions||[]).map(tx=>tx.date.slice(0,4)))].sort().reverse();
   document.getElementById('txFilterBar').innerHTML =
-    `<div class="filter-chip ${txFilter.year==='all'?'active':''}" onclick="setTxFilter('year','all')">הכל</div>` +
+    `<div class="filter-chip ${txFilter.year==='all'?'active':''}" onclick="setTxFilter('year','all')">${t('filter_all')}</div>` +
     years.map(y=>`<div class="filter-chip ${txFilter.year===y?'active':''}" onclick="setTxFilter('year','${y}')">${y}</div>`).join('') +
-    `<div class="filter-chip ${txFilter.type==='income'?'active':''}" onclick="setTxFilter('type','income')">הכנסות</div>` +
-    `<div class="filter-chip ${txFilter.type==='expense'?'active':''}" onclick="setTxFilter('type','expense')">הוצאות</div>`;
+    `<div class="filter-chip ${txFilter.type==='income'?'active':''}" onclick="setTxFilter('type','income')">${t('filter_income')}</div>` +
+    `<div class="filter-chip ${txFilter.type==='expense'?'active':''}" onclick="setTxFilter('type','expense')">${t('filter_expense')}</div>`;
 
   let txs = [...(b.transactions||[])].sort((a,c)=>c.date.localeCompare(a.date));
-  if(txFilter.year!=='all') txs=txs.filter(t=>t.date.startsWith(txFilter.year));
-  if(txFilter.type!=='all') txs=txs.filter(t=>t.type===txFilter.type);
+  if(txFilter.year!=='all') txs=txs.filter(tx=>tx.date.startsWith(txFilter.year));
+  if(txFilter.type!=='all') txs=txs.filter(tx=>tx.type===txFilter.type);
 
-  if(!txs.length) { document.getElementById('txList').innerHTML=`<div class="empty-state"><div class="empty-icon">📭</div><p>אין תנועות</p></div>`; return; }
-
-  const allSorted = [...(b.transactions||[])].sort((a,c)=>c.date.localeCompare(a.date));
-  const balMap = {}; let bal = calcBalance(b);
-  allSorted.forEach(tx => { balMap[tx.id]=bal; bal -= tx.type==='income'?tx.amount:-tx.amount; });
+  if(!txs.length) { document.getElementById('txList').innerHTML=`<div class="empty-state"><div class="empty-icon">📭</div><p>${t('empty_tx2')}</p></div>`; return; }
 
   document.getElementById('txList').innerHTML = txs.map(tx => `
     <div class="tx-item" onclick="openTxModal(null,'${tx.id}')">
       <div class="tx-icon ${tx.type}">${tx.type==='income'?'⬆️':'⬇️'}</div>
       <div class="tx-body"><div class="tx-desc">${tx.description}</div>
-        <div class="tx-date">${fmtDate(tx.date)} · <span class="badge ${tx.type==='income'?'badge-success':'badge-danger'}">${tx.category||''}</span></div>
+        <div class="tx-date">${fmtDate(tx.date)} · <span class="badge ${tx.type==='income'?'badge-success':'badge-danger'}">${getCatLabel(tx.category||'')}</span></div>
       </div>
-      <div style="text-align:left">
+      <div style="text-align:${appLang==='he'?'left':'right'}">
         <div class="tx-amount ${tx.type}">${tx.type==='income'?'+':'-'}${fmt(tx.amount)}</div>
-        <div style="font-size:0.68rem;color:var(--text-2)">${fmt(balMap[tx.id])}</div>
       </div>
     </div>`).join('');
 }
@@ -1296,7 +1461,7 @@ function renderContacts() {
         <div class="flex-gap">
           <div class="contact-avatar">${apt.name.replace('דירה ','')}</div>
           <div><div class="contact-name">${apt.name}</div>
-            <div class="contact-sub">${apt.resident?.name?'דייר: '+apt.resident.name:''} ${apt.owners?.length?'· '+apt.owners.map(o=>o.name).filter(Boolean).join(', '):''}</div>
+            <div class="contact-sub">${apt.resident?.name?t('lbl_tenant')+': '+apt.resident.name:''} ${apt.owners?.length?'· '+apt.owners.map(o=>o.name).filter(Boolean).join(', '):''}</div>
           </div>
         </div>
         <div class="flex-gap">
@@ -1305,10 +1470,10 @@ function renderContacts() {
         </div>
       </div>
       <div class="contact-body" id="cc_${apt.id}">
-        ${apt.resident?.phone?`<div class="contact-row"><span class="contact-lbl">דייר:</span><span>${apt.resident.name}</span><a href="tel:${apt.resident.phone}">${apt.resident.phone}</a></div>`:''}
+        ${apt.resident?.phone?`<div class="contact-row"><span class="contact-lbl">${t('lbl_tenant')}:</span><span>${apt.resident.name}</span><a href="tel:${apt.resident.phone}">${apt.resident.phone}</a></div>`:''}
         ${(apt.owners||[]).map(o=>`
-          <div class="contact-row"><span class="contact-lbl">בעלים:</span><span>${o.name}</span>${o.phone?`<a href="tel:${o.phone}">${o.phone}</a>`:''} ${o.whatsapp?`<a href="https://wa.me/972${o.whatsapp.replace(/^0/,'').replace(/-/g,'')}" style="color:#25d366">💬</a>`:''}</div>
-          ${o.email?`<div class="contact-row"><span class="contact-lbl">אימייל:</span><a href="mailto:${o.email}">${o.email}</a></div>`:''}`).join('')}
+          <div class="contact-row"><span class="contact-lbl">${t('lbl_owner')}:</span><span>${o.name}</span>${o.phone?`<a href="tel:${o.phone}">${o.phone}</a>`:''} ${o.whatsapp?`<a href="https://wa.me/972${o.whatsapp.replace(/^0/,'').replace(/-/g,'')}" style="color:#25d366">💬</a>`:''}</div>
+          ${o.email?`<div class="contact-row"><span class="contact-lbl">${t('lbl_email')}:</span><a href="mailto:${o.email}">${o.email}</a></div>`:''}`).join('')}
       </div>
     </div>`).join('');
 
@@ -1318,7 +1483,7 @@ function renderContacts() {
         <div class="flex-gap">
           <div class="contact-avatar" style="background:var(--warning-bg);color:var(--warning)">🔧</div>
           <div><div class="contact-name">${p.role}${p.name?' – '+p.name:''}</div>
-            <div class="contact-sub">${p.monthlyCost?fmt(p.monthlyCost)+' לחודש':''}</div>
+            <div class="contact-sub">${p.monthlyCost?fmt(p.monthlyCost)+t('per_month'):''}</div>
           </div>
         </div>
         <div class="flex-gap">
@@ -1327,7 +1492,7 @@ function renderContacts() {
         </div>
       </div>
       <div class="contact-body" id="cp_${p.id}">
-        ${p.phone?`<div class="contact-row"><span class="contact-lbl">טלפון:</span><a href="tel:${p.phone}">${p.phone}</a></div>`:''}
+        ${p.phone?`<div class="contact-row"><span class="contact-lbl">${t('lbl_phone')}:</span><a href="tel:${p.phone}">${p.phone}</a></div>`:''}
       </div>
     </div>`).join('');
 }
@@ -1342,15 +1507,15 @@ function renderSettings() {
   document.getElementById('buildingSettingsGroup').innerHTML = `
     <div class="settings-row" style="cursor:pointer" onclick="openBuildingModal()">
       <div><div class="settings-lbl">🏢 ${b.name}</div>
-        <div class="settings-sub">מנהל: ${b.manager||'—'} · ${fmt(b.monthlyDue||100)}/חודש</div>
+        <div class="settings-sub">${t('mgr_lbl')}: ${b.manager||'—'} · ${fmt(b.monthlyDue||100)}${t('per_month')}</div>
       </div><span style="color:var(--accent)">✏️</span>
     </div>
     <div class="settings-row">
-      <div class="settings-lbl">יתרה פתיחה</div>
+      <div class="settings-lbl">${t('init_balance')}</div>
       <span style="color:var(--text-2);font-size:0.85rem">${fmt(b.initialBalance||0)}</span>
     </div>
     <div class="settings-row">
-      <div class="settings-lbl">מספר דירות</div>
+      <div class="settings-lbl">${t('num_apts')}</div>
       <span style="color:var(--text-2);font-size:0.85rem">${(b.apartments||[]).length}</span>
     </div>`;
 
@@ -1358,6 +1523,9 @@ function renderSettings() {
   document.getElementById('darkToggle').checked = isDark;
   const scale = localStorage.getItem('vb_fontScale')||'1';
   document.querySelectorAll('.font-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.scale===scale));
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === appLang));
+  // Update all static i18n labels
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
 }
 
 // ═══════════════════════════════════════════════
@@ -1370,14 +1538,14 @@ function openPayModal(aptId) {
 
   document.getElementById('payModal').classList.add('open');
   document.getElementById('payAptId').value = aptId;
-  document.getElementById('payModalTitle').textContent = `תשלום – ${apt.name}`;
+  document.getElementById('payModalTitle').textContent = `${t('pay_title')} – ${apt.name}`;
   document.getElementById('payDate').value = todayISO();
 
   const { year } = nowMY();
   const due = b.monthlyDue || 100;
 
   const grid = document.getElementById('payMonthsGrid');
-  grid.innerHTML = MONTHS_HE.map((name, i) => {
+  grid.innerHTML = getMonths().map((name, i) => {
     const m = i + 1;
     const isPaid = !!(b.dues?.[aptId]?.[year]?.[m]);
     return `<div class="month-check-item ${isPaid ? 'already-paid' : ''}" onclick="togglePayMonth(this, ${m})">
@@ -1406,7 +1574,7 @@ function updatePayPreview(aptId) {
   const due = b.monthlyDue || 100;
   const checked = document.querySelectorAll('#payMonthsGrid input[type=checkbox]:not(:disabled):checked').length;
   const el = document.getElementById('payAmountPreview');
-  el.textContent = checked > 0 ? `סכום לתשלום: ${fmt(checked * due)} (${checked} חודשים)` : '';
+  el.textContent = checked > 0 ? `${t('pay_amount_lbl')}: ${fmt(checked * due)} (${checked} ${t('pay_months_unit')})` : '';
 }
 
 function savePayModal() {
@@ -1419,7 +1587,7 @@ function savePayModal() {
   const checked = Array.from(document.querySelectorAll('#payMonthsGrid input[type=checkbox]:not(:disabled):checked'))
     .map(cb => parseInt(cb.value));
 
-  if (checked.length === 0) { showSnack('יש לבחור לפחות חודש אחד'); return; }
+  if (checked.length === 0) { showSnack(t('snk_sel_month')); return; }
 
   // Mark months as paid
   if (!b.dues) b.dues = {};
@@ -1427,11 +1595,11 @@ function savePayModal() {
   if (!b.dues[aptId][year]) b.dues[aptId][year] = {};
   checked.forEach(m => { b.dues[aptId][year][m] = true; });
 
-  // Build description like existing format
-  const monthNames = checked.sort((a,c)=>a-c).map(m => MONTHS_HE[m-1]);
+  // Always use Hebrew month names in stored description (for consistent dues parsing)
+  const monthNamesHE = checked.sort((a,c)=>a-c).map(m => MONTHS_HE[m-1]);
   const desc = checked.length === 1
-    ? `וועד בית ${apt.name} - ${monthNames[0]} ${year}`
-    : `וועד בית ${apt.name} - ${monthNames[0]}-${monthNames[monthNames.length-1]} ${year}`;
+    ? `וועד בית ${apt.name} - ${monthNamesHE[0]} ${year}`
+    : `וועד בית ${apt.name} - ${monthNamesHE[0]}-${monthNamesHE[monthNamesHE.length-1]} ${year}`;
 
   const amount = checked.length * (b.monthlyDue || 100);
 
@@ -1443,7 +1611,8 @@ function savePayModal() {
   saveBuilding();
   closeModal('payModal');
   renderDashboard();
-  showSnack(`${apt.name} — ${checked.length} חודשים שולמו ✓`);
+  const sfx = t('pay_months_suffix');
+  showSnack(`${apt.name} — ${typeof sfx === 'function' ? sfx(checked.length) : checked.length + ' ' + t('pay_months_unit')}`);
 }
 
 // ═══════════════════════════════════════════════
@@ -1493,13 +1662,13 @@ function generateReport() {
   const to = document.getElementById('reportTo').value;
   const txTypeFilter = document.getElementById('reportTxType').value;
 
-  if (!from || !to) { showSnack('יש לבחור טווח תאריכים'); return; }
-  if (reportType === 'apt' && !reportAptId) { showSnack('יש לבחור דירה'); return; }
+  if (!from || !to) { showSnack(t('snk_no_dates')); return; }
+  if (reportType === 'apt' && !reportAptId) { showSnack(t('snk_no_apt')); return; }
 
   let txs = [...(b.transactions || [])].filter(tx => tx.date >= from && tx.date <= to);
   if (txTypeFilter !== 'all') txs = txs.filter(tx => tx.type === txTypeFilter);
 
-  let aptName = 'כל הדירות';
+  let aptName = t('rpt_all_apts');
   if (reportType === 'apt' && reportAptId) {
     const apt = b.apartments.find(a => a.id === reportAptId);
     aptName = apt ? apt.name : '';
@@ -1508,33 +1677,27 @@ function generateReport() {
 
   txs.sort((a,c) => a.date.localeCompare(c.date));
 
-  if (txs.length === 0) { showSnack('לא נמצאו תנועות בטווח הזה'); return; }
+  if (txs.length === 0) { showSnack(t('snk_no_tx')); return; }
 
-  // Compute totals
-  const totalIncome = txs.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
-  const totalExpense = txs.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  const totalIncome = txs.filter(tx=>tx.type==='income').reduce((s,tx)=>s+tx.amount,0);
+  const totalExpense = txs.filter(tx=>tx.type==='expense').reduce((s,tx)=>s+tx.amount,0);
+  const periodBalance = totalIncome - totalExpense;
 
-  // Build running balance starting from balance BEFORE 'from' date
-  let startBal = b.initialBalance || 0;
-  (b.transactions||[]).filter(t=>t.date<from).forEach(t=>{ startBal += t.type==='income'?t.amount:-t.amount; });
+  const docDir = appLang === 'he' ? 'rtl' : 'ltr';
+  const docLang = appLang;
 
-  let runBal = startBal;
-  const rows = txs.map(tx => {
-    runBal += tx.type==='income' ? tx.amount : -tx.amount;
-    return `<tr>
-      <td>${fmtDate(tx.date)}</td>
-      <td style="max-width:220px">${tx.description}</td>
-      <td><span style="padding:2px 6px;border-radius:6px;font-size:0.78rem;background:${tx.type==='income'?'#e8f5e9':'#ffebee'};color:${tx.type==='income'?'#2e7d32':'#c62828'}">${tx.category||''}</span></td>
-      <td style="color:${tx.type==='income'?'#2e7d32':'#c62828'};font-weight:700">${tx.type==='income'?'+':'-'}₪${tx.amount.toLocaleString('he-IL',{minimumFractionDigits:0,maximumFractionDigits:2})}</td>
-      <td style="font-weight:600">₪${runBal.toLocaleString('he-IL',{minimumFractionDigits:0,maximumFractionDigits:2})}</td>
-    </tr>`;
-  }).join('');
+  const rows = txs.map(tx => `<tr>
+    <td>${fmtDate(tx.date)}</td>
+    <td style="max-width:220px">${tx.description}</td>
+    <td><span style="padding:2px 6px;border-radius:6px;font-size:0.78rem;background:${tx.type==='income'?'#e8f5e9':'#ffebee'};color:${tx.type==='income'?'#2e7d32':'#c62828'}">${tx.category||''}</span></td>
+    <td style="color:${tx.type==='income'?'#2e7d32':'#c62828'};font-weight:700">${tx.type==='income'?'+':'-'}₪${tx.amount.toLocaleString('he-IL',{minimumFractionDigits:0,maximumFractionDigits:2})}</td>
+  </tr>`).join('');
 
   const html = `<!DOCTYPE html>
-<html lang="he" dir="rtl">
-<head><meta charset="UTF-8"><title>דוח תנועות – ${b.name}</title>
+<html lang="${docLang}" dir="${docDir}">
+<head><meta charset="UTF-8"><title>${t('rpt_doc_title')||'דוח תנועות'} – ${b.name}</title>
 <style>
-  body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;direction:rtl;padding:24px;color:#1a2233;background:#f8f9fc;}
+  body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;direction:${docDir};padding:24px;color:#1a2233;background:#f8f9fc;}
   h1{font-size:1.4rem;margin-bottom:4px;color:#1565c0}
   .meta{font-size:0.85rem;color:#666;margin-bottom:20px}
   .summary{display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap}
@@ -1550,32 +1713,31 @@ function generateReport() {
 </style></head>
 <body>
 <div class="no-print" style="margin-bottom:16px;display:flex;gap:8px">
-  <button onclick="window.print()" style="padding:8px 18px;background:#1976d2;color:white;border:none;border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:700">🖨️ הדפס</button>
+  <button onclick="window.print()" style="padding:8px 18px;background:#1976d2;color:white;border:none;border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:700">${t('btn_print')}</button>
   <button onclick="exportCsv()" style="padding:8px 18px;background:#2e7d32;color:white;border:none;border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:700">📥 CSV</button>
 </div>
-<h1>דוח תנועות — ${b.name}</h1>
-<div class="meta">${aptName} · ${fmtDate(from)} עד ${fmtDate(to)} · ${txs.length} תנועות</div>
+<h1>${t('tx_title')} — ${b.name}</h1>
+<div class="meta">${aptName} · ${fmtDate(from)} – ${fmtDate(to)} · ${txs.length}</div>
 <div class="summary">
-  <div class="sum-box"><div class="sum-val" style="color:#2e7d32">+₪${totalIncome.toLocaleString('he-IL',{minimumFractionDigits:0,maximumFractionDigits:2})}</div><div class="sum-lbl">סה"כ הכנסות</div></div>
-  <div class="sum-box"><div class="sum-val" style="color:#c62828">-₪${totalExpense.toLocaleString('he-IL',{minimumFractionDigits:0,maximumFractionDigits:2})}</div><div class="sum-lbl">סה"כ הוצאות</div></div>
-  <div class="sum-box"><div class="sum-val" style="color:#1565c0">₪${(totalIncome-totalExpense).toLocaleString('he-IL',{minimumFractionDigits:0,maximumFractionDigits:2})}</div><div class="sum-lbl">מאזן תקופה</div></div>
-  <div class="sum-box"><div class="sum-val">₪${runBal.toLocaleString('he-IL',{minimumFractionDigits:0,maximumFractionDigits:2})}</div><div class="sum-lbl">יתרה סופית</div></div>
+  <div class="sum-box"><div class="sum-val" style="color:#2e7d32">+₪${totalIncome.toLocaleString('he-IL',{minimumFractionDigits:0,maximumFractionDigits:2})}</div><div class="sum-lbl">${t('rpt_doc_income')}</div></div>
+  <div class="sum-box"><div class="sum-val" style="color:#c62828">-₪${totalExpense.toLocaleString('he-IL',{minimumFractionDigits:0,maximumFractionDigits:2})}</div><div class="sum-lbl">${t('rpt_doc_expense')}</div></div>
+  <div class="sum-box"><div class="sum-val" style="color:${periodBalance>=0?'#1565c0':'#c62828'}">₪${periodBalance.toLocaleString('he-IL',{minimumFractionDigits:0,maximumFractionDigits:2})}</div><div class="sum-lbl">${t('rpt_doc_balance')}</div></div>
 </div>
 <table>
-  <thead><tr><th>תאריך</th><th>תיאור</th><th>קטגוריה</th><th>סכום</th><th>יתרה</th></tr></thead>
+  <thead><tr><th>${t('col_date')}</th><th>${t('col_desc')}</th><th>${t('col_cat')}</th><th>${t('col_amount')}</th></tr></thead>
   <tbody>${rows}</tbody>
 </table>
 <script>
 const txData = ${JSON.stringify(txs)};
 function exportCsv(){
-  const lines = ['תאריך,תיאור,קטגוריה,סוג,סכום'];
-  txData.forEach(t=>{
-    const d = t.date.split('-').reverse().join('/');
-    lines.push([d, '"'+t.description+'"', t.category||'', t.type==='income'?'הכנסה':'הוצאה', (t.type==='income'?'+':'-')+t.amount].join(','));
+  const lines = ['${t('col_date')},${t('col_desc')},${t('col_cat')},type,${t('col_amount')}'];
+  txData.forEach(tx=>{
+    const d = tx.date.split('-').reverse().join('/');
+    lines.push([d, '"'+tx.description+'"', tx.category||'', tx.type, (tx.type==='income'?'+':'-')+tx.amount].join(','));
   });
   const blob = new Blob(['\uFEFF'+lines.join('\\n')],{type:'text/csv;charset=utf-8'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-  a.download='vaad-bait-report-${from}-${to}.csv'; a.click();
+  a.download='report-${from}-${to}.csv'; a.click();
 }
 <\/script>
 </body></html>`;
@@ -1594,14 +1756,14 @@ function openTxModal(type, editId) {
   document.getElementById('txDeleteBtn').style.display = editId?'block':'none';
   if(editId) {
     const tx = getBuilding().transactions.find(t=>t.id===editId); if(!tx) return;
-    document.getElementById('txModalTitle').textContent='עריכת תנועה';
+    document.getElementById('txModalTitle').textContent=t('tx_edit');
     document.getElementById('txType').value=tx.type;
     document.getElementById('txAmount').value=tx.amount;
     document.getElementById('txDesc').value=tx.description;
     document.getElementById('txDate').value=tx.date;
     renderTxCats(tx.type, tx.category);
   } else {
-    document.getElementById('txModalTitle').textContent=type==='expense'?'➖ הוצאה':'➕ הכנסה';
+    document.getElementById('txModalTitle').textContent=type==='expense'?t('btn_expense'):t('btn_income');
     document.getElementById('txType').value=type||'income';
     document.getElementById('txAmount').value='';
     document.getElementById('txDesc').value='';
@@ -1620,20 +1782,55 @@ function saveTx() {
   const b=getBuilding();
   const id=document.getElementById('txEditId').value;
   const amount=parseFloat(document.getElementById('txAmount').value);
-  if(!amount||isNaN(amount)||amount<=0){showSnack('יש להזין סכום תקין');return;}
+  if(!amount||isNaN(amount)||amount<=0){showSnack(t('snk_no_amount'));return;}
   const desc=document.getElementById('txDesc').value.trim();
-  if(!desc){showSnack('יש להזין תיאור');return;}
+  if(!desc){showSnack(t('snk_no_desc'));return;}
   const tx={id:id||uid(),date:document.getElementById('txDate').value||todayISO(),type:document.getElementById('txType').value,amount,description:desc,category:document.getElementById('txCategory').value};
   if(id){const idx=b.transactions.findIndex(t=>t.id===id);if(idx!==-1)b.transactions[idx]=tx;}
   else b.transactions.push(tx);
-  saveBuilding(); closeModal('txModal'); renderScreen(currentScreen); showSnack('נשמר ✓');
+  saveBuilding(); closeModal('txModal'); renderScreen(currentScreen); showSnack(t('snk_saved'));
 }
 
 function deleteTx() {
-  const id=document.getElementById('txEditId').value;
-  if(!id||!confirm('למחוק תנועה זו?'))return;
-  const b=getBuilding(); b.transactions=b.transactions.filter(t=>t.id!==id);
-  saveBuilding(); closeModal('txModal'); renderScreen(currentScreen); showSnack('נמחק');
+  const id = document.getElementById('txEditId').value;
+  if (!id || !confirm(t('confirm_del_tx'))) return;
+  const b = getBuilding();
+  const tx = b.transactions.find(tx => tx.id === id);
+  if (tx) unmarkDuesFromTx(b, tx);
+  b.transactions = b.transactions.filter(tx => tx.id !== id);
+  saveBuilding(); closeModal('txModal'); renderScreen(currentScreen); showSnack(t('snk_deleted'));
+}
+
+function unmarkDuesFromTx(b, tx) {
+  if (!tx.description) return;
+  const apts = b.apartments || [];
+  for (const apt of apts) {
+    const prefix = `וועד בית ${apt.name} - `;
+    if (!tx.description.startsWith(prefix)) continue;
+    const rest = tx.description.slice(prefix.length).trim();
+    const yearMatch = rest.match(/(\d{4})$/);
+    if (!yearMatch) continue;
+    const year = parseInt(yearMatch[1]);
+    const monthsPart = rest.slice(0, rest.length - 4).trim();
+    const parts = monthsPart.split('-').map(s => s.trim());
+    let months = [];
+    if (parts.length === 1) {
+      const idx = MONTHS_HE.indexOf(parts[0]);
+      if (idx !== -1) months = [idx + 1];
+    } else if (parts.length === 2) {
+      const s = MONTHS_HE.indexOf(parts[0]), e = MONTHS_HE.indexOf(parts[1]);
+      if (s !== -1 && e !== -1 && s <= e) {
+        for (let m = s + 1; m <= e + 1; m++) months.push(m);
+      }
+    }
+    if (months.length > 0) {
+      if (!b.dues) b.dues = {};
+      if (!b.dues[apt.id]) b.dues[apt.id] = {};
+      if (!b.dues[apt.id][year]) b.dues[apt.id][year] = {};
+      months.forEach(m => { b.dues[apt.id][year][m] = false; });
+    }
+    break;
+  }
 }
 
 // ═══════════════════════════════════════════════
@@ -1643,7 +1840,7 @@ function openBuildingModal() {
   const b=getBuilding(); if(!b) return;
   document.getElementById('buildingModal').classList.add('open');
   document.getElementById('buildingEditId').value=b.id;
-  document.getElementById('buildingModalTitle').textContent='עריכת בניין';
+  document.getElementById('buildingModalTitle').textContent=t('bld_edit_title');
   document.getElementById('buildingName').value=b.name;
   document.getElementById('buildingManager').value=b.manager||'';
   document.getElementById('buildingDue').value=b.monthlyDue||100;
@@ -1654,7 +1851,7 @@ function openBuildingModal() {
 function saveBuilding_modal() {
   const id=document.getElementById('buildingEditId').value;
   const name=document.getElementById('buildingName').value.trim();
-  if(!name){showSnack('יש להזין שם בניין');return;}
+  if(!name){showSnack(t('snk_no_bld'));return;}
   const manager=document.getElementById('buildingManager').value.trim();
   const b=getBuilding();
   b.name=name; b.manager=manager;
@@ -1667,14 +1864,14 @@ function saveBuilding_modal() {
   closeModal('buildingModal');
   renderBuildingSelector();
   renderScreen(currentScreen);
-  showSnack('הבניין עודכן ✓');
+  showSnack(t('snk_bld_updated'));
 }
 // Override saveBuilding global name conflict:
 document.getElementById('buildingModal').querySelector('.btn-primary').onclick = saveBuilding_modal;
 
 function deleteBuilding() {
   const id=document.getElementById('buildingEditId').value;
-  if(!confirm('למחוק בניין זה וכל נתוניו?'))return;
+  if(!confirm(t('confirm_del_bld')))return;
   deleteBuildingData(id);
   let idx=getIndex().filter(b=>b.id!==id);
   saveIndex(idx);
@@ -1694,7 +1891,7 @@ function openAptModal(editId) {
   document.getElementById('aptDeleteBtn').style.display=editId?'block':'none';
   if(editId){
     const apt=getBuilding().apartments.find(a=>a.id===editId); if(!apt)return;
-    document.getElementById('aptModalTitle').textContent='עריכת דירה';
+    document.getElementById('aptModalTitle').textContent=t('apt_edit');
     document.getElementById('aptName').value=apt.name;
     document.getElementById('aptResidentName').value=apt.resident?.name||'';
     document.getElementById('aptResidentPhone').value=apt.resident?.phone||'';
@@ -1705,14 +1902,14 @@ function openAptModal(editId) {
     document.getElementById('aptOwner2Name').value=apt.owners?.[1]?.name||'';
     document.getElementById('aptOwner2Phone').value=apt.owners?.[1]?.phone||'';
   } else {
-    document.getElementById('aptModalTitle').textContent='דירה חדשה';
+    document.getElementById('aptModalTitle').textContent=t('apt_new');
     ['aptName','aptResidentName','aptResidentPhone','aptOwner1Name','aptOwner1Phone','aptOwner1Email','aptOwner1WA','aptOwner2Name','aptOwner2Phone'].forEach(i=>document.getElementById(i).value='');
   }
 }
 
 function saveApt() {
   const b=getBuilding(); const id=document.getElementById('aptEditId').value;
-  const name=document.getElementById('aptName').value.trim(); if(!name){showSnack('יש להזין שם');return;}
+  const name=document.getElementById('aptName').value.trim(); if(!name){showSnack(t('snk_no_name'));return;}
   const owners=[]; const o1=document.getElementById('aptOwner1Name').value.trim();
   if(o1) owners.push({name:o1,phone:document.getElementById('aptOwner1Phone').value.trim(),email:document.getElementById('aptOwner1Email').value.trim(),whatsapp:document.getElementById('aptOwner1WA').value.trim()});
   const o2=document.getElementById('aptOwner2Name').value.trim();
@@ -1720,13 +1917,13 @@ function saveApt() {
   const apt={id:id||uid(),name,resident:{name:document.getElementById('aptResidentName').value.trim(),phone:document.getElementById('aptResidentPhone').value.trim()},owners};
   if(id){const i=b.apartments.findIndex(a=>a.id===id);if(i!==-1)b.apartments[i]=apt;}
   else{b.apartments.push(apt);if(!b.dues)b.dues={};b.dues[apt.id]={};}
-  saveBuilding(); closeModal('aptModal'); renderContacts(); showSnack('נשמר ✓');
+  saveBuilding(); closeModal('aptModal'); renderContacts(); showSnack(t('snk_saved'));
 }
 
 function deleteApt() {
-  const id=document.getElementById('aptEditId').value; if(!id||!confirm('למחוק?'))return;
+  const id=document.getElementById('aptEditId').value; if(!id||!confirm(t('confirm_del_apt')))return;
   const b=getBuilding(); b.apartments=b.apartments.filter(a=>a.id!==id); if(b.dues)delete b.dues[id];
-  saveBuilding(); closeModal('aptModal'); renderContacts(); showSnack('נמחק');
+  saveBuilding(); closeModal('aptModal'); renderContacts(); showSnack(t('snk_deleted'));
 }
 
 // ═══════════════════════════════════════════════
@@ -1748,17 +1945,17 @@ function openProviderModal(editId) {
 function saveProvider() {
   const b=getBuilding(); if(!b.serviceProviders)b.serviceProviders=[];
   const id=document.getElementById('providerEditId').value;
-  const role=document.getElementById('providerRole').value.trim(); if(!role){showSnack('יש להזין תפקיד');return;}
+  const role=document.getElementById('providerRole').value.trim(); if(!role){showSnack(t('snk_no_role'));return;}
   const p={id:id||uid(),role,name:document.getElementById('providerName').value.trim(),phone:document.getElementById('providerPhone').value.trim(),monthlyCost:parseFloat(document.getElementById('providerCost').value)||0};
   if(id){const i=b.serviceProviders.findIndex(x=>x.id===id);if(i!==-1)b.serviceProviders[i]=p;}
   else b.serviceProviders.push(p);
-  saveBuilding(); closeModal('providerModal'); renderContacts(); showSnack('נשמר ✓');
+  saveBuilding(); closeModal('providerModal'); renderContacts(); showSnack(t('snk_saved'));
 }
 
 function deleteProvider() {
-  const id=document.getElementById('providerEditId').value; if(!id||!confirm('למחוק?'))return;
+  const id=document.getElementById('providerEditId').value; if(!id||!confirm(t('confirm_del_provider')))return;
   const b=getBuilding(); b.serviceProviders=(b.serviceProviders||[]).filter(p=>p.id!==id);
-  saveBuilding(); closeModal('providerModal'); renderContacts(); showSnack('נמחק');
+  saveBuilding(); closeModal('providerModal'); renderContacts(); showSnack(t('snk_deleted'));
 }
 
 // ═══════════════════════════════════════════════
@@ -1795,7 +1992,7 @@ function doInstall() {
   if (!deferredPrompt) return;
   deferredPrompt.prompt();
   deferredPrompt.userChoice.then(result => {
-    if (result.outcome === 'accepted') showSnack('האפליקציה הותקנה! ✓');
+    if (result.outcome === 'accepted') showSnack(t('snk_installed'));
     dismissInstall();
   });
 }
@@ -1817,7 +2014,7 @@ function showInstallHelp() {
   } else if (deferredPrompt) {
     doInstall();
   } else {
-    showSnack('פתח בדפדפן Chrome והשתמש בתפריט "הוסף למסך הבית"');
+    showSnack(t('snk_install_chrome'));
   }
 }
 
@@ -1849,7 +2046,7 @@ function exportData() {
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a'); a.href=url;
   a.download=`vaad-bait-${b.name.replace(/\s+/g,'-')}-${new Date().toISOString().slice(0,10)}.json`;
-  a.click(); URL.revokeObjectURL(url); showSnack('ייצוא הצליח ✓');
+  a.click(); URL.revokeObjectURL(url); showSnack(t('snk_exported'));
 }
 
 function importData() {
@@ -1857,19 +2054,33 @@ function importData() {
   input.onchange=async(e)=>{
     try {
       const text=await e.target.files[0].text(); const data=JSON.parse(text);
-      if(!data.building){showSnack('קובץ לא תקין');return;}
+      if(!data.building){showSnack(t('snk_import_err'));return;}
       const b=data.building;
       saveBuildingData(b.id,b);
       const idx=getIndex(); if(!idx.find(x=>x.id===b.id)){idx.push({id:b.id,name:b.name,manager:b.manager||''});saveIndex(idx);}
-      loadBuilding(b.id); showApp(); showSnack('ייבוא הצליח ✓');
+      loadBuilding(b.id); showApp(); showSnack(t('snk_imported'));
     } catch(err){showSnack('שגיאה: '+err.message);}
   };
   input.click();
 }
 
 function resetData() {
-  if(!confirm('למחוק את כל הנתונים לחלוטין?'))return;
-  localStorage.clear(); location.reload();
+  if (!confirm(t('confirm_reset'))) return;
+  // Auto-backup all buildings before deleting
+  try {
+    const index = getIndex();
+    const allData = { appName: APP_NAME, version: APP_VERSION, exportDate: new Date().toISOString(), buildings: [] };
+    index.forEach(entry => {
+      const bd = getBuildingData(entry.id);
+      if (bd) allData.buildings.push(bd);
+    });
+    const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url;
+    a.download = `vaad-bait-backup-${new Date().toISOString().slice(0,10)}.json`;
+    a.click(); URL.revokeObjectURL(url);
+  } catch(e) {}
+  setTimeout(() => { localStorage.clear(); location.reload(); }, 600);
 }
 
 // ═══════════════════════════════════════════════
@@ -1895,7 +2106,7 @@ if('serviceWorker' in navigator) {
       const newWorker = reg.installing;
       newWorker.addEventListener('statechange', () => {
         if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-          showSnack('עדכון זמין — סגור ופתח מחדש להתקנה');
+          showSnack(t('snk_update'));
         }
       });
     });
