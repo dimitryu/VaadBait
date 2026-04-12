@@ -1,0 +1,44 @@
+{
+  "name": "וועד בית",
+  "short_name": "וועד בית",
+  "description": "אפליקציית ניהול וועד הבית",
+  "start_url": "./vaad_bait.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1976d2",
+  "theme_color": "#1976d2",
+  "lang": "he",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "מעקב תשלומים",
+      "short_name": "תשלומים",
+      "description": "פתח מעקב תשלומים",
+      "url": "./vaad_bait.html#dues",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "הוסף תנועה",
+      "short_name": "הוסף",
+      "description": "הוסף הכנסה או הוצאה",
+      "url": "./vaad_bait.html#add",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "categories": ["finance", "utilities"]
+}

@@ -5,15 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="וועד בית">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#1976d2">
+<meta name="application-name" content="וועד בית">
 <title>וועד בית</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
 <script>
 // ╔══════════════════════════════════════════════════════════╗
 // ║  APP CONFIGURATION                                        ║
 // ╚══════════════════════════════════════════════════════════╝
-const APP_VERSION = "1.0.0";
+const APP_VERSION = "1.0.1";
 const APP_NAME = "וועד בית";
-const GITHUB_REPO = ""; // set your repo here
+const GITHUB_REPO = "dimitryu/VaadBait";
 
 // Theme init (prevent flash)
 (function() {
@@ -60,9 +67,7 @@ const GITHUB_REPO = ""; // set your repo here
   --warning: #ffa726;
   --warning-bg: #3a2700;
 }
-
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
 html, body {
   font-family: -apple-system, 'Segoe UI', Arial, sans-serif;
   background: var(--bg);
@@ -72,7 +77,114 @@ html, body {
   overflow-x: hidden;
   font-size: calc(15px * var(--font-scale));
   direction: rtl;
+  overscroll-behavior-y: contain;
 }
+
+/* ── WELCOME SCREEN ── */
+#welcomeScreen {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(160deg, #1565c0 0%, #1976d2 50%, #42a5f5 100%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 24px;
+  color: white;
+  text-align: center;
+}
+.welcome-logo { font-size: 5rem; margin-bottom: 16px; animation: pop 0.5s ease; }
+@keyframes pop { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.welcome-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 6px; }
+.welcome-sub { font-size: 0.95rem; opacity: 0.85; margin-bottom: 36px; }
+.welcome-box {
+  background: rgba(255,255,255,0.15);
+  border-radius: 20px;
+  padding: 24px 20px;
+  width: 100%;
+  max-width: 380px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.25);
+}
+.welcome-box-title { font-size: 1rem; font-weight: 700; margin-bottom: 16px; }
+.welcome-input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 2px solid rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.15);
+  color: white;
+  font-size: 1rem;
+  outline: none;
+  direction: rtl;
+  margin-bottom: 10px;
+  font-family: inherit;
+}
+.welcome-input::placeholder { color: rgba(255,255,255,0.6); }
+.welcome-input:focus { border-color: white; background: rgba(255,255,255,0.25); }
+.welcome-btn {
+  width: 100%;
+  padding: 14px;
+  background: white;
+  color: #1565c0;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  margin-top: 6px;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.welcome-btn:active { transform: scale(0.97); }
+.welcome-version { margin-top: 20px; font-size: 0.72rem; opacity: 0.5; }
+
+/* ── INSTALL BANNER ── */
+#installBanner {
+  position: fixed;
+  bottom: calc(70px + env(safe-area-inset-bottom));
+  left: 12px; right: 12px;
+  background: linear-gradient(135deg, #1565c0, #1976d2);
+  color: white;
+  border-radius: 16px;
+  padding: 12px 16px;
+  display: none;
+  align-items: center;
+  gap: 10px;
+  z-index: 300;
+  box-shadow: 0 4px 20px rgba(25,118,210,0.4);
+  animation: slideUp 0.4s ease;
+}
+@keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.install-icon { font-size: 1.8rem; flex-shrink: 0; }
+.install-text { flex: 1; }
+.install-text strong { font-size: 0.9rem; display: block; }
+.install-text span { font-size: 0.75rem; opacity: 0.85; }
+.install-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.install-yes {
+  padding: 7px 14px; background: white; color: #1565c0;
+  border: none; border-radius: 10px; font-weight: 700; font-size: 0.82rem; cursor: pointer;
+}
+.install-no {
+  padding: 7px 10px; background: rgba(255,255,255,0.2);
+  border: none; border-radius: 10px; color: white; font-size: 0.82rem; cursor: pointer;
+}
+/* iOS install instructions */
+#iosInstall {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--bg-card);
+  border-radius: 20px 20px 0 0;
+  padding: 20px 20px calc(30px + env(safe-area-inset-bottom));
+  z-index: 400;
+  box-shadow: 0 -4px 30px rgba(0,0,0,0.2);
+  display: none;
+  text-align: center;
+}
+.ios-step { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); text-align: right; }
+.ios-step:last-child { border-bottom: none; }
+.ios-step-icon { font-size: 1.8rem; flex-shrink: 0; }
 
 /* ── Header ── */
 .app-header {
@@ -90,635 +202,182 @@ html, body {
   padding: 10px 14px;
   gap: 8px;
 }
-.header-title {
-  font-size: calc(1.1rem * var(--font-scale));
-  font-weight: 700;
-  letter-spacing: 0.3px;
-  white-space: nowrap;
-}
-.version-badge {
-  font-size: 0.65rem;
-  opacity: 0.7;
-  background: rgba(255,255,255,0.15);
-  padding: 2px 6px;
-  border-radius: 8px;
-}
+.header-title { font-size: calc(1.05rem * var(--font-scale)); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+.header-user { font-size: 0.72rem; opacity: 0.8; }
+.version-badge { font-size: 0.62rem; opacity: 0.65; background: rgba(255,255,255,0.15); padding: 2px 6px; border-radius: 8px; white-space: nowrap; }
 .building-selector-bar {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 0 14px 10px;
-  overflow-x: auto;
-  scrollbar-width: none;
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 14px 10px; overflow-x: auto; scrollbar-width: none;
 }
 .building-selector-bar::-webkit-scrollbar { display: none; }
 .building-chip {
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  border: 1.5px solid rgba(255,255,255,0.4);
-  color: rgba(255,255,255,0.85);
-  background: transparent;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.2s;
-  flex-shrink: 0;
+  padding: 4px 12px; border-radius: 20px; font-size: 0.78rem;
+  border: 1.5px solid rgba(255,255,255,0.4); color: rgba(255,255,255,0.85);
+  background: transparent; cursor: pointer; white-space: nowrap; transition: all 0.2s; flex-shrink: 0;
 }
-.building-chip.active {
-  background: rgba(255,255,255,0.25);
-  border-color: white;
-  color: white;
-  font-weight: 700;
-}
+.building-chip.active { background: rgba(255,255,255,0.25); border-color: white; color: white; font-weight: 700; }
 .building-chip-add {
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  border: 1.5px dashed rgba(255,255,255,0.5);
-  color: rgba(255,255,255,0.7);
-  background: transparent;
-  cursor: pointer;
-  flex-shrink: 0;
+  padding: 4px 10px; border-radius: 20px; font-size: 0.85rem;
+  border: 1.5px dashed rgba(255,255,255,0.5); color: rgba(255,255,255,0.7);
+  background: transparent; cursor: pointer; flex-shrink: 0;
 }
 
 /* ── Balance Banner ── */
 .balance-banner {
   background: linear-gradient(135deg, #1565c0, #1976d2 60%, #1e88e5);
-  color: white;
-  padding: 18px 16px 14px;
-  text-align: center;
+  color: white; padding: 18px 16px 14px; text-align: center;
 }
-[data-theme="dark"] .balance-banner {
-  background: linear-gradient(135deg, #0a2a5e, #0d3a8c);
-}
+[data-theme="dark"] .balance-banner { background: linear-gradient(135deg, #0a2a5e, #0d3a8c); }
 .balance-label { font-size: 0.8rem; opacity: 0.85; margin-bottom: 4px; }
-.balance-amount {
-  font-size: calc(2.2rem * var(--font-scale));
-  font-weight: 800;
-  letter-spacing: -1px;
-}
-.balance-sub {
-  font-size: 0.78rem;
-  opacity: 0.75;
-  margin-top: 3px;
-}
+.balance-amount { font-size: calc(2.2rem * var(--font-scale)); font-weight: 800; letter-spacing: -1px; }
+.balance-sub { font-size: 0.78rem; opacity: 0.75; margin-top: 3px; }
 
-/* ── Content ── */
+/* ── Screens ── */
 .screen { display: none; padding-bottom: 80px; }
 .screen.active { display: block; }
 
 /* ── Bottom Nav ── */
 .bottom-nav {
-  position: fixed;
-  bottom: 0; left: 0; right: 0;
-  background: var(--bg-card);
-  border-top: 1px solid var(--border);
-  display: flex;
-  justify-content: space-around;
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--bg-card); border-top: 1px solid var(--border);
+  display: flex; justify-content: space-around;
   padding: 6px 0 calc(6px + env(safe-area-inset-bottom));
-  z-index: 100;
-  box-shadow: 0 -2px 10px var(--shadow);
+  z-index: 100; box-shadow: 0 -2px 10px var(--shadow);
 }
 .nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  font-size: 0.62rem;
-  color: var(--text-2);
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 8px;
-  transition: color 0.2s;
-  min-width: 52px;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  font-size: 0.6rem; color: var(--text-2); cursor: pointer;
+  padding: 4px 8px; border-radius: 8px; transition: color 0.2s; min-width: 52px;
 }
 .nav-item.active { color: var(--accent); }
-.nav-item .ni { font-size: 1.3rem; }
+.nav-item .ni { font-size: 1.25rem; }
 
 /* ── Cards ── */
-.card {
-  background: var(--bg-card);
-  border-radius: 14px;
-  padding: 14px;
-  margin: 8px 12px;
-  box-shadow: 0 1px 4px var(--shadow);
-  border: 1px solid var(--border);
-}
-.card-title {
-  font-size: 0.78rem;
-  color: var(--text-2);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 10px;
-  font-weight: 600;
-}
-.section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 14px 4px;
-}
-.section-title {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--text-2);
-  text-transform: uppercase;
-}
+.card { background: var(--bg-card); border-radius: 14px; padding: 14px; margin: 8px 12px; box-shadow: 0 1px 4px var(--shadow); border: 1px solid var(--border); }
+.card-title { font-size: 0.78rem; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; font-weight: 600; }
+.section-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px 4px; }
+.section-title { font-size: 0.82rem; font-weight: 700; color: var(--text-2); text-transform: uppercase; }
 
 /* ── Quick Actions ── */
-.quick-actions {
-  display: flex;
-  gap: 8px;
-  padding: 8px 12px 0;
-}
-.qa-btn {
-  flex: 1;
-  padding: 11px;
-  border: none;
-  border-radius: 12px;
-  font-size: calc(0.85rem * var(--font-scale));
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  transition: all 0.2s;
-}
+.quick-actions { display: flex; gap: 8px; padding: 8px 12px 0; }
+.qa-btn { flex: 1; padding: 11px; border: none; border-radius: 12px; font-size: calc(0.85rem * var(--font-scale)); font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s; }
 .qa-btn:active { transform: scale(0.96); }
 .qa-income { background: var(--success-bg); color: var(--success); }
 .qa-expense { background: var(--danger-bg); color: var(--danger); }
-.qa-apt { background: var(--accent-light); color: var(--accent); }
 
 /* ── Unpaid list ── */
-.unpaid-apt {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border);
-}
+.unpaid-apt { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); }
 .unpaid-apt:last-child { border-bottom: none; }
 .apt-name { font-weight: 600; font-size: 0.9rem; }
 .apt-info { font-size: 0.75rem; color: var(--text-2); }
-.pay-btn {
-  padding: 5px 12px;
-  background: var(--success-bg);
-  color: var(--success);
-  border: 1px solid var(--success);
-  border-radius: 20px;
-  font-size: 0.8rem;
-  cursor: pointer;
-  font-weight: 600;
-  white-space: nowrap;
-}
+.pay-btn { padding: 5px 12px; background: var(--success-bg); color: var(--success); border: 1px solid var(--success); border-radius: 20px; font-size: 0.8rem; cursor: pointer; font-weight: 600; white-space: nowrap; }
 .pay-btn:active { transform: scale(0.95); }
 
 /* ── Transactions ── */
-.tx-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--border);
-  cursor: pointer;
-}
+.tx-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
 .tx-item:last-child { border-bottom: none; }
-.tx-icon {
-  width: 36px; height: 36px;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1rem;
-  flex-shrink: 0;
-}
+.tx-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
 .tx-icon.income { background: var(--success-bg); }
 .tx-icon.expense { background: var(--danger-bg); }
 .tx-body { flex: 1; min-width: 0; }
-.tx-desc {
-  font-size: 0.88rem;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+.tx-desc { font-size: 0.88rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tx-date { font-size: 0.72rem; color: var(--text-2); margin-top: 2px; }
 .tx-amount { font-size: 0.95rem; font-weight: 800; white-space: nowrap; }
 .tx-amount.income { color: var(--success); }
 .tx-amount.expense { color: var(--danger); }
 
 /* ── Dues Grid ── */
-.dues-controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  flex-wrap: wrap;
-}
-.year-btn {
-  padding: 5px 14px;
-  border: 1.5px solid var(--border);
-  border-radius: 20px;
-  background: var(--bg-card);
-  color: var(--text);
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.year-btn.active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: white;
-  font-weight: 700;
-}
-.dues-summary {
-  display: flex;
-  gap: 8px;
-  padding: 0 12px 8px;
-  flex-wrap: wrap;
-}
-.dues-stat {
-  flex: 1;
-  min-width: 80px;
-  background: var(--bg-card);
-  border-radius: 10px;
-  padding: 8px 10px;
-  border: 1px solid var(--border);
-  text-align: center;
-}
+.dues-controls { display: flex; align-items: center; gap: 8px; padding: 10px 12px; flex-wrap: wrap; }
+.year-btn { padding: 5px 14px; border: 1.5px solid var(--border); border-radius: 20px; background: var(--bg-card); color: var(--text); font-size: 0.85rem; cursor: pointer; transition: all 0.2s; }
+.year-btn.active { background: var(--accent); border-color: var(--accent); color: white; font-weight: 700; }
+.dues-summary { display: flex; gap: 8px; padding: 0 12px 8px; flex-wrap: wrap; }
+.dues-stat { flex: 1; min-width: 80px; background: var(--bg-card); border-radius: 10px; padding: 8px 10px; border: 1px solid var(--border); text-align: center; }
 .dues-stat-val { font-size: 1.15rem; font-weight: 800; }
 .dues-stat-lbl { font-size: 0.68rem; color: var(--text-2); }
-.grid-wrap {
-  overflow-x: auto;
-  padding: 0 12px 8px;
-  -webkit-overflow-scrolling: touch;
-}
-.dues-grid {
-  border-collapse: collapse;
-  width: 100%;
-  min-width: 500px;
-  font-size: calc(0.75rem * var(--font-scale));
-}
-.dues-grid th {
-  background: var(--bg-header);
-  color: white;
-  padding: 7px 5px;
-  text-align: center;
-  font-weight: 700;
-  white-space: nowrap;
-  position: sticky;
-  top: 0;
-}
-.dues-grid td {
-  padding: 6px 4px;
-  text-align: center;
-  border: 1px solid var(--border);
-  background: var(--bg-card);
-  cursor: pointer;
-  transition: background 0.15s;
-}
+.grid-wrap { overflow-x: auto; padding: 0 12px 8px; -webkit-overflow-scrolling: touch; }
+.dues-grid { border-collapse: collapse; width: 100%; min-width: 500px; font-size: calc(0.75rem * var(--font-scale)); }
+.dues-grid th { background: var(--bg-header); color: white; padding: 7px 5px; text-align: center; font-weight: 700; white-space: nowrap; }
+.dues-grid td { padding: 6px 4px; text-align: center; border: 1px solid var(--border); background: var(--bg-card); cursor: pointer; transition: background 0.15s; }
 .dues-grid td:hover { filter: brightness(0.95); }
 .dues-grid tr:nth-child(even) td { background: var(--bg); }
 .dues-grid td.paid { color: var(--success); font-size: 1rem; }
 .dues-grid td.unpaid { color: var(--danger); font-size: 0.85rem; }
-.dues-grid td.total-cell {
-  font-weight: 700;
-  background: var(--accent-light);
-  cursor: default;
-}
-.dues-grid th.month-col { min-width: 52px; }
-.dues-grid th.apt-col { min-width: 60px; }
-.dues-grid th.total-col { min-width: 50px; background: #0d47a1; }
+.dues-grid td.total-cell { font-weight: 700; background: var(--accent-light); cursor: default; }
+.dues-grid th.total-col { background: #0d47a1; }
 
 /* ── Contacts ── */
-.contact-card {
-  background: var(--bg-card);
-  border-radius: 14px;
-  margin: 6px 12px;
-  border: 1px solid var(--border);
-  box-shadow: 0 1px 3px var(--shadow);
-  overflow: hidden;
-}
-.contact-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 14px;
-  cursor: pointer;
-}
-.contact-avatar {
-  width: 38px; height: 38px;
-  border-radius: 50%;
-  background: var(--accent-light);
-  color: var(--accent);
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 800;
-  font-size: 1rem;
-  flex-shrink: 0;
-}
+.contact-card { background: var(--bg-card); border-radius: 14px; margin: 6px 12px; border: 1px solid var(--border); box-shadow: 0 1px 3px var(--shadow); overflow: hidden; }
+.contact-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; cursor: pointer; }
+.contact-avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--accent-light); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem; flex-shrink: 0; }
 .contact-name { font-weight: 700; font-size: 0.95rem; }
 .contact-sub { font-size: 0.75rem; color: var(--text-2); margin-top: 2px; }
 .contact-body { padding: 0 14px 12px; display: none; }
 .contact-body.open { display: block; }
-.contact-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 5px 0;
-  font-size: 0.85rem;
-  border-bottom: 1px solid var(--border);
-}
+.contact-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 0.85rem; border-bottom: 1px solid var(--border); }
 .contact-row:last-child { border-bottom: none; }
 .contact-row a { color: var(--accent); text-decoration: none; }
-.contact-lbl { color: var(--text-2); font-size: 0.75rem; min-width: 42px; }
-.contact-actions {
-  display: flex;
-  gap: 6px;
-  margin-top: 8px;
-}
+.contact-lbl { color: var(--text-2); font-size: 0.75rem; min-width: 48px; }
 
-/* ── Forms / Modals ── */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.55);
-  z-index: 500;
-  display: none;
-  align-items: flex-end;
-  justify-content: center;
-}
+/* ── Modals ── */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 500; display: none; align-items: flex-end; justify-content: center; }
 .modal-overlay.open { display: flex; }
-.modal {
-  background: var(--bg-card);
-  width: 100%;
-  max-width: 520px;
-  border-radius: 20px 20px 0 0;
-  max-height: 92vh;
-  overflow-y: auto;
-  padding: 20px 16px calc(20px + env(safe-area-inset-bottom));
-  animation: slideUp 0.3s ease;
-}
-@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-.modal-handle {
-  width: 40px; height: 4px;
-  background: var(--border);
-  border-radius: 2px;
-  margin: 0 auto 16px;
-}
-.modal-title {
-  font-size: 1.1rem;
-  font-weight: 800;
-  margin-bottom: 16px;
-  text-align: center;
-}
+.modal { background: var(--bg-card); width: 100%; max-width: 520px; border-radius: 20px 20px 0 0; max-height: 92vh; overflow-y: auto; padding: 20px 16px calc(20px + env(safe-area-inset-bottom)); animation: slideUpM 0.3s ease; }
+@keyframes slideUpM { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 16px; }
+.modal-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 16px; text-align: center; }
 .form-group { margin-bottom: 12px; }
-.form-label {
-  display: block;
-  font-size: 0.8rem;
-  color: var(--text-2);
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-.form-input, .form-select, .form-textarea {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1.5px solid var(--border);
-  border-radius: 10px;
-  background: var(--bg);
-  color: var(--text);
-  font-size: calc(0.9rem * var(--font-scale));
-  direction: rtl;
-  outline: none;
-  transition: border-color 0.2s;
-  font-family: inherit;
-}
+.form-label { display: block; font-size: 0.8rem; color: var(--text-2); font-weight: 600; margin-bottom: 4px; }
+.form-input, .form-select, .form-textarea { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--text); font-size: 16px; direction: rtl; outline: none; transition: border-color 0.2s; font-family: inherit; }
 .form-input:focus, .form-select:focus { border-color: var(--accent); }
 .form-textarea { min-height: 70px; resize: vertical; }
 .form-row { display: flex; gap: 8px; }
 .form-row .form-group { flex: 1; }
-.modal-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 16px;
-}
-.btn {
-  flex: 1;
-  padding: 12px;
-  border: none;
-  border-radius: 12px;
-  font-size: calc(0.9rem * var(--font-scale));
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: inherit;
-}
+.modal-actions { display: flex; gap: 8px; margin-top: 16px; }
+.btn { flex: 1; padding: 12px; border: none; border-radius: 12px; font-size: calc(0.9rem * var(--font-scale)); font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: inherit; }
 .btn:active { transform: scale(0.97); }
 .btn-primary { background: var(--accent); color: white; }
 .btn-danger { background: var(--danger); color: white; }
-.btn-ghost {
-  background: var(--bg);
-  color: var(--text-2);
-  border: 1.5px solid var(--border);
-}
-.btn-sm {
-  padding: 6px 12px;
-  font-size: 0.78rem;
-  border-radius: 8px;
-}
+.btn-ghost { background: var(--bg); color: var(--text-2); border: 1.5px solid var(--border); }
+.btn-sm { padding: 6px 12px; font-size: 0.78rem; border-radius: 8px; }
 
 /* ── Settings ── */
-.settings-group {
-  background: var(--bg-card);
-  border-radius: 14px;
-  margin: 8px 12px;
-  border: 1px solid var(--border);
-  overflow: hidden;
-}
-.settings-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 13px 14px;
-  border-bottom: 1px solid var(--border);
-  gap: 8px;
-}
+.settings-group { background: var(--bg-card); border-radius: 14px; margin: 8px 12px; border: 1px solid var(--border); overflow: hidden; }
+.settings-row { display: flex; align-items: center; justify-content: space-between; padding: 13px 14px; border-bottom: 1px solid var(--border); gap: 8px; }
 .settings-row:last-child { border-bottom: none; }
 .settings-lbl { font-size: 0.9rem; font-weight: 500; }
 .settings-sub { font-size: 0.75rem; color: var(--text-2); }
-.toggle {
-  position: relative; width: 46px; height: 26px; flex-shrink: 0;
-}
+.toggle { position: relative; width: 46px; height: 26px; flex-shrink: 0; }
 .toggle input { opacity: 0; width: 0; height: 0; }
-.toggle-slider {
-  position: absolute; inset: 0;
-  background: var(--border); border-radius: 26px; cursor: pointer;
-  transition: background 0.3s;
-}
-.toggle-slider::before {
-  content: ''; position: absolute;
-  width: 20px; height: 20px;
-  bottom: 3px; right: 3px;
-  background: white; border-radius: 50%;
-  transition: transform 0.3s;
-}
+.toggle-slider { position: absolute; inset: 0; background: var(--border); border-radius: 26px; cursor: pointer; transition: background 0.3s; }
+.toggle-slider::before { content: ''; position: absolute; width: 20px; height: 20px; bottom: 3px; right: 3px; background: white; border-radius: 50%; transition: transform 0.3s; }
 .toggle input:checked + .toggle-slider { background: var(--accent); }
 .toggle input:checked + .toggle-slider::before { transform: translateX(-20px); }
-.font-btns, .lang-btns {
-  display: flex; gap: 6px; flex-wrap: wrap; padding: 0 14px 12px;
-}
-.font-btn, .lang-btn {
-  padding: 5px 12px;
-  border: 1.5px solid var(--border);
-  border-radius: 20px;
-  background: var(--bg);
-  color: var(--text);
-  font-size: 0.82rem;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.font-btn.active, .lang-btn.active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: white;
-  font-weight: 700;
-}
-.settings-group-title {
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  color: var(--text-2);
-  letter-spacing: 0.5px;
-  font-weight: 700;
-  padding: 10px 14px 2px;
-}
+.font-btns, .lang-btns { display: flex; gap: 6px; flex-wrap: wrap; padding: 0 14px 12px; }
+.font-btn, .lang-btn { padding: 5px 12px; border: 1.5px solid var(--border); border-radius: 20px; background: var(--bg); color: var(--text); font-size: 0.82rem; cursor: pointer; transition: all 0.2s; }
+.font-btn.active, .lang-btn.active { background: var(--accent); border-color: var(--accent); color: white; font-weight: 700; }
+.settings-group-title { font-size: 0.72rem; text-transform: uppercase; color: var(--text-2); letter-spacing: 0.5px; font-weight: 700; padding: 10px 14px 2px; }
 
-/* ── Filter bar ── */
-.filter-bar {
-  display: flex;
-  gap: 6px;
-  padding: 6px 12px;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
+/* ── Filter ── */
+.filter-bar { display: flex; gap: 6px; padding: 6px 12px; overflow-x: auto; scrollbar-width: none; }
 .filter-bar::-webkit-scrollbar { display: none; }
-.filter-chip {
-  padding: 4px 12px;
-  border: 1.5px solid var(--border);
-  border-radius: 20px;
-  background: var(--bg-card);
-  color: var(--text-2);
-  font-size: 0.78rem;
-  cursor: pointer;
-  white-space: nowrap;
-  flex-shrink: 0;
-  transition: all 0.2s;
-}
-.filter-chip.active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: white;
-  font-weight: 700;
-}
-
-/* ── Provider chip ── */
-.provider-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--accent-light);
-  color: var(--accent);
-  border-radius: 20px;
-  padding: 4px 10px;
-  font-size: 0.78rem;
-  font-weight: 600;
-}
-
-/* ── Empty state ── */
-.empty-state {
-  text-align: center;
-  padding: 30px 20px;
-  color: var(--text-2);
-}
-.empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 8px; }
-.empty-state p { font-size: 0.88rem; }
-
-/* ── Floating add btn ── */
-.fab {
-  position: fixed;
-  bottom: 76px;
-  left: 16px;
-  width: 50px; height: 50px;
-  border-radius: 50%;
-  background: var(--accent);
-  color: white;
-  border: none;
-  font-size: 1.4rem;
-  cursor: pointer;
-  box-shadow: 0 4px 16px rgba(25,118,210,0.4);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 90;
-  transition: all 0.2s;
-}
-.fab:active { transform: scale(0.92); }
+.filter-chip { padding: 4px 12px; border: 1.5px solid var(--border); border-radius: 20px; background: var(--bg-card); color: var(--text-2); font-size: 0.78rem; cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: all 0.2s; }
+.filter-chip.active { background: var(--accent); border-color: var(--accent); color: white; font-weight: 700; }
 
 /* ── Misc ── */
-.badge {
-  display: inline-block;
-  padding: 2px 7px;
-  border-radius: 10px;
-  font-size: 0.72rem;
-  font-weight: 700;
-}
+.badge { display: inline-block; padding: 2px 7px; border-radius: 10px; font-size: 0.72rem; font-weight: 700; }
 .badge-danger { background: var(--danger-bg); color: var(--danger); }
 .badge-success { background: var(--success-bg); color: var(--success); }
-.badge-warn { background: var(--warning-bg); color: var(--warning); }
-
 .flex-between { display: flex; align-items: center; justify-content: space-between; }
 .flex-gap { display: flex; align-items: center; gap: 8px; }
-
-.month-progress {
-  height: 6px;
-  background: var(--border);
-  border-radius: 3px;
-  margin-top: 6px;
-  overflow: hidden;
-}
-.month-progress-bar {
-  height: 100%;
-  background: var(--success);
-  border-radius: 3px;
-  transition: width 0.3s;
-}
-
-input[type="date"] { font-size: 16px; }
-input[type="number"] { font-size: 16px; }
-
-.apt-edit-list { display: flex; flex-direction: column; gap: 6px; padding: 0 14px 12px; }
-.apt-edit-row {
-  display: flex; align-items: center; gap: 8px;
-  padding: 8px 10px;
-  background: var(--bg);
-  border-radius: 10px;
-  border: 1px solid var(--border);
-}
-.apt-edit-name { flex: 1; font-weight: 600; }
-
-.snackbar {
-  position: fixed;
-  bottom: calc(70px + env(safe-area-inset-bottom));
-  left: 50%; transform: translateX(-50%);
-  background: #333;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 24px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  z-index: 9999;
-  opacity: 0;
-  transition: opacity 0.3s;
-  white-space: nowrap;
-  pointer-events: none;
-}
+.month-progress { height: 6px; background: var(--border); border-radius: 3px; margin-top: 6px; overflow: hidden; }
+.month-progress-bar { height: 100%; background: var(--success); border-radius: 3px; transition: width 0.3s; }
+.empty-state { text-align: center; padding: 30px 20px; color: var(--text-2); }
+.empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 8px; }
+.empty-state p { font-size: 0.88rem; }
+.fab { position: fixed; bottom: 76px; left: 16px; width: 50px; height: 50px; border-radius: 50%; background: var(--accent); color: white; border: none; font-size: 1.4rem; cursor: pointer; box-shadow: 0 4px 16px rgba(25,118,210,0.4); display: flex; align-items: center; justify-content: center; z-index: 90; transition: all 0.2s; }
+.fab:active { transform: scale(0.92); }
+.snackbar { position: fixed; bottom: calc(70px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 10px 20px; border-radius: 24px; font-size: 0.85rem; font-weight: 600; z-index: 9999; opacity: 0; transition: opacity 0.3s; white-space: nowrap; pointer-events: none; }
 .snackbar.show { opacity: 1; }
-
 @media (min-width: 520px) {
   .modal { border-radius: 20px; margin: auto; max-height: 85vh; }
   .modal-overlay { align-items: center; }
@@ -727,15 +386,68 @@ input[type="number"] { font-size: 16px; }
 </head>
 <body>
 
+<!-- ═══════════════ WELCOME / LOGIN SCREEN ═══════════════ -->
+<div id="welcomeScreen">
+  <div class="welcome-logo">🏢</div>
+  <div class="welcome-title">וועד בית</div>
+  <div class="welcome-sub">מערכת ניהול וועד הבית</div>
+  <div class="welcome-box">
+    <div class="welcome-box-title">מה שם הבניין שלך?</div>
+    <input class="welcome-input" type="text" id="welcomeBuildingName" placeholder="לדוג': רחוב הרצל 12" maxlength="40">
+    <input class="welcome-input" type="text" id="welcomeManagerName" placeholder="שמך (מנהל הבניין)" maxlength="30">
+    <input class="welcome-input" type="number" id="welcomeDue" placeholder="סכום חודשי לדירה (₪)" value="100" min="1">
+    <button class="welcome-btn" onclick="completeWelcome()">🚀 התחל לנהל</button>
+    <p style="font-size:0.75rem;opacity:0.7;margin-top:10px;">הנתונים נשמרים במכשיר זה בלבד</p>
+  </div>
+  <div class="welcome-version">v<span id="welcomeVersion"></span></div>
+</div>
+
+<!-- ═══════════════ MAIN APP ═══════════════ -->
+<div id="appShell" style="display:none">
+
+<!-- Install Banner (Android) -->
+<div id="installBanner">
+  <div class="install-icon">📲</div>
+  <div class="install-text">
+    <strong>התקן את האפליקציה</strong>
+    <span>עבוד ללא אינטרנט, כמו אפליקציה אמיתית</span>
+  </div>
+  <div class="install-actions">
+    <button class="install-yes" onclick="doInstall()">התקן</button>
+    <button class="install-no" onclick="dismissInstall()">✕</button>
+  </div>
+</div>
+
+<!-- iOS Install Instructions -->
+<div id="iosInstall">
+  <div style="font-weight:800;font-size:1rem;margin-bottom:12px;">📱 התקנה על iPhone / iPad</div>
+  <div class="ios-step">
+    <div class="ios-step-icon">⬆️</div>
+    <div><strong>לחץ על כפתור "שתף"</strong><br><span style="font-size:0.8rem;color:var(--text-2)">בתחתית Safari (הריבוע עם החץ)</span></div>
+  </div>
+  <div class="ios-step">
+    <div class="ios-step-icon">➕</div>
+    <div><strong>בחר "הוסף למסך הבית"</strong><br><span style="font-size:0.8rem;color:var(--text-2)">גלול למטה ברשימה ולחץ</span></div>
+  </div>
+  <div class="ios-step">
+    <div class="ios-step-icon">✅</div>
+    <div><strong>לחץ "הוסף"</strong><br><span style="font-size:0.8rem;color:var(--text-2)">האפליקציה תופיע על מסך הבית</span></div>
+  </div>
+  <button class="btn btn-primary" style="margin-top:16px;width:100%" onclick="closeIosInstall()">הבנתי!</button>
+</div>
+
 <!-- App Header -->
 <div class="app-header">
   <div class="header-top">
-    <div class="flex-gap">
-      <span style="font-size:1.4rem">🏢</span>
-      <span class="header-title" id="headerTitle">וועד בית</span>
-      <span class="version-badge">v<span id="versionBadge">1.0.0</span></span>
+    <div class="flex-gap" style="flex:1;min-width:0">
+      <span style="font-size:1.4rem;flex-shrink:0">🏢</span>
+      <div style="flex:1;min-width:0">
+        <div class="header-title" id="headerTitle">וועד בית</div>
+        <div class="header-user" id="headerUser"></div>
+      </div>
+      <span class="version-badge">v<span id="versionBadge"></span></span>
     </div>
-    <div class="flex-gap">
+    <div class="flex-gap" style="flex-shrink:0">
       <button onclick="toggleTheme()" style="background:none;border:none;color:white;font-size:1.2rem;cursor:pointer;" id="themeBtn">🌙</button>
     </div>
   </div>
@@ -744,14 +456,14 @@ input[type="number"] { font-size: 16px; }
 
 <!-- Screens -->
 <div id="screenDashboard" class="screen active">
-  <div class="balance-banner" id="balanceBanner">
+  <div class="balance-banner">
     <div class="balance-label">יתרה נוכחית</div>
     <div class="balance-amount" id="balanceAmount">₪0</div>
-    <div class="balance-sub" id="balanceSub">טוען...</div>
+    <div class="balance-sub" id="balanceSub"></div>
   </div>
   <div class="quick-actions">
-    <button class="qa-btn qa-income" onclick="openTxModal('income')">+ הכנסה</button>
-    <button class="qa-btn qa-expense" onclick="openTxModal('expense')">+ הוצאה</button>
+    <button class="qa-btn qa-income" onclick="openTxModal('income')">➕ הכנסה</button>
+    <button class="qa-btn qa-expense" onclick="openTxModal('expense')">➖ הוצאה</button>
   </div>
   <div class="section-header" style="margin-top:8px">
     <span class="section-title">תשלומי החודש</span>
@@ -760,7 +472,7 @@ input[type="number"] { font-size: 16px; }
   <div class="card" id="monthlyCard"></div>
   <div class="section-header">
     <span class="section-title">תנועות אחרונות</span>
-    <span style="font-size:0.8rem;color:var(--accent);cursor:pointer;" onclick="showScreen('screenTransactions')">הכל</span>
+    <span style="font-size:0.8rem;color:var(--accent);cursor:pointer;" onclick="showScreen('screenTransactions')">הכל ›</span>
   </div>
   <div class="card" id="recentTxCard"></div>
 </div>
@@ -773,13 +485,13 @@ input[type="number"] { font-size: 16px; }
 
 <div id="screenTransactions" class="screen">
   <div class="filter-bar" id="txFilterBar"></div>
-  <div id="txList" style="padding: 0 12px 8px;"></div>
+  <div id="txList" style="padding:0 12px 8px;"></div>
 </div>
 
 <div id="screenContacts" class="screen">
   <div class="section-header">
     <span class="section-title">דירות</span>
-    <button class="btn btn-primary btn-sm" onclick="openAptModal()">+ הוסף דירה</button>
+    <button class="btn btn-primary btn-sm" onclick="openAptModal()">+ הוסף</button>
   </div>
   <div id="contactsList"></div>
   <div class="section-header" style="margin-top:8px">
@@ -790,17 +502,14 @@ input[type="number"] { font-size: 16px; }
 </div>
 
 <div id="screenSettings" class="screen">
-  <div class="settings-group-title">הגדרות בניין</div>
+  <div class="settings-group-title">פרטי הבניין</div>
   <div class="settings-group" id="buildingSettingsGroup"></div>
 
   <div class="settings-group-title" style="margin-top:12px">מראה</div>
   <div class="settings-group">
     <div class="settings-row">
       <div><div class="settings-lbl">מצב כהה</div></div>
-      <label class="toggle">
-        <input type="checkbox" id="darkToggle" onchange="toggleTheme()">
-        <span class="toggle-slider"></span>
-      </label>
+      <label class="toggle"><input type="checkbox" id="darkToggle" onchange="toggleTheme()"><span class="toggle-slider"></span></label>
     </div>
   </div>
 
@@ -811,15 +520,6 @@ input[type="number"] { font-size: 16px; }
       <button class="font-btn" data-scale="1" onclick="setFontSize('1')">בינוני</button>
       <button class="font-btn" data-scale="1.15" onclick="setFontSize('1.15')">גדול</button>
       <button class="font-btn" data-scale="1.3" onclick="setFontSize('1.3')">גדול מאוד</button>
-    </div>
-  </div>
-
-  <div class="settings-group-title" style="margin-top:12px">שפה</div>
-  <div class="settings-group">
-    <div class="lang-btns">
-      <button class="lang-btn active" data-lang="he" onclick="setLang('he')">עברית</button>
-      <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">Русский</button>
-      <button class="lang-btn" data-lang="en" onclick="setLang('en')">English</button>
     </div>
   </div>
 
@@ -835,20 +535,33 @@ input[type="number"] { font-size: 16px; }
     </div>
   </div>
 
+  <div class="settings-group-title" style="margin-top:12px">התקנה על הטלפון</div>
+  <div class="settings-group">
+    <div class="settings-row" style="cursor:pointer" onclick="showInstallHelp()">
+      <div><div class="settings-lbl">📲 התקן כאפליקציה</div><div class="settings-sub">עבוד ללא דפדפן, כמו אפליקציה אמיתית</div></div>
+      <span style="color:var(--accent)">›</span>
+    </div>
+  </div>
+
   <div class="settings-group-title" style="margin-top:12px">אודות</div>
   <div class="settings-group">
     <div class="settings-row">
       <div class="settings-lbl">גרסה</div>
-      <span style="color:var(--text-2);font-size:0.85rem;">v<span id="settingsVersion">1.0.0</span></span>
+      <span style="color:var(--text-2);font-size:0.85rem;">v<span id="settingsVersion"></span></span>
+    </div>
+    <div class="settings-row" style="cursor:pointer" onclick="switchUser()">
+      <div><div class="settings-lbl" style="color:var(--warning)">🔄 החלף מנהל / בניין</div><div class="settings-sub">חזור למסך הכניסה</div></div>
     </div>
     <div class="settings-row" style="cursor:pointer" onclick="resetData()">
-      <div><div class="settings-lbl" style="color:var(--danger)">איפוס כל הנתונים</div><div class="settings-sub">מחיקת כל הבניינים והנתונים</div></div>
+      <div><div class="settings-lbl" style="color:var(--danger)">🗑️ מחק את כל הנתונים</div><div class="settings-sub">פעולה בלתי הפיכה</div></div>
     </div>
   </div>
 </div>
 
+</div><!-- end appShell -->
+
 <!-- Bottom Navigation -->
-<nav class="bottom-nav">
+<nav class="bottom-nav" id="bottomNav" style="display:none">
   <div class="nav-item active" data-screen="screenDashboard" onclick="showScreen('screenDashboard')">
     <span class="ni">🏠</span><span>ראשי</span>
   </div>
@@ -866,7 +579,6 @@ input[type="number"] { font-size: 16px; }
   </div>
 </nav>
 
-<!-- FAB for transactions screen -->
 <button class="fab" id="fab" onclick="openTxModal()" style="display:none">+</button>
 
 <!-- ═══════════════ MODALS ═══════════════ -->
@@ -894,7 +606,7 @@ input[type="number"] { font-size: 16px; }
       <label class="form-label">תיאור</label>
       <input type="text" class="form-input" id="txDesc" placeholder="תיאור התנועה">
     </div>
-    <div class="form-group" id="txCatGroup">
+    <div class="form-group">
       <label class="form-label">קטגוריה</label>
       <select class="form-select" id="txCategory"></select>
     </div>
@@ -917,12 +629,12 @@ input[type="number"] { font-size: 16px; }
     <div class="modal-title" id="buildingModalTitle">הוסף בניין</div>
     <input type="hidden" id="buildingEditId">
     <div class="form-group">
-      <label class="form-label">שם הבניין</label>
+      <label class="form-label">שם / כתובת הבניין</label>
       <input type="text" class="form-input" id="buildingName" placeholder="לדוג': רחוב הרצל 12">
     </div>
     <div class="form-group">
-      <label class="form-label">כתובת</label>
-      <input type="text" class="form-input" id="buildingAddress" placeholder="כתובת מלאה">
+      <label class="form-label">שם המנהל</label>
+      <input type="text" class="form-input" id="buildingManager" placeholder="שם המנהל">
     </div>
     <div class="form-row">
       <div class="form-group">
@@ -971,28 +683,26 @@ input[type="number"] { font-size: 16px; }
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">טלפון</label>
-        <input type="tel" class="form-input" id="aptOwner1Phone" placeholder="050-0000000">
+        <input type="tel" class="form-input" id="aptOwner1Phone">
       </div>
       <div class="form-group">
         <label class="form-label">WhatsApp</label>
-        <input type="tel" class="form-input" id="aptOwner1WA" placeholder="050-0000000">
+        <input type="tel" class="form-input" id="aptOwner1WA">
       </div>
     </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">אימייל</label>
-        <input type="email" class="form-input" id="aptOwner1Email" placeholder="email@example.com">
-      </div>
+    <div class="form-group">
+      <label class="form-label">אימייל</label>
+      <input type="email" class="form-input" id="aptOwner1Email">
     </div>
     <div style="font-size:0.82rem;font-weight:700;color:var(--text-2);margin:8px 0 6px;">בעל דירה נוסף (אופציונלי)</div>
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">שם</label>
-        <input type="text" class="form-input" id="aptOwner2Name" placeholder="שם">
+        <input type="text" class="form-input" id="aptOwner2Name">
       </div>
       <div class="form-group">
         <label class="form-label">טלפון</label>
-        <input type="tel" class="form-input" id="aptOwner2Phone" placeholder="050-0000000">
+        <input type="tel" class="form-input" id="aptOwner2Phone">
       </div>
     </div>
     <div class="modal-actions">
@@ -1016,17 +726,17 @@ input[type="number"] { font-size: 16px; }
       </div>
       <div class="form-group">
         <label class="form-label">שם</label>
-        <input type="text" class="form-input" id="providerName" placeholder="שם">
+        <input type="text" class="form-input" id="providerName">
       </div>
     </div>
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">טלפון</label>
-        <input type="tel" class="form-input" id="providerPhone" placeholder="050-0000000">
+        <input type="tel" class="form-input" id="providerPhone">
       </div>
       <div class="form-group">
         <label class="form-label">עלות חודשית (₪)</label>
-        <input type="number" class="form-input" id="providerCost" placeholder="0">
+        <input type="number" class="form-input" id="providerCost">
       </div>
     </div>
     <div class="modal-actions">
@@ -1037,80 +747,69 @@ input[type="number"] { font-size: 16px; }
   </div>
 </div>
 
-<!-- Snackbar -->
 <div class="snackbar" id="snackbar"></div>
 
 <script>
 // ═══════════════════════════════════════════════
-//  DATA MODEL & INITIALIZATION
+//  CONSTANTS
 // ═══════════════════════════════════════════════
-
 const MONTHS_HE = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+const expenseCategories = ['חשמל','גנן','ניקיון','ציוד','תיקון','אחר'];
+const incomeCategories = ['וועד בית','החזר','אחר'];
 
-function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
 
-function buildDefaultData() {
-  const bId = uid();
+// ═══════════════════════════════════════════════
+//  STORAGE — each building gets its own key
+//  Key format: vb_building_{buildingId}
+//  Global index: vb_index = [{id, name, manager}]
+// ═══════════════════════════════════════════════
+function getIndex() {
+  try { return JSON.parse(localStorage.getItem('vb_index') || '[]'); } catch { return []; }
+}
+function saveIndex(idx) { localStorage.setItem('vb_index', JSON.stringify(idx)); }
 
-  // Apartments
-  const apts = [
-    { id: uid(), name: 'דירה 1', resident: { name: 'עובדים זרים', phone: '' },
-      owners: [{ name: 'אריה הופמן', phone: '055-678-6171', email: 'ah786171@gmail.com', whatsapp: '' }] },
-    { id: uid(), name: 'דירה 2', resident: { name: 'מלכה', phone: '' },
-      owners: [{ name: 'אלקחם מלכה', phone: '052-7580089', email: '', whatsapp: '' }] },
-    { id: uid(), name: 'דירה 3', resident: { name: 'עובדים זרים', phone: '' },
-      owners: [{ name: 'יואל היימליך', phone: '052-7695639', email: 'mirimandel84@gmail.com', whatsapp: '053-9483788' }] },
-    { id: uid(), name: 'דירה 4', resident: { name: 'גבריהוט', phone: '054-9408248' },
-      owners: [{ name: 'דורון אמבר', phone: '054-5687575', email: '', whatsapp: '' }] },
-    { id: uid(), name: 'דירה 5', resident: { name: 'עובדים זרים', phone: '' },
-      owners: [{ name: 'אפריים הרשקוביץ', phone: '054-8592512', email: 'a0548592512@gmail.com', whatsapp: '' }] },
-    { id: uid(), name: 'דירה 6', resident: { name: 'דימה', phone: '' },
-      owners: [{ name: 'דימה אושקץ', phone: '050-6775214', email: '', whatsapp: '' }] },
-    { id: uid(), name: 'דירה 7', resident: { name: 'ראיה', phone: '050-9343761' },
-      owners: [
-        { name: 'שומסקי ארקדי', phone: '052-8547054', email: '', whatsapp: '' },
-        { name: 'שומסקי אלה', phone: '058-7083244', email: '', whatsapp: '' }
-      ] },
-    { id: uid(), name: 'דירה 8', resident: { name: 'וולדימיר', phone: '050-2503342' },
-      owners: [
-        { name: 'טרושין נטליה', phone: '054-7767489', email: '', whatsapp: '' },
-        { name: 'זיאבלוב אלכסנדר', phone: '', email: '', whatsapp: '' }
-      ] },
+function getBuildingData(id) {
+  try { return JSON.parse(localStorage.getItem('vb_building_' + id) || 'null'); } catch { return null; }
+}
+function saveBuildingData(id, data) { localStorage.setItem('vb_building_' + id, JSON.stringify(data)); }
+function deleteBuildingData(id) { localStorage.removeItem('vb_building_' + id); }
+
+function getCurrentBuildingId() { return localStorage.getItem('vb_current') || ''; }
+function setCurrentBuildingId(id) { localStorage.setItem('vb_current', id); }
+
+// ═══════════════════════════════════════════════
+//  DEFAULT DATA (from Excel)
+// ═══════════════════════════════════════════════
+function buildDefaultApartments() {
+  return [
+    { id: uid(), name: 'דירה 1', resident: { name: 'עובדים זרים', phone: '' }, owners: [{ name: 'אריה הופמן', phone: '055-678-6171', email: 'ah786171@gmail.com', whatsapp: '' }] },
+    { id: uid(), name: 'דירה 2', resident: { name: 'מלכה', phone: '' }, owners: [{ name: 'אלקחם מלכה', phone: '052-7580089', email: '', whatsapp: '' }] },
+    { id: uid(), name: 'דירה 3', resident: { name: 'עובדים זרים', phone: '' }, owners: [{ name: 'יואל היימליך', phone: '052-7695639', email: 'mirimandel84@gmail.com', whatsapp: '053-9483788' }] },
+    { id: uid(), name: 'דירה 4', resident: { name: 'גבריהוט', phone: '054-9408248' }, owners: [{ name: 'דורון אמבר', phone: '054-5687575', email: '', whatsapp: '' }] },
+    { id: uid(), name: 'דירה 5', resident: { name: 'עובדים זרים', phone: '' }, owners: [{ name: 'אפריים הרשקוביץ', phone: '054-8592512', email: 'a0548592512@gmail.com', whatsapp: '' }] },
+    { id: uid(), name: 'דירה 6', resident: { name: 'דימה', phone: '' }, owners: [{ name: 'דימה אושקץ', phone: '050-6775214', email: '', whatsapp: '' }] },
+    { id: uid(), name: 'דירה 7', resident: { name: 'ראיה', phone: '050-9343761' }, owners: [{ name: 'שומסקי ארקדי', phone: '052-8547054', email: '', whatsapp: '' }, { name: 'שומסקי אלה', phone: '058-7083244', email: '', whatsapp: '' }] },
+    { id: uid(), name: 'דירה 8', resident: { name: 'וולדימיר', phone: '050-2503342' }, owners: [{ name: 'טרושין נטליה', phone: '054-7767489', email: '', whatsapp: '' }, { name: 'זיאבלוב אלכסנדר', phone: '', email: '', whatsapp: '' }] },
   ];
+}
 
-  const a = apts; // shorthand
-
-  // Build dues: paid months per apartment
+function buildDefaultDues(apts) {
   const dues = {};
+  const paid2026 = [[1,2,3,4],[1,2,3],[1,2,3],[1,2],[1,2,3],[1],[],[1,2,3]];
   apts.forEach((apt, i) => {
     dues[apt.id] = {};
-    // 2024: all 12 months
     dues[apt.id][2024] = {};
-    for (let m = 1; m <= 12; m++) dues[apt.id][2024][m] = true;
-    // 2025: all 12 months
     dues[apt.id][2025] = {};
-    for (let m = 1; m <= 12; m++) dues[apt.id][2025][m] = true;
-    // 2026
     dues[apt.id][2026] = {};
+    for (let m = 1; m <= 12; m++) { dues[apt.id][2024][m] = true; dues[apt.id][2025][m] = true; }
+    (paid2026[i] || []).forEach(m => { dues[apt.id][2026][m] = true; });
   });
-  // 2026 paid months per apartment (0-indexed apt array)
-  const paid2026 = [
-    [1,2,3,4],   // דירה 1
-    [1,2,3],     // דירה 2
-    [1,2,3],     // דירה 3
-    [1,2],       // דירה 4
-    [1,2,3],     // דירה 5
-    [1],         // דירה 6
-    [],          // דירה 7
-    [1,2,3],     // דירה 8
-  ];
-  apts.forEach((apt, i) => {
-    paid2026[i].forEach(m => { dues[apt.id][2026][m] = true; });
-  });
+  return dues;
+}
 
-  // Transactions (all from Excel data)
-  const txs = [
-    // ── 2024 ──
+function buildDefaultTransactions() {
+  return [
     {id:uid(),date:'2024-09-01',type:'expense',amount:105.59,description:'חשמל - יוני, יולי (שולם באינטרנט ע"י דימה)',category:'חשמל'},
     {id:uid(),date:'2024-10-14',type:'income',amount:200,description:'וועד בית דירה 8 - אוקטובר, נובמבר 2024',category:'וועד בית'},
     {id:uid(),date:'2024-10-20',type:'expense',amount:125.54,description:'חשמל - אוגוסט, ספטמבר (שולם באינטרנט ע"י דימה)',category:'חשמל'},
@@ -1127,7 +826,6 @@ function buildDefaultData() {
     {id:uid(),date:'2024-12-23',type:'income',amount:600,description:'וועד בית דירה 3 - יולי-דצמבר 2024',category:'וועד בית'},
     {id:uid(),date:'2024-12-29',type:'expense',amount:126.25,description:'חשמל - אוקטובר, נובמבר (שולם באינטרנט ע"י דימה)',category:'חשמל'},
     {id:uid(),date:'2024-12-31',type:'income',amount:600,description:'וועד בית דירה 6 - יולי-דצמבר 2024',category:'וועד בית'},
-    // ── 2025 ──
     {id:uid(),date:'2025-01-06',type:'income',amount:200,description:'וועד בית דירה 7 - נובמבר-דצמבר 2024',category:'וועד בית'},
     {id:uid(),date:'2025-01-16',type:'income',amount:200,description:'וועד בית דירה 5 - ינואר-פברואר 2025',category:'וועד בית'},
     {id:uid(),date:'2025-02-10',type:'expense',amount:40,description:'מנורות למדרגות',category:'ציוד'},
@@ -1172,7 +870,6 @@ function buildDefaultData() {
     {id:uid(),date:'2025-12-26',type:'income',amount:400,description:'וועד בית דירה 1 - ספטמבר-נובמבר 2026 (מקדמה)',category:'וועד בית'},
     {id:uid(),date:'2025-12-27',type:'expense',amount:30,description:'ספר חשבוניות עבור תשלומי וועד',category:'ציוד'},
     {id:uid(),date:'2025-12-28',type:'expense',amount:900,description:'גנן - אוקטובר-דצמבר 2025',category:'גנן'},
-    // ── 2026 ──
     {id:uid(),date:'2026-01-23',type:'income',amount:200,description:'וועד בית דירה 4 - ינואר-פברואר 2026',category:'וועד בית'},
     {id:uid(),date:'2026-01-23',type:'income',amount:300,description:'וועד בית דירה 4 - אוקטובר-דצמבר 2025',category:'וועד בית'},
     {id:uid(),date:'2026-02-03',type:'income',amount:300,description:'וועד בית דירה 3 - ינואר-מרץ 2026',category:'וועד בית'},
@@ -1183,112 +880,164 @@ function buildDefaultData() {
     {id:uid(),date:'2026-03-11',type:'income',amount:300,description:'וועד בית דירה 2 - ינואר-מרץ 2026',category:'וועד בית'},
     {id:uid(),date:'2026-04-07',type:'expense',amount:23,description:'מנורות למקלט - דימה אשראי',category:'ציוד'},
   ];
-
-  return {
-    id: bId,
-    name: 'הבניין שלי',
-    address: '',
-    monthlyDue: 100,
-    initialBalance: 8620,
-    apartments: apts,
-    transactions: txs,
-    dues: dues,
-    serviceProviders: [
-      { id: uid(), role: 'גנן', name: 'רונן', phone: '052-4076794', monthlyCost: 300 },
-      { id: uid(), role: 'מנקה', name: '', phone: '', monthlyCost: 800 },
-    ]
-  };
 }
 
 // ═══════════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════════
-let state = { buildings: [], currentBuildingId: null };
+let currentBuildingId = '';
+let currentBuilding = null;
 
-function loadState() {
-  try {
-    const raw = localStorage.getItem('vb_state');
-    if (raw) {
-      state = JSON.parse(raw);
-    } else {
-      const defaultBuilding = buildDefaultData();
-      state.buildings = [defaultBuilding];
-      state.currentBuildingId = defaultBuilding.id;
-      saveState();
-    }
-  } catch(e) {
-    console.error(e);
-    const defaultBuilding = buildDefaultData();
-    state.buildings = [defaultBuilding];
-    state.currentBuildingId = defaultBuilding.id;
-  }
-  if (!state.currentBuildingId && state.buildings.length > 0) {
-    state.currentBuildingId = state.buildings[0].id;
-  }
+function getBuilding() { return currentBuilding; }
+
+function loadBuilding(id) {
+  currentBuildingId = id;
+  setCurrentBuildingId(id);
+  currentBuilding = getBuildingData(id);
 }
 
-function saveState() {
-  localStorage.setItem('vb_state', JSON.stringify(state));
-}
-
-function getBuilding() {
-  return state.buildings.find(b => b.id === state.currentBuildingId) || state.buildings[0];
+function saveBuilding() {
+  saveBuildingData(currentBuildingId, currentBuilding);
 }
 
 // ═══════════════════════════════════════════════
-//  COMPUTED
+//  WELCOME / USER SETUP
 // ═══════════════════════════════════════════════
-function calcBalance(building) {
-  if (!building) return 0;
-  let bal = building.initialBalance || 0;
-  (building.transactions || []).forEach(tx => {
-    bal += tx.type === 'income' ? tx.amount : -tx.amount;
-  });
-  return bal;
+function initApp() {
+  document.getElementById('welcomeVersion').textContent = APP_VERSION;
+  document.getElementById('versionBadge').textContent = APP_VERSION;
+  document.getElementById('settingsVersion').textContent = APP_VERSION;
+
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.getElementById('themeBtn').textContent = isDark ? '☀️' : '🌙';
+
+  const savedScale = localStorage.getItem('vb_fontScale') || '1';
+  document.documentElement.style.setProperty('--font-scale', savedScale);
+
+  const index = getIndex();
+  const lastId = getCurrentBuildingId();
+
+  if (index.length > 0 && lastId && index.find(b => b.id === lastId)) {
+    loadBuilding(lastId);
+    showApp();
+  } else if (index.length > 0) {
+    loadBuilding(index[0].id);
+    showApp();
+  } else {
+    // First time — show welcome
+    document.getElementById('welcomeScreen').style.display = 'flex';
+  }
 }
 
-function getMonthDues(building, year, month) {
-  const paid = [], unpaid = [];
-  (building.apartments || []).forEach(apt => {
-    const isPaid = !!(building.dues?.[apt.id]?.[year]?.[month]);
-    if (isPaid) paid.push(apt);
-    else unpaid.push(apt);
-  });
-  return { paid, unpaid };
+function completeWelcome() {
+  const name = document.getElementById('welcomeBuildingName').value.trim();
+  const manager = document.getElementById('welcomeManagerName').value.trim();
+  const due = parseFloat(document.getElementById('welcomeDue').value) || 100;
+
+  if (!name) { document.getElementById('welcomeBuildingName').focus(); return; }
+  if (!manager) { document.getElementById('welcomeManagerName').focus(); return; }
+
+  // Check if this building name already exists in index — if yes, just switch to it
+  const index = getIndex();
+  let existing = index.find(b => b.name === name);
+
+  if (existing) {
+    loadBuilding(existing.id);
+    showApp();
+    return;
+  }
+
+  // Create new building with default data (from Excel)
+  const id = uid();
+  const apts = buildDefaultApartments();
+  const dues = buildDefaultDues(apts);
+  const building = {
+    id, name, manager, monthlyDue: due,
+    initialBalance: 8620,
+    apartments: apts,
+    transactions: buildDefaultTransactions(),
+    dues,
+    serviceProviders: [
+      { id: uid(), role: 'גנן', name: 'רונן', phone: '052-4076794', monthlyCost: 300 },
+      { id: uid(), role: 'מנקה', name: '', phone: '', monthlyCost: 800 },
+    ]
+  };
+
+  saveBuildingData(id, building);
+  index.push({ id, name, manager });
+  saveIndex(index);
+
+  loadBuilding(id);
+  showApp();
 }
 
-function fmt(n) {
-  return '₪' + Number(n).toLocaleString('he-IL', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+function showApp() {
+  document.getElementById('welcomeScreen').style.display = 'none';
+  document.getElementById('appShell').style.display = 'block';
+  document.getElementById('bottomNav').style.display = 'flex';
+  renderBuildingSelector();
+  renderDashboard();
+  initInstallPrompt();
 }
 
-function fmtDate(dateStr) {
-  if (!dateStr) return '';
-  const d = new Date(dateStr);
-  if (isNaN(d)) return dateStr;
-  return d.toLocaleDateString('he-IL', { day:'2-digit', month:'2-digit', year:'2-digit' });
+function switchUser() {
+  if (!confirm('לחזור למסך הכניסה?\n(הנתונים נשמרים)')) return;
+  document.getElementById('appShell').style.display = 'none';
+  document.getElementById('bottomNav').style.display = 'none';
+  document.getElementById('welcomeScreen').style.display = 'flex';
+  document.getElementById('welcomeBuildingName').value = '';
+  document.getElementById('welcomeManagerName').value = '';
 }
 
-function todayISO() {
-  const d = new Date();
-  return d.toISOString().slice(0,10);
+// ═══════════════════════════════════════════════
+//  BUILDING SELECTOR
+// ═══════════════════════════════════════════════
+function renderBuildingSelector() {
+  const b = getBuilding();
+  if (!b) return;
+
+  document.getElementById('headerTitle').textContent = b.name;
+  document.getElementById('headerUser').textContent = b.manager ? '👤 ' + b.manager : '';
+
+  const index = getIndex();
+  const bar = document.getElementById('buildingSelector');
+
+  if (index.length <= 1) {
+    bar.innerHTML = '';
+    return;
+  }
+
+  bar.innerHTML = index.map(item =>
+    `<button class="building-chip ${item.id === currentBuildingId ? 'active' : ''}"
+      onclick="switchBuilding('${item.id}')">${item.name}</button>`
+  ).join('') + `<button class="building-chip-add" onclick="openAddBuildingModal()">+ בניין</button>`;
 }
 
-function nowMonthYear() {
-  const d = new Date();
-  return { month: d.getMonth() + 1, year: d.getFullYear() };
+function switchBuilding(id) {
+  loadBuilding(id);
+  renderBuildingSelector();
+  renderScreen(currentScreen);
+}
+
+function openAddBuildingModal() {
+  // Go back to welcome to add another building
+  document.getElementById('welcomeScreen').style.display = 'flex';
+  document.getElementById('welcomeBuildingName').value = '';
+  document.getElementById('welcomeManagerName').value = '';
+  document.getElementById('welcomeDue').value = 100;
 }
 
 // ═══════════════════════════════════════════════
 //  NAVIGATION
 // ═══════════════════════════════════════════════
 let currentScreen = 'screenDashboard';
+let duesYear = new Date().getFullYear();
+let txFilter = { year: 'all', type: 'all' };
 
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n => {
-    n.classList.toggle('active', n.dataset.screen === id);
-  });
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.screen === id));
   document.getElementById('fab').style.display = id === 'screenTransactions' ? 'flex' : 'none';
   currentScreen = id;
   renderScreen(id);
@@ -1303,75 +1052,55 @@ function renderScreen(id) {
 }
 
 // ═══════════════════════════════════════════════
-//  BUILDING SELECTOR
+//  COMPUTED
 // ═══════════════════════════════════════════════
-function renderBuildingSelector() {
-  const bar = document.getElementById('buildingSelector');
-  bar.innerHTML = state.buildings.map(b =>
-    `<button class="building-chip ${b.id === state.currentBuildingId ? 'active' : ''}"
-      onclick="switchBuilding('${b.id}')">${b.name}</button>`
-  ).join('') +
-  `<button class="building-chip-add" onclick="openBuildingModal()">+ בניין</button>`;
+function calcBalance(b) {
+  let bal = b.initialBalance || 0;
+  (b.transactions || []).forEach(tx => { bal += tx.type === 'income' ? tx.amount : -tx.amount; });
+  return bal;
 }
 
-function switchBuilding(id) {
-  state.currentBuildingId = id;
-  saveState();
-  renderBuildingSelector();
-  renderScreen(currentScreen);
-}
+function fmt(n) { return '₪' + Number(n).toLocaleString('he-IL', { minimumFractionDigits: 0, maximumFractionDigits: 2 }); }
+function fmtDate(d) { if (!d) return ''; const dt = new Date(d); if (isNaN(dt)) return d; return dt.toLocaleDateString('he-IL', { day:'2-digit', month:'2-digit', year:'2-digit' }); }
+function todayISO() { return new Date().toISOString().slice(0,10); }
+function nowMY() { const d = new Date(); return { month: d.getMonth()+1, year: d.getFullYear() }; }
 
 // ═══════════════════════════════════════════════
 //  DASHBOARD
 // ═══════════════════════════════════════════════
 function renderDashboard() {
-  const b = getBuilding();
-  if (!b) return;
-
+  const b = getBuilding(); if (!b) return;
   const bal = calcBalance(b);
   document.getElementById('balanceAmount').textContent = fmt(bal);
 
-  const { month, year } = nowMonthYear();
+  const { month, year } = nowMY();
   document.getElementById('monthLabel').textContent = MONTHS_HE[month-1] + ' ' + year;
 
-  const { paid, unpaid } = getMonthDues(b, year, month);
-  const total = (b.apartments || []).length;
-  const collectedAmt = paid.length * (b.monthlyDue || 100);
-  const targetAmt = total * (b.monthlyDue || 100);
-  const pct = total ? Math.round(paid.length / total * 100) : 0;
+  const apts = b.apartments || [];
+  const paid = apts.filter(a => b.dues?.[a.id]?.[year]?.[month]);
+  const unpaid = apts.filter(a => !b.dues?.[a.id]?.[year]?.[month]);
+  const collected = paid.length * (b.monthlyDue || 100);
+  const target = apts.length * (b.monthlyDue || 100);
+  const pct = apts.length ? Math.round(paid.length / apts.length * 100) : 0;
+  document.getElementById('balanceSub').textContent = `גבייה: ${fmt(collected)} / ${fmt(target)} (${pct}%)`;
 
-  document.getElementById('balanceSub').textContent =
-    `גבייה חודשית: ${fmt(collectedAmt)} מתוך ${fmt(targetAmt)} (${pct}%)`;
-
-  // Monthly card
   const mCard = document.getElementById('monthlyCard');
   if (unpaid.length === 0) {
-    mCard.innerHTML = `<div style="text-align:center;padding:12px 0;color:var(--success);font-weight:700;font-size:1rem;">✅ כל הדירות שילמו החודש!</div>`;
+    mCard.innerHTML = `<div style="text-align:center;padding:12px 0;color:var(--success);font-weight:700">✅ כל הדירות שילמו החודש!</div>`;
   } else {
-    mCard.innerHTML = `
-      <div class="card-title">לא שילמו החודש (${unpaid.length}/${total})</div>
+    mCard.innerHTML = `<div class="card-title">לא שילמו (${unpaid.length}/${apts.length})</div>
       <div class="month-progress"><div class="month-progress-bar" style="width:${pct}%"></div></div>
-      <div style="margin-top:10px">
-        ${unpaid.map(apt => `
-          <div class="unpaid-apt">
-            <div>
-              <div class="apt-name">${apt.name}</div>
-              <div class="apt-info">${apt.owners?.[0]?.name || ''}</div>
-            </div>
-            <button class="pay-btn" onclick="quickPay('${apt.id}',${year},${month})">✓ שולם</button>
-          </div>
-        `).join('')}
-      </div>`;
+      <div style="margin-top:10px">${unpaid.map(a => `<div class="unpaid-apt">
+        <div><div class="apt-name">${a.name}</div><div class="apt-info">${a.owners?.[0]?.name||''}</div></div>
+        <button class="pay-btn" onclick="quickPay('${a.id}',${year},${month})">✓ שולם</button>
+      </div>`).join('')}</div>`;
   }
 
-  // Recent transactions
-  const txs = [...(b.transactions || [])].sort((a,c) => c.date.localeCompare(a.date)).slice(0,5);
+  const txs = [...(b.transactions||[])].sort((a,c) => c.date.localeCompare(a.date)).slice(0,5);
   const rCard = document.getElementById('recentTxCard');
-  if (txs.length === 0) {
-    rCard.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><p>אין תנועות עדיין</p></div>`;
-  } else {
-    rCard.innerHTML = txs.map(tx => txHTML(tx)).join('');
-  }
+  rCard.innerHTML = txs.length === 0
+    ? `<div class="empty-state"><div class="empty-icon">📭</div><p>אין תנועות עדיין</p></div>`
+    : txs.map(tx => txRowHTML(tx)).join('');
 }
 
 function quickPay(aptId, year, month) {
@@ -1380,188 +1109,111 @@ function quickPay(aptId, year, month) {
   if (!b.dues[aptId]) b.dues[aptId] = {};
   if (!b.dues[aptId][year]) b.dues[aptId][year] = {};
   b.dues[aptId][year][month] = true;
-  saveState();
-  renderDashboard();
-  showSnack('סומן כשולם ✓');
+  saveBuilding(); renderDashboard(); showSnack('סומן כשולם ✓');
 }
 
-function txHTML(tx, showBalance) {
-  const isIncome = tx.type === 'income';
+function txRowHTML(tx) {
+  const inc = tx.type === 'income';
   return `<div class="tx-item" onclick="openTxModal(null,'${tx.id}')">
-    <div class="tx-icon ${tx.type}">${isIncome ? '⬆️' : '⬇️'}</div>
-    <div class="tx-body">
-      <div class="tx-desc">${tx.description}</div>
-      <div class="tx-date">${fmtDate(tx.date)} · ${tx.category || ''}</div>
-    </div>
-    <div class="tx-amount ${tx.type}">${isIncome ? '+' : '-'}${fmt(tx.amount)}</div>
+    <div class="tx-icon ${tx.type}">${inc?'⬆️':'⬇️'}</div>
+    <div class="tx-body"><div class="tx-desc">${tx.description}</div><div class="tx-date">${fmtDate(tx.date)} · ${tx.category||''}</div></div>
+    <div class="tx-amount ${tx.type}">${inc?'+':'-'}${fmt(tx.amount)}</div>
   </div>`;
 }
 
 // ═══════════════════════════════════════════════
-//  DUES TRACKER
+//  DUES
 // ═══════════════════════════════════════════════
-let duesYear = new Date().getFullYear();
-
 function renderDues() {
-  const b = getBuilding();
-  if (!b) return;
-
-  // Year buttons
-  const years = [2024, 2025, 2026, 2027].filter(y => y <= new Date().getFullYear() + 1);
+  const b = getBuilding(); if (!b) return;
+  const years = [2024,2025,2026,2027].filter(y => y <= new Date().getFullYear()+1);
   document.getElementById('yearBtns').innerHTML =
-    `<span style="font-size:0.85rem;font-weight:700;color:var(--text-2);">שנה:</span>` +
-    years.map(y => `<button class="year-btn ${y === duesYear ? 'active' : ''}" onclick="setDuesYear(${y})">${y}</button>`).join('');
+    `<span style="font-size:0.85rem;font-weight:700;color:var(--text-2)">שנה:</span>` +
+    years.map(y => `<button class="year-btn ${y===duesYear?'active':''}" onclick="setDuesYear(${y})">${y}</button>`).join('');
 
   const apts = b.apartments || [];
   const due = b.monthlyDue || 100;
-
-  let totalPaid = 0, totalUnpaid = 0;
-  apts.forEach(apt => {
-    for (let m = 1; m <= 12; m++) {
-      if (b.dues?.[apt.id]?.[duesYear]?.[m]) totalPaid++;
-      else totalUnpaid++;
-    }
-  });
-  const totalExpected = apts.length * 12 * due;
-  const totalCollected = totalPaid * due;
-
+  let totalPaid = 0;
+  apts.forEach(a => { for(let m=1;m<=12;m++) if(b.dues?.[a.id]?.[duesYear]?.[m]) totalPaid++; });
+  const totalUnpaid = apts.length * 12 - totalPaid;
   document.getElementById('duesSummary').innerHTML = `
     <div class="dues-stat"><div class="dues-stat-val" style="color:var(--success)">${totalPaid}</div><div class="dues-stat-lbl">שולמו</div></div>
-    <div class="dues-stat"><div class="dues-stat-val" style="color:var(--danger)">${totalUnpaid}</div><div class="dues-stat-lbl">לא שולמו</div></div>
-    <div class="dues-stat"><div class="dues-stat-val">${fmt(totalCollected)}</div><div class="dues-stat-lbl">נגבה</div></div>
-    <div class="dues-stat"><div class="dues-stat-val" style="color:var(--text-2)">${fmt(totalExpected - totalCollected)}</div><div class="dues-stat-lbl">חסר</div></div>
-  `;
+    <div class="dues-stat"><div class="dues-stat-val" style="color:var(--danger)">${totalUnpaid}</div><div class="dues-stat-lbl">חסרים</div></div>
+    <div class="dues-stat"><div class="dues-stat-val">${fmt(totalPaid*due)}</div><div class="dues-stat-lbl">נגבה</div></div>
+    <div class="dues-stat"><div class="dues-stat-val" style="color:var(--text-2)">${fmt(totalUnpaid*due)}</div><div class="dues-stat-lbl">יתרה לגבות</div></div>`;
 
-  // Grid
-  let html = `<thead><tr>
-    <th class="month-col">חודש</th>
-    ${apts.map(a => `<th class="apt-col">${a.name}</th>`).join('')}
-    <th class="total-col">סה"כ</th>
-  </tr></thead><tbody>`;
-
-  for (let m = 1; m <= 12; m++) {
-    let rowPaid = 0;
-    const cells = apts.map(apt => {
-      const paid = !!(b.dues?.[apt.id]?.[duesYear]?.[m]);
-      if (paid) rowPaid++;
-      return `<td class="${paid ? 'paid' : 'unpaid'}" onclick="toggleDue('${apt.id}',${duesYear},${m})">${paid ? '✓' : '✗'}</td>`;
-    });
-    html += `<tr><td style="font-weight:700;cursor:default;background:var(--bg-card)">${MONTHS_HE[m-1]}</td>
-      ${cells.join('')}
-      <td class="total-cell">${fmt(rowPaid * due)}</td>
-    </tr>`;
+  let html = `<thead><tr><th class="month-col">חודש</th>${apts.map(a=>`<th class="apt-col">${a.name}</th>`).join('')}<th class="total-col">סה"כ</th></tr></thead><tbody>`;
+  for(let m=1;m<=12;m++) {
+    let rp=0;
+    const cells = apts.map(a => { const p=!!(b.dues?.[a.id]?.[duesYear]?.[m]); if(p)rp++; return `<td class="${p?'paid':'unpaid'}" onclick="toggleDue('${a.id}',${duesYear},${m})">${p?'✓':'✗'}</td>`; });
+    html += `<tr><td style="font-weight:700;cursor:default;background:var(--bg-card)">${MONTHS_HE[m-1]}</td>${cells.join('')}<td class="total-cell">${fmt(rp*due)}</td></tr>`;
   }
-
-  // Totals row
-  const aptTotals = apts.map(apt => {
-    let cnt = 0;
-    for (let m = 1; m <= 12; m++) if (b.dues?.[apt.id]?.[duesYear]?.[m]) cnt++;
-    return cnt;
-  });
-  html += `<tr>
-    <td style="font-weight:800;cursor:default;background:var(--accent-light)">סה"כ</td>
-    ${aptTotals.map(cnt => `<td class="total-cell">${fmt(cnt * due)}</td>`).join('')}
-    <td class="total-cell">${fmt(totalPaid * due)}</td>
-  </tr>`;
-
-  html += '</tbody>';
+  const aptTotals = apts.map(a => { let c=0; for(let m=1;m<=12;m++) if(b.dues?.[a.id]?.[duesYear]?.[m]) c++; return c; });
+  html += `<tr><td style="font-weight:800;cursor:default;background:var(--accent-light)">סה"כ</td>${aptTotals.map(c=>`<td class="total-cell">${fmt(c*due)}</td>`).join('')}<td class="total-cell">${fmt(totalPaid*due)}</td></tr></tbody>`;
   document.getElementById('duesGrid').innerHTML = html;
 }
 
-function setDuesYear(y) {
-  duesYear = y;
-  renderDues();
-}
+function setDuesYear(y) { duesYear=y; renderDues(); }
 
 function toggleDue(aptId, year, month) {
   const b = getBuilding();
-  if (!b.dues) b.dues = {};
-  if (!b.dues[aptId]) b.dues[aptId] = {};
-  if (!b.dues[aptId][year]) b.dues[aptId][year] = {};
-  const current = b.dues[aptId][year][month];
-  b.dues[aptId][year][month] = !current;
-  saveState();
-  renderDues();
+  if(!b.dues) b.dues={};
+  if(!b.dues[aptId]) b.dues[aptId]={};
+  if(!b.dues[aptId][year]) b.dues[aptId][year]={};
+  b.dues[aptId][year][month] = !b.dues[aptId][year][month];
+  saveBuilding(); renderDues();
   showSnack(b.dues[aptId][year][month] ? 'סומן כשולם ✓' : 'סומן כלא שולם');
 }
 
 // ═══════════════════════════════════════════════
 //  TRANSACTIONS
 // ═══════════════════════════════════════════════
-let txFilter = { year: 'all', type: 'all' };
-
 function renderTransactions() {
-  const b = getBuilding();
-  if (!b) return;
-
-  const years = [...new Set((b.transactions || []).map(tx => tx.date.slice(0,4)))].sort().reverse();
-
+  const b = getBuilding(); if (!b) return;
+  const years = [...new Set((b.transactions||[]).map(t=>t.date.slice(0,4)))].sort().reverse();
   document.getElementById('txFilterBar').innerHTML =
     `<div class="filter-chip ${txFilter.year==='all'?'active':''}" onclick="setTxFilter('year','all')">הכל</div>` +
-    years.map(y => `<div class="filter-chip ${txFilter.year===y?'active':''}" onclick="setTxFilter('year','${y}')">${y}</div>`).join('') +
+    years.map(y=>`<div class="filter-chip ${txFilter.year===y?'active':''}" onclick="setTxFilter('year','${y}')">${y}</div>`).join('') +
     `<div class="filter-chip ${txFilter.type==='income'?'active':''}" onclick="setTxFilter('type','income')">הכנסות</div>` +
     `<div class="filter-chip ${txFilter.type==='expense'?'active':''}" onclick="setTxFilter('type','expense')">הוצאות</div>`;
 
-  let txs = [...(b.transactions || [])].sort((a,c) => c.date.localeCompare(a.date));
-  if (txFilter.year !== 'all') txs = txs.filter(tx => tx.date.startsWith(txFilter.year));
-  if (txFilter.type !== 'all') txs = txs.filter(tx => tx.type === txFilter.type);
+  let txs = [...(b.transactions||[])].sort((a,c)=>c.date.localeCompare(a.date));
+  if(txFilter.year!=='all') txs=txs.filter(t=>t.date.startsWith(txFilter.year));
+  if(txFilter.type!=='all') txs=txs.filter(t=>t.type===txFilter.type);
 
-  if (txs.length === 0) {
-    document.getElementById('txList').innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><p>אין תנועות</p></div>`;
-    return;
-  }
+  if(!txs.length) { document.getElementById('txList').innerHTML=`<div class="empty-state"><div class="empty-icon">📭</div><p>אין תנועות</p></div>`; return; }
 
-  // Compute running balance (descending order - show current balance first)
-  let runBal = calcBalance(b);
-  const allTxsSorted = [...(b.transactions || [])].sort((a,c) => c.date.localeCompare(a.date));
-
-  const balMap = {};
-  let bal = calcBalance(b);
-  allTxsSorted.forEach(tx => {
-    balMap[tx.id] = bal;
-    bal -= tx.type === 'income' ? tx.amount : -tx.amount;
-  });
+  const allSorted = [...(b.transactions||[])].sort((a,c)=>c.date.localeCompare(a.date));
+  const balMap = {}; let bal = calcBalance(b);
+  allSorted.forEach(tx => { balMap[tx.id]=bal; bal -= tx.type==='income'?tx.amount:-tx.amount; });
 
   document.getElementById('txList').innerHTML = txs.map(tx => `
     <div class="tx-item" onclick="openTxModal(null,'${tx.id}')">
       <div class="tx-icon ${tx.type}">${tx.type==='income'?'⬆️':'⬇️'}</div>
-      <div class="tx-body">
-        <div class="tx-desc">${tx.description}</div>
+      <div class="tx-body"><div class="tx-desc">${tx.description}</div>
         <div class="tx-date">${fmtDate(tx.date)} · <span class="badge ${tx.type==='income'?'badge-success':'badge-danger'}">${tx.category||''}</span></div>
       </div>
       <div style="text-align:left">
         <div class="tx-amount ${tx.type}">${tx.type==='income'?'+':'-'}${fmt(tx.amount)}</div>
-        <div style="font-size:0.68rem;color:var(--text-2);text-align:left">${fmt(balMap[tx.id])}</div>
+        <div style="font-size:0.68rem;color:var(--text-2)">${fmt(balMap[tx.id])}</div>
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
-function setTxFilter(key, val) {
-  if (key === 'type' && txFilter.type === val) { txFilter.type = 'all'; }
-  else txFilter[key] = val;
-  renderTransactions();
-}
+function setTxFilter(key, val) { if(key==='type'&&txFilter.type===val) txFilter.type='all'; else txFilter[key]=val; renderTransactions(); }
 
 // ═══════════════════════════════════════════════
 //  CONTACTS
 // ═══════════════════════════════════════════════
 function renderContacts() {
-  const b = getBuilding();
-  if (!b) return;
-
-  const apts = b.apartments || [];
-  document.getElementById('contactsList').innerHTML = apts.map(apt => `
+  const b = getBuilding(); if (!b) return;
+  document.getElementById('contactsList').innerHTML = (b.apartments||[]).map(apt => `
     <div class="contact-card">
       <div class="contact-header" onclick="toggleContact('cc_${apt.id}')">
         <div class="flex-gap">
           <div class="contact-avatar">${apt.name.replace('דירה ','')}</div>
-          <div>
-            <div class="contact-name">${apt.name}</div>
-            <div class="contact-sub">
-              ${apt.resident?.name ? `דייר: ${apt.resident.name}` : ''}
-              ${apt.owners?.length ? ` · בעלים: ${apt.owners.map(o=>o.name).filter(Boolean).join(', ')}` : ''}
-            </div>
+          <div><div class="contact-name">${apt.name}</div>
+            <div class="contact-sub">${apt.resident?.name?'דייר: '+apt.resident.name:''} ${apt.owners?.length?'· '+apt.owners.map(o=>o.name).filter(Boolean).join(', '):''}</div>
           </div>
         </div>
         <div class="flex-gap">
@@ -1570,240 +1222,159 @@ function renderContacts() {
         </div>
       </div>
       <div class="contact-body" id="cc_${apt.id}">
-        ${apt.resident?.phone ? `<div class="contact-row"><span class="contact-lbl">דייר:</span> <span>${apt.resident.name}</span> <a href="tel:${apt.resident.phone}">${apt.resident.phone}</a></div>` : ''}
-        ${(apt.owners||[]).map(o => `
-          <div class="contact-row">
-            <span class="contact-lbl">בעלים:</span>
-            <span>${o.name}</span>
-            ${o.phone ? `<a href="tel:${o.phone}">${o.phone}</a>` : ''}
-            ${o.whatsapp ? `<a href="https://wa.me/972${o.whatsapp.replace(/^0/,'').replace(/-/g,'')}" style="color:#25d366">💬 WA</a>` : ''}
-          </div>
-          ${o.email ? `<div class="contact-row"><span class="contact-lbl">אימייל:</span><a href="mailto:${o.email}">${o.email}</a></div>` : ''}
-        `).join('')}
+        ${apt.resident?.phone?`<div class="contact-row"><span class="contact-lbl">דייר:</span><span>${apt.resident.name}</span><a href="tel:${apt.resident.phone}">${apt.resident.phone}</a></div>`:''}
+        ${(apt.owners||[]).map(o=>`
+          <div class="contact-row"><span class="contact-lbl">בעלים:</span><span>${o.name}</span>${o.phone?`<a href="tel:${o.phone}">${o.phone}</a>`:''} ${o.whatsapp?`<a href="https://wa.me/972${o.whatsapp.replace(/^0/,'').replace(/-/g,'')}" style="color:#25d366">💬</a>`:''}</div>
+          ${o.email?`<div class="contact-row"><span class="contact-lbl">אימייל:</span><a href="mailto:${o.email}">${o.email}</a></div>`:''}`).join('')}
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 
-  // Providers
-  const providers = b.serviceProviders || [];
-  document.getElementById('providersList').innerHTML = providers.length === 0
-    ? `<div style="color:var(--text-2);font-size:0.85rem;padding:8px 0;">אין נותני שירות</div>`
-    : providers.map(p => `
-      <div class="contact-card">
-        <div class="contact-header" onclick="toggleContact('cp_${p.id}')">
-          <div class="flex-gap">
-            <div class="contact-avatar" style="background:var(--warning-bg);color:var(--warning)">🔧</div>
-            <div>
-              <div class="contact-name">${p.role} ${p.name ? '– ' + p.name : ''}</div>
-              <div class="contact-sub">${p.monthlyCost ? fmt(p.monthlyCost) + ' לחודש' : ''}</div>
-            </div>
-          </div>
-          <div class="flex-gap">
-            <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openProviderModal('${p.id}')">✏️</button>
-            <span style="color:var(--text-2)">▾</span>
+  document.getElementById('providersList').innerHTML = (b.serviceProviders||[]).map(p => `
+    <div class="contact-card">
+      <div class="contact-header" onclick="toggleContact('cp_${p.id}')">
+        <div class="flex-gap">
+          <div class="contact-avatar" style="background:var(--warning-bg);color:var(--warning)">🔧</div>
+          <div><div class="contact-name">${p.role}${p.name?' – '+p.name:''}</div>
+            <div class="contact-sub">${p.monthlyCost?fmt(p.monthlyCost)+' לחודש':''}</div>
           </div>
         </div>
-        <div class="contact-body" id="cp_${p.id}">
-          ${p.phone ? `<div class="contact-row"><span class="contact-lbl">טלפון:</span><a href="tel:${p.phone}">${p.phone}</a></div>` : ''}
+        <div class="flex-gap">
+          <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openProviderModal('${p.id}')">✏️</button>
+          <span style="color:var(--text-2)">▾</span>
         </div>
       </div>
-    `).join('');
+      <div class="contact-body" id="cp_${p.id}">
+        ${p.phone?`<div class="contact-row"><span class="contact-lbl">טלפון:</span><a href="tel:${p.phone}">${p.phone}</a></div>`:''}
+      </div>
+    </div>`).join('');
 }
 
-function toggleContact(id) {
-  const el = document.getElementById(id);
-  if (el) el.classList.toggle('open');
-}
+function toggleContact(id) { const el=document.getElementById(id); if(el) el.classList.toggle('open'); }
 
 // ═══════════════════════════════════════════════
 //  SETTINGS
 // ═══════════════════════════════════════════════
 function renderSettings() {
-  const b = getBuilding();
-  if (!b) return;
-
+  const b = getBuilding(); if (!b) return;
   document.getElementById('buildingSettingsGroup').innerHTML = `
-    <div class="settings-row" style="cursor:pointer" onclick="openBuildingModal('${b.id}')">
-      <div>
-        <div class="settings-lbl">🏢 ${b.name}</div>
-        <div class="settings-sub">${b.address || 'לחץ לעריכה'} · ${fmt(b.monthlyDue||100)}/חודש</div>
-      </div>
-      <span style="color:var(--text-2)">✏️</span>
+    <div class="settings-row" style="cursor:pointer" onclick="openBuildingModal()">
+      <div><div class="settings-lbl">🏢 ${b.name}</div>
+        <div class="settings-sub">מנהל: ${b.manager||'—'} · ${fmt(b.monthlyDue||100)}/חודש</div>
+      </div><span style="color:var(--accent)">✏️</span>
     </div>
     <div class="settings-row">
       <div class="settings-lbl">יתרה פתיחה</div>
-      <span style="color:var(--text-2);font-size:0.85rem;">${fmt(b.initialBalance||0)}</span>
+      <span style="color:var(--text-2);font-size:0.85rem">${fmt(b.initialBalance||0)}</span>
     </div>
     <div class="settings-row">
       <div class="settings-lbl">מספר דירות</div>
-      <span style="color:var(--text-2);font-size:0.85rem;">${(b.apartments||[]).length}</span>
-    </div>
-  `;
+      <span style="color:var(--text-2);font-size:0.85rem">${(b.apartments||[]).length}</span>
+    </div>`;
 
-  // Theme toggle
-  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const isDark = document.documentElement.getAttribute('data-theme')==='dark';
   document.getElementById('darkToggle').checked = isDark;
-
-  // Font size
-  const scale = localStorage.getItem('vb_fontScale') || '1';
-  document.querySelectorAll('.font-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.scale === scale);
-  });
-
-  // Lang
-  const lang = localStorage.getItem('vb_lang') || 'he';
-  document.querySelectorAll('.lang-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.lang === lang);
-  });
+  const scale = localStorage.getItem('vb_fontScale')||'1';
+  document.querySelectorAll('.font-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.scale===scale));
 }
 
 // ═══════════════════════════════════════════════
 //  TRANSACTION MODAL
 // ═══════════════════════════════════════════════
-const expenseCategories = ['חשמל','גנן','ניקיון','ציוד','תיקון','אחר'];
-const incomeCategories = ['וועד בית','החזר','אחר'];
-
 function openTxModal(type, editId) {
   document.getElementById('txModal').classList.add('open');
-  document.getElementById('txEditId').value = editId || '';
-  document.getElementById('txDeleteBtn').style.display = editId ? 'block' : 'none';
-
-  if (editId) {
-    const b = getBuilding();
-    const tx = b.transactions.find(t => t.id === editId);
-    if (!tx) return;
-    document.getElementById('txModalTitle').textContent = 'עריכת תנועה';
-    document.getElementById('txType').value = tx.type;
-    document.getElementById('txAmount').value = tx.amount;
-    document.getElementById('txDesc').value = tx.description;
-    document.getElementById('txDate').value = tx.date;
-    renderTxCategories(tx.type, tx.category);
+  document.getElementById('txEditId').value = editId||'';
+  document.getElementById('txDeleteBtn').style.display = editId?'block':'none';
+  if(editId) {
+    const tx = getBuilding().transactions.find(t=>t.id===editId); if(!tx) return;
+    document.getElementById('txModalTitle').textContent='עריכת תנועה';
+    document.getElementById('txType').value=tx.type;
+    document.getElementById('txAmount').value=tx.amount;
+    document.getElementById('txDesc').value=tx.description;
+    document.getElementById('txDate').value=tx.date;
+    renderTxCats(tx.type, tx.category);
   } else {
-    document.getElementById('txModalTitle').textContent = type === 'expense' ? '+ הוצאה' : '+ הכנסה';
-    document.getElementById('txType').value = type || 'income';
-    document.getElementById('txAmount').value = '';
-    document.getElementById('txDesc').value = '';
-    document.getElementById('txDate').value = todayISO();
-    renderTxCategories(type || 'income', '');
+    document.getElementById('txModalTitle').textContent=type==='expense'?'➖ הוצאה':'➕ הכנסה';
+    document.getElementById('txType').value=type||'income';
+    document.getElementById('txAmount').value='';
+    document.getElementById('txDesc').value='';
+    document.getElementById('txDate').value=todayISO();
+    renderTxCats(type||'income','');
   }
 }
 
-function renderTxCategories(type, selected) {
-  const cats = type === 'expense' ? expenseCategories : incomeCategories;
-  const sel = document.getElementById('txCategory');
-  sel.innerHTML = cats.map(c => `<option value="${c}" ${c===selected?'selected':''}>${c}</option>`).join('');
+function renderTxCats(type, sel) {
+  const cats = type==='expense'?expenseCategories:incomeCategories;
+  document.getElementById('txCategory').innerHTML = cats.map(c=>`<option value="${c}" ${c===sel?'selected':''}>${c}</option>`).join('');
 }
-
-function onTxTypeChange() {
-  const type = document.getElementById('txType').value;
-  renderTxCategories(type, '');
-}
+function onTxTypeChange() { renderTxCats(document.getElementById('txType').value,''); }
 
 function saveTx() {
-  const b = getBuilding();
-  const id = document.getElementById('txEditId').value;
-  const amount = parseFloat(document.getElementById('txAmount').value);
-  if (!amount || isNaN(amount) || amount <= 0) { showSnack('יש להזין סכום תקין'); return; }
-  const desc = document.getElementById('txDesc').value.trim();
-  if (!desc) { showSnack('יש להזין תיאור'); return; }
-
-  const tx = {
-    id: id || uid(),
-    date: document.getElementById('txDate').value || todayISO(),
-    type: document.getElementById('txType').value,
-    amount,
-    description: desc,
-    category: document.getElementById('txCategory').value
-  };
-
-  if (id) {
-    const idx = b.transactions.findIndex(t => t.id === id);
-    if (idx !== -1) b.transactions[idx] = tx;
-  } else {
-    b.transactions.push(tx);
-  }
-  saveState();
-  closeModal('txModal');
-  renderScreen(currentScreen);
-  showSnack('נשמר בהצלחה ✓');
+  const b=getBuilding();
+  const id=document.getElementById('txEditId').value;
+  const amount=parseFloat(document.getElementById('txAmount').value);
+  if(!amount||isNaN(amount)||amount<=0){showSnack('יש להזין סכום תקין');return;}
+  const desc=document.getElementById('txDesc').value.trim();
+  if(!desc){showSnack('יש להזין תיאור');return;}
+  const tx={id:id||uid(),date:document.getElementById('txDate').value||todayISO(),type:document.getElementById('txType').value,amount,description:desc,category:document.getElementById('txCategory').value};
+  if(id){const idx=b.transactions.findIndex(t=>t.id===id);if(idx!==-1)b.transactions[idx]=tx;}
+  else b.transactions.push(tx);
+  saveBuilding(); closeModal('txModal'); renderScreen(currentScreen); showSnack('נשמר ✓');
 }
 
 function deleteTx() {
-  const id = document.getElementById('txEditId').value;
-  if (!id || !confirm('למחוק תנועה זו?')) return;
-  const b = getBuilding();
-  b.transactions = b.transactions.filter(t => t.id !== id);
-  saveState();
-  closeModal('txModal');
-  renderScreen(currentScreen);
-  showSnack('נמחק');
+  const id=document.getElementById('txEditId').value;
+  if(!id||!confirm('למחוק תנועה זו?'))return;
+  const b=getBuilding(); b.transactions=b.transactions.filter(t=>t.id!==id);
+  saveBuilding(); closeModal('txModal'); renderScreen(currentScreen); showSnack('נמחק');
 }
 
 // ═══════════════════════════════════════════════
-//  BUILDING MODAL
+//  BUILDING EDIT MODAL
 // ═══════════════════════════════════════════════
-function openBuildingModal(editId) {
+function openBuildingModal() {
+  const b=getBuilding(); if(!b) return;
   document.getElementById('buildingModal').classList.add('open');
-  document.getElementById('buildingEditId').value = editId || '';
-  document.getElementById('buildingDeleteBtn').style.display = editId && state.buildings.length > 1 ? 'block' : 'none';
-
-  if (editId) {
-    const b = state.buildings.find(x => x.id === editId);
-    if (!b) return;
-    document.getElementById('buildingModalTitle').textContent = 'עריכת בניין';
-    document.getElementById('buildingName').value = b.name;
-    document.getElementById('buildingAddress').value = b.address || '';
-    document.getElementById('buildingDue').value = b.monthlyDue || 100;
-    document.getElementById('buildingBalance').value = b.initialBalance || 0;
-  } else {
-    document.getElementById('buildingModalTitle').textContent = 'הוסף בניין';
-    document.getElementById('buildingName').value = '';
-    document.getElementById('buildingAddress').value = '';
-    document.getElementById('buildingDue').value = 100;
-    document.getElementById('buildingBalance').value = 0;
-  }
+  document.getElementById('buildingEditId').value=b.id;
+  document.getElementById('buildingModalTitle').textContent='עריכת בניין';
+  document.getElementById('buildingName').value=b.name;
+  document.getElementById('buildingManager').value=b.manager||'';
+  document.getElementById('buildingDue').value=b.monthlyDue||100;
+  document.getElementById('buildingBalance').value=b.initialBalance||0;
+  document.getElementById('buildingDeleteBtn').style.display=getIndex().length>1?'block':'none';
 }
 
-function saveBuilding() {
-  const id = document.getElementById('buildingEditId').value;
-  const name = document.getElementById('buildingName').value.trim();
-  if (!name) { showSnack('יש להזין שם בניין'); return; }
-
-  if (id) {
-    const b = state.buildings.find(x => x.id === id);
-    if (b) {
-      b.name = name;
-      b.address = document.getElementById('buildingAddress').value.trim();
-      b.monthlyDue = parseFloat(document.getElementById('buildingDue').value) || 100;
-      b.initialBalance = parseFloat(document.getElementById('buildingBalance').value) || 0;
-    }
-  } else {
-    const newB = {
-      id: uid(), name, address: document.getElementById('buildingAddress').value.trim(),
-      monthlyDue: parseFloat(document.getElementById('buildingDue').value) || 100,
-      initialBalance: parseFloat(document.getElementById('buildingBalance').value) || 0,
-      apartments: [], transactions: [], dues: {}, serviceProviders: []
-    };
-    state.buildings.push(newB);
-    state.currentBuildingId = newB.id;
-  }
-  saveState();
+function saveBuilding_modal() {
+  const id=document.getElementById('buildingEditId').value;
+  const name=document.getElementById('buildingName').value.trim();
+  if(!name){showSnack('יש להזין שם בניין');return;}
+  const manager=document.getElementById('buildingManager').value.trim();
+  const b=getBuilding();
+  b.name=name; b.manager=manager;
+  b.monthlyDue=parseFloat(document.getElementById('buildingDue').value)||100;
+  b.initialBalance=parseFloat(document.getElementById('buildingBalance').value)||0;
+  saveBuilding();
+  // Update index
+  const idx=getIndex(); const entry=idx.find(x=>x.id===id);
+  if(entry){entry.name=name;entry.manager=manager;saveIndex(idx);}
   closeModal('buildingModal');
   renderBuildingSelector();
   renderScreen(currentScreen);
-  showSnack('נשמר ✓');
+  showSnack('הבניין עודכן ✓');
 }
+// Override saveBuilding global name conflict:
+document.getElementById('buildingModal').querySelector('.btn-primary').onclick = saveBuilding_modal;
 
 function deleteBuilding() {
-  const id = document.getElementById('buildingEditId').value;
-  if (!id || state.buildings.length <= 1) return;
-  if (!confirm('למחוק בניין זה וכל נתוניו?')) return;
-  state.buildings = state.buildings.filter(b => b.id !== id);
-  state.currentBuildingId = state.buildings[0].id;
-  saveState();
+  const id=document.getElementById('buildingEditId').value;
+  if(!confirm('למחוק בניין זה וכל נתוניו?'))return;
+  deleteBuildingData(id);
+  let idx=getIndex().filter(b=>b.id!==id);
+  saveIndex(idx);
   closeModal('buildingModal');
+  if(idx.length===0){resetData();return;}
+  loadBuilding(idx[0].id);
   renderBuildingSelector();
-  renderScreen(currentScreen);
+  renderScreen('screenDashboard');
 }
 
 // ═══════════════════════════════════════════════
@@ -1811,85 +1382,43 @@ function deleteBuilding() {
 // ═══════════════════════════════════════════════
 function openAptModal(editId) {
   document.getElementById('aptModal').classList.add('open');
-  document.getElementById('aptEditId').value = editId || '';
-  document.getElementById('aptDeleteBtn').style.display = editId ? 'block' : 'none';
-
-  if (editId) {
-    const b = getBuilding();
-    const apt = b.apartments.find(a => a.id === editId);
-    if (!apt) return;
-    document.getElementById('aptModalTitle').textContent = 'עריכת דירה';
-    document.getElementById('aptName').value = apt.name;
-    document.getElementById('aptResidentName').value = apt.resident?.name || '';
-    document.getElementById('aptResidentPhone').value = apt.resident?.phone || '';
-    document.getElementById('aptOwner1Name').value = apt.owners?.[0]?.name || '';
-    document.getElementById('aptOwner1Phone').value = apt.owners?.[0]?.phone || '';
-    document.getElementById('aptOwner1Email').value = apt.owners?.[0]?.email || '';
-    document.getElementById('aptOwner1WA').value = apt.owners?.[0]?.whatsapp || '';
-    document.getElementById('aptOwner2Name').value = apt.owners?.[1]?.name || '';
-    document.getElementById('aptOwner2Phone').value = apt.owners?.[1]?.phone || '';
+  document.getElementById('aptEditId').value=editId||'';
+  document.getElementById('aptDeleteBtn').style.display=editId?'block':'none';
+  if(editId){
+    const apt=getBuilding().apartments.find(a=>a.id===editId); if(!apt)return;
+    document.getElementById('aptModalTitle').textContent='עריכת דירה';
+    document.getElementById('aptName').value=apt.name;
+    document.getElementById('aptResidentName').value=apt.resident?.name||'';
+    document.getElementById('aptResidentPhone').value=apt.resident?.phone||'';
+    document.getElementById('aptOwner1Name').value=apt.owners?.[0]?.name||'';
+    document.getElementById('aptOwner1Phone').value=apt.owners?.[0]?.phone||'';
+    document.getElementById('aptOwner1Email').value=apt.owners?.[0]?.email||'';
+    document.getElementById('aptOwner1WA').value=apt.owners?.[0]?.whatsapp||'';
+    document.getElementById('aptOwner2Name').value=apt.owners?.[1]?.name||'';
+    document.getElementById('aptOwner2Phone').value=apt.owners?.[1]?.phone||'';
   } else {
-    document.getElementById('aptModalTitle').textContent = 'דירה חדשה';
-    ['aptName','aptResidentName','aptResidentPhone','aptOwner1Name','aptOwner1Phone','aptOwner1Email','aptOwner1WA','aptOwner2Name','aptOwner2Phone']
-      .forEach(id => document.getElementById(id).value = '');
+    document.getElementById('aptModalTitle').textContent='דירה חדשה';
+    ['aptName','aptResidentName','aptResidentPhone','aptOwner1Name','aptOwner1Phone','aptOwner1Email','aptOwner1WA','aptOwner2Name','aptOwner2Phone'].forEach(i=>document.getElementById(i).value='');
   }
 }
 
 function saveApt() {
-  const b = getBuilding();
-  const id = document.getElementById('aptEditId').value;
-  const name = document.getElementById('aptName').value.trim();
-  if (!name) { showSnack('יש להזין שם דירה'); return; }
-
-  const owners = [];
-  const o1name = document.getElementById('aptOwner1Name').value.trim();
-  if (o1name) owners.push({
-    name: o1name,
-    phone: document.getElementById('aptOwner1Phone').value.trim(),
-    email: document.getElementById('aptOwner1Email').value.trim(),
-    whatsapp: document.getElementById('aptOwner1WA').value.trim()
-  });
-  const o2name = document.getElementById('aptOwner2Name').value.trim();
-  if (o2name) owners.push({
-    name: o2name,
-    phone: document.getElementById('aptOwner2Phone').value.trim(),
-    email: '', whatsapp: ''
-  });
-
-  const apt = {
-    id: id || uid(),
-    name,
-    resident: {
-      name: document.getElementById('aptResidentName').value.trim(),
-      phone: document.getElementById('aptResidentPhone').value.trim()
-    },
-    owners
-  };
-
-  if (id) {
-    const idx = b.apartments.findIndex(a => a.id === id);
-    if (idx !== -1) b.apartments[idx] = apt;
-  } else {
-    b.apartments.push(apt);
-    if (!b.dues) b.dues = {};
-    b.dues[apt.id] = {};
-  }
-  saveState();
-  closeModal('aptModal');
-  renderContacts();
-  showSnack('נשמר ✓');
+  const b=getBuilding(); const id=document.getElementById('aptEditId').value;
+  const name=document.getElementById('aptName').value.trim(); if(!name){showSnack('יש להזין שם');return;}
+  const owners=[]; const o1=document.getElementById('aptOwner1Name').value.trim();
+  if(o1) owners.push({name:o1,phone:document.getElementById('aptOwner1Phone').value.trim(),email:document.getElementById('aptOwner1Email').value.trim(),whatsapp:document.getElementById('aptOwner1WA').value.trim()});
+  const o2=document.getElementById('aptOwner2Name').value.trim();
+  if(o2) owners.push({name:o2,phone:document.getElementById('aptOwner2Phone').value.trim(),email:'',whatsapp:''});
+  const apt={id:id||uid(),name,resident:{name:document.getElementById('aptResidentName').value.trim(),phone:document.getElementById('aptResidentPhone').value.trim()},owners};
+  if(id){const i=b.apartments.findIndex(a=>a.id===id);if(i!==-1)b.apartments[i]=apt;}
+  else{b.apartments.push(apt);if(!b.dues)b.dues={};b.dues[apt.id]={};}
+  saveBuilding(); closeModal('aptModal'); renderContacts(); showSnack('נשמר ✓');
 }
 
 function deleteApt() {
-  const id = document.getElementById('aptEditId').value;
-  if (!id || !confirm('למחוק דירה זו?')) return;
-  const b = getBuilding();
-  b.apartments = b.apartments.filter(a => a.id !== id);
-  if (b.dues) delete b.dues[id];
-  saveState();
-  closeModal('aptModal');
-  renderContacts();
-  showSnack('נמחק');
+  const id=document.getElementById('aptEditId').value; if(!id||!confirm('למחוק?'))return;
+  const b=getBuilding(); b.apartments=b.apartments.filter(a=>a.id!==id); if(b.dues)delete b.dues[id];
+  saveBuilding(); closeModal('aptModal'); renderContacts(); showSnack('נמחק');
 }
 
 // ═══════════════════════════════════════════════
@@ -1897,205 +1426,178 @@ function deleteApt() {
 // ═══════════════════════════════════════════════
 function openProviderModal(editId) {
   document.getElementById('providerModal').classList.add('open');
-  document.getElementById('providerEditId').value = editId || '';
-  document.getElementById('providerDeleteBtn').style.display = editId ? 'block' : 'none';
-
-  if (editId) {
-    const b = getBuilding();
-    const p = (b.serviceProviders||[]).find(x => x.id === editId);
-    if (!p) return;
-    document.getElementById('providerRole').value = p.role || '';
-    document.getElementById('providerName').value = p.name || '';
-    document.getElementById('providerPhone').value = p.phone || '';
-    document.getElementById('providerCost').value = p.monthlyCost || '';
-  } else {
-    ['providerRole','providerName','providerPhone','providerCost'].forEach(id => document.getElementById(id).value = '');
-  }
+  document.getElementById('providerEditId').value=editId||'';
+  document.getElementById('providerDeleteBtn').style.display=editId?'block':'none';
+  if(editId){
+    const p=(getBuilding().serviceProviders||[]).find(x=>x.id===editId); if(!p)return;
+    document.getElementById('providerRole').value=p.role||'';
+    document.getElementById('providerName').value=p.name||'';
+    document.getElementById('providerPhone').value=p.phone||'';
+    document.getElementById('providerCost').value=p.monthlyCost||'';
+  } else ['providerRole','providerName','providerPhone','providerCost'].forEach(i=>document.getElementById(i).value='');
 }
 
 function saveProvider() {
-  const b = getBuilding();
-  if (!b.serviceProviders) b.serviceProviders = [];
-  const id = document.getElementById('providerEditId').value;
-  const role = document.getElementById('providerRole').value.trim();
-  if (!role) { showSnack('יש להזין תפקיד'); return; }
-
-  const p = {
-    id: id || uid(),
-    role,
-    name: document.getElementById('providerName').value.trim(),
-    phone: document.getElementById('providerPhone').value.trim(),
-    monthlyCost: parseFloat(document.getElementById('providerCost').value) || 0
-  };
-
-  if (id) {
-    const idx = b.serviceProviders.findIndex(x => x.id === id);
-    if (idx !== -1) b.serviceProviders[idx] = p;
-  } else {
-    b.serviceProviders.push(p);
-  }
-  saveState();
-  closeModal('providerModal');
-  renderContacts();
-  showSnack('נשמר ✓');
+  const b=getBuilding(); if(!b.serviceProviders)b.serviceProviders=[];
+  const id=document.getElementById('providerEditId').value;
+  const role=document.getElementById('providerRole').value.trim(); if(!role){showSnack('יש להזין תפקיד');return;}
+  const p={id:id||uid(),role,name:document.getElementById('providerName').value.trim(),phone:document.getElementById('providerPhone').value.trim(),monthlyCost:parseFloat(document.getElementById('providerCost').value)||0};
+  if(id){const i=b.serviceProviders.findIndex(x=>x.id===id);if(i!==-1)b.serviceProviders[i]=p;}
+  else b.serviceProviders.push(p);
+  saveBuilding(); closeModal('providerModal'); renderContacts(); showSnack('נשמר ✓');
 }
 
 function deleteProvider() {
-  const id = document.getElementById('providerEditId').value;
-  if (!id || !confirm('למחוק?')) return;
-  const b = getBuilding();
-  b.serviceProviders = (b.serviceProviders||[]).filter(p => p.id !== id);
-  saveState();
-  closeModal('providerModal');
-  renderContacts();
-  showSnack('נמחק');
+  const id=document.getElementById('providerEditId').value; if(!id||!confirm('למחוק?'))return;
+  const b=getBuilding(); b.serviceProviders=(b.serviceProviders||[]).filter(p=>p.id!==id);
+  saveBuilding(); closeModal('providerModal'); renderContacts(); showSnack('נמחק');
 }
 
 // ═══════════════════════════════════════════════
-//  THEME / FONT / LANG
+//  INSTALL / PWA
+// ═══════════════════════════════════════════════
+let deferredPrompt = null;
+
+function initInstallPrompt() {
+  const dismissed = localStorage.getItem('vb_install_dismissed');
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+  const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+
+  if (isStandalone) return; // already installed
+
+  if (isIOS && !dismissed) {
+    setTimeout(() => {
+      document.getElementById('iosInstall').style.display = 'block';
+    }, 3000);
+    return;
+  }
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    if (!dismissed) {
+      setTimeout(() => {
+        document.getElementById('installBanner').style.display = 'flex';
+      }, 2000);
+    }
+  });
+}
+
+function doInstall() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(result => {
+    if (result.outcome === 'accepted') showSnack('האפליקציה הותקנה! ✓');
+    dismissInstall();
+  });
+}
+
+function dismissInstall() {
+  document.getElementById('installBanner').style.display = 'none';
+  localStorage.setItem('vb_install_dismissed', '1');
+}
+
+function closeIosInstall() {
+  document.getElementById('iosInstall').style.display = 'none';
+  localStorage.setItem('vb_install_dismissed', '1');
+}
+
+function showInstallHelp() {
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+  if (isIOS) {
+    document.getElementById('iosInstall').style.display = 'block';
+  } else if (deferredPrompt) {
+    doInstall();
+  } else {
+    showSnack('פתח בדפדפן Chrome והשתמש בתפריט "הוסף למסך הבית"');
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  THEME / FONT
 // ═══════════════════════════════════════════════
 function toggleTheme() {
-  const current = document.documentElement.getAttribute('data-theme');
-  const next = current === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  localStorage.setItem('vb_theme', next);
-  document.getElementById('themeBtn').textContent = next === 'dark' ? '☀️' : '🌙';
-  const tog = document.getElementById('darkToggle');
-  if (tog) tog.checked = next === 'dark';
+  const cur=document.documentElement.getAttribute('data-theme');
+  const next=cur==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',next);
+  localStorage.setItem('vb_theme',next);
+  document.getElementById('themeBtn').textContent=next==='dark'?'☀️':'🌙';
+  const tog=document.getElementById('darkToggle'); if(tog)tog.checked=next==='dark';
 }
 
 function setFontSize(scale) {
-  document.documentElement.style.setProperty('--font-scale', scale);
-  localStorage.setItem('vb_fontScale', scale);
-  document.querySelectorAll('.font-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.scale === scale);
-  });
-}
-
-function setLang(lang) {
-  // For now just update direction for he vs others
-  const dir = lang === 'he' ? 'rtl' : 'ltr';
-  document.documentElement.setAttribute('dir', dir);
-  document.documentElement.setAttribute('lang', lang);
-  localStorage.setItem('vb_lang', lang);
-  document.querySelectorAll('.lang-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.lang === lang);
-  });
+  document.documentElement.style.setProperty('--font-scale',scale);
+  localStorage.setItem('vb_fontScale',scale);
+  document.querySelectorAll('.font-btn').forEach(b=>b.classList.toggle('active',b.dataset.scale===scale));
 }
 
 // ═══════════════════════════════════════════════
 //  DATA EXPORT / IMPORT
 // ═══════════════════════════════════════════════
 function exportData() {
-  const data = {
-    appName: APP_NAME,
-    version: APP_VERSION,
-    exportDate: new Date().toISOString(),
-    state
-  };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `vaad-bait-backup-${new Date().toISOString().slice(0,10)}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-  showSnack('ייצוא הצליח ✓');
+  const b=getBuilding(); if(!b)return;
+  const data={appName:APP_NAME,version:APP_VERSION,exportDate:new Date().toISOString(),building:b};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url;
+  a.download=`vaad-bait-${b.name.replace(/\s+/g,'-')}-${new Date().toISOString().slice(0,10)}.json`;
+  a.click(); URL.revokeObjectURL(url); showSnack('ייצוא הצליח ✓');
 }
 
 function importData() {
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = '.json';
-  input.onchange = async (e) => {
+  const input=document.createElement('input'); input.type='file'; input.accept='.json';
+  input.onchange=async(e)=>{
     try {
-      const text = await e.target.files[0].text();
-      const data = JSON.parse(text);
-      if (!data.state || !data.state.buildings) { showSnack('קובץ לא תקין'); return; }
-      state = data.state;
-      saveState();
-      location.reload();
-    } catch(err) {
-      showSnack('שגיאה בייבוא: ' + err.message);
-    }
+      const text=await e.target.files[0].text(); const data=JSON.parse(text);
+      if(!data.building){showSnack('קובץ לא תקין');return;}
+      const b=data.building;
+      saveBuildingData(b.id,b);
+      const idx=getIndex(); if(!idx.find(x=>x.id===b.id)){idx.push({id:b.id,name:b.name,manager:b.manager||''});saveIndex(idx);}
+      loadBuilding(b.id); showApp(); showSnack('ייבוא הצליח ✓');
+    } catch(err){showSnack('שגיאה: '+err.message);}
   };
   input.click();
 }
 
 function resetData() {
-  if (!confirm('למחוק את כל הנתונים? פעולה זו בלתי הפיכה!')) return;
-  localStorage.removeItem('vb_state');
-  location.reload();
+  if(!confirm('למחוק את כל הנתונים לחלוטין?'))return;
+  localStorage.clear(); location.reload();
 }
 
 // ═══════════════════════════════════════════════
 //  MODAL HELPERS
 // ═══════════════════════════════════════════════
-function closeModal(id) {
-  document.getElementById(id).classList.remove('open');
-}
-
-// Close modal on overlay click
-document.querySelectorAll('.modal-overlay').forEach(overlay => {
-  overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) overlay.classList.remove('open');
-  });
-});
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
 
 // ═══════════════════════════════════════════════
 //  SNACKBAR
 // ═══════════════════════════════════════════════
 function showSnack(msg) {
-  const el = document.getElementById('snackbar');
-  el.textContent = msg;
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2500);
+  const el=document.getElementById('snackbar'); el.textContent=msg;
+  el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),2500);
+}
+
+// ═══════════════════════════════════════════════
+//  SERVICE WORKER
+// ═══════════════════════════════════════════════
+if('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').then(reg => {
+    reg.addEventListener('updatefound', () => {
+      const newWorker = reg.installing;
+      newWorker.addEventListener('statechange', () => {
+        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+          showSnack('עדכון זמין — סגור ופתח מחדש להתקנה');
+        }
+      });
+    });
+  });
 }
 
 // ═══════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', () => {
-  // Font size
-  const savedScale = localStorage.getItem('vb_fontScale') || '1';
-  document.documentElement.style.setProperty('--font-scale', savedScale);
-
-  // Theme icon
-  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-  document.getElementById('themeBtn').textContent = isDark ? '☀️' : '🌙';
-
-  // Version
-  document.getElementById('versionBadge').textContent = APP_VERSION;
-  document.getElementById('settingsVersion').textContent = APP_VERSION;
-
-  // Load data
-  loadState();
-
-  // Render
-  renderBuildingSelector();
-  renderDashboard();
-
-  // Lang
-  const savedLang = localStorage.getItem('vb_lang') || 'he';
-  setLang(savedLang);
-
-  // Update check (delayed)
-  if (GITHUB_REPO) setTimeout(checkForUpdates, 3000);
-});
-
-async function checkForUpdates() {
-  if (!GITHUB_REPO) return;
-  try {
-    const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/vaad_bait.html`, { cache: 'no-store' });
-    if (!res.ok) return;
-    const file = await res.json();
-    const content = atob(file.content);
-    const match = content.match(/APP_VERSION\s*=\s*["']([^"']+)["']/);
-    if (match && match[1] !== APP_VERSION) {
-      if (confirm(`עדכון זמין: v${match[1]}\nלהתקין עכשיו?`)) location.reload(true);
-    }
-  } catch(e) {}
-}
+document.addEventListener('DOMContentLoaded', initApp);
 </script>
 </body>
 </html>
