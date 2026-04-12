@@ -1,0 +1,2101 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1976d2">
+<title>וועד בית</title>
+<script>
+// ╔══════════════════════════════════════════════════════════╗
+// ║  APP CONFIGURATION                                        ║
+// ╚══════════════════════════════════════════════════════════╝
+const APP_VERSION = "1.0.0";
+const APP_NAME = "וועד בית";
+const GITHUB_REPO = ""; // set your repo here
+
+// Theme init (prevent flash)
+(function() {
+  const t = localStorage.getItem('vb_theme');
+  const d = window.matchMedia('(prefers-color-scheme:dark)').matches;
+  document.documentElement.setAttribute('data-theme', t || (d ? 'dark' : 'light'));
+})();
+</script>
+<style>
+:root {
+  --bg: #f0f4f8;
+  --bg-card: #ffffff;
+  --bg-header: #1976d2;
+  --text: #1a2233;
+  --text-2: #5a6478;
+  --text-inv: #ffffff;
+  --accent: #1976d2;
+  --accent-light: #e3f0ff;
+  --border: #dde3ec;
+  --shadow: rgba(25,118,210,0.08);
+  --success: #2e7d32;
+  --success-bg: #e8f5e9;
+  --danger: #c62828;
+  --danger-bg: #ffebee;
+  --warning: #e65100;
+  --warning-bg: #fff3e0;
+  --font-scale: 1;
+}
+[data-theme="dark"] {
+  --bg: #0f1621;
+  --bg-card: #1a2233;
+  --bg-header: #0d47a1;
+  --text: #e0e8f0;
+  --text-2: #7a8aaa;
+  --text-inv: #ffffff;
+  --accent: #64b5f6;
+  --accent-light: #0d2a4a;
+  --border: #2a3550;
+  --shadow: rgba(0,0,0,0.3);
+  --success: #66bb6a;
+  --success-bg: #1b3a1e;
+  --danger: #ef5350;
+  --danger-bg: #3a1515;
+  --warning: #ffa726;
+  --warning-bg: #3a2700;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  font-family: -apple-system, 'Segoe UI', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  font-size: calc(15px * var(--font-scale));
+  direction: rtl;
+}
+
+/* ── Header ── */
+.app-header {
+  background: var(--bg-header);
+  color: var(--text-inv);
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  gap: 8px;
+}
+.header-title {
+  font-size: calc(1.1rem * var(--font-scale));
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+.version-badge {
+  font-size: 0.65rem;
+  opacity: 0.7;
+  background: rgba(255,255,255,0.15);
+  padding: 2px 6px;
+  border-radius: 8px;
+}
+.building-selector-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 14px 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.building-selector-bar::-webkit-scrollbar { display: none; }
+.building-chip {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  border: 1.5px solid rgba(255,255,255,0.4);
+  color: rgba(255,255,255,0.85);
+  background: transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.building-chip.active {
+  background: rgba(255,255,255,0.25);
+  border-color: white;
+  color: white;
+  font-weight: 700;
+}
+.building-chip-add {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  border: 1.5px dashed rgba(255,255,255,0.5);
+  color: rgba(255,255,255,0.7);
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* ── Balance Banner ── */
+.balance-banner {
+  background: linear-gradient(135deg, #1565c0, #1976d2 60%, #1e88e5);
+  color: white;
+  padding: 18px 16px 14px;
+  text-align: center;
+}
+[data-theme="dark"] .balance-banner {
+  background: linear-gradient(135deg, #0a2a5e, #0d3a8c);
+}
+.balance-label { font-size: 0.8rem; opacity: 0.85; margin-bottom: 4px; }
+.balance-amount {
+  font-size: calc(2.2rem * var(--font-scale));
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+.balance-sub {
+  font-size: 0.78rem;
+  opacity: 0.75;
+  margin-top: 3px;
+}
+
+/* ── Content ── */
+.screen { display: none; padding-bottom: 80px; }
+.screen.active { display: block; }
+
+/* ── Bottom Nav ── */
+.bottom-nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-around;
+  padding: 6px 0 calc(6px + env(safe-area-inset-bottom));
+  z-index: 100;
+  box-shadow: 0 -2px 10px var(--shadow);
+}
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.62rem;
+  color: var(--text-2);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: color 0.2s;
+  min-width: 52px;
+}
+.nav-item.active { color: var(--accent); }
+.nav-item .ni { font-size: 1.3rem; }
+
+/* ── Cards ── */
+.card {
+  background: var(--bg-card);
+  border-radius: 14px;
+  padding: 14px;
+  margin: 8px 12px;
+  box-shadow: 0 1px 4px var(--shadow);
+  border: 1px solid var(--border);
+}
+.card-title {
+  font-size: 0.78rem;
+  color: var(--text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px 4px;
+}
+.section-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-2);
+  text-transform: uppercase;
+}
+
+/* ── Quick Actions ── */
+.quick-actions {
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px 0;
+}
+.qa-btn {
+  flex: 1;
+  padding: 11px;
+  border: none;
+  border-radius: 12px;
+  font-size: calc(0.85rem * var(--font-scale));
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+.qa-btn:active { transform: scale(0.96); }
+.qa-income { background: var(--success-bg); color: var(--success); }
+.qa-expense { background: var(--danger-bg); color: var(--danger); }
+.qa-apt { background: var(--accent-light); color: var(--accent); }
+
+/* ── Unpaid list ── */
+.unpaid-apt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.unpaid-apt:last-child { border-bottom: none; }
+.apt-name { font-weight: 600; font-size: 0.9rem; }
+.apt-info { font-size: 0.75rem; color: var(--text-2); }
+.pay-btn {
+  padding: 5px 12px;
+  background: var(--success-bg);
+  color: var(--success);
+  border: 1px solid var(--success);
+  border-radius: 20px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.pay-btn:active { transform: scale(0.95); }
+
+/* ── Transactions ── */
+.tx-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+.tx-item:last-child { border-bottom: none; }
+.tx-icon {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.tx-icon.income { background: var(--success-bg); }
+.tx-icon.expense { background: var(--danger-bg); }
+.tx-body { flex: 1; min-width: 0; }
+.tx-desc {
+  font-size: 0.88rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tx-date { font-size: 0.72rem; color: var(--text-2); margin-top: 2px; }
+.tx-amount { font-size: 0.95rem; font-weight: 800; white-space: nowrap; }
+.tx-amount.income { color: var(--success); }
+.tx-amount.expense { color: var(--danger); }
+
+/* ── Dues Grid ── */
+.dues-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  flex-wrap: wrap;
+}
+.year-btn {
+  padding: 5px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  background: var(--bg-card);
+  color: var(--text);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.year-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+  font-weight: 700;
+}
+.dues-summary {
+  display: flex;
+  gap: 8px;
+  padding: 0 12px 8px;
+  flex-wrap: wrap;
+}
+.dues-stat {
+  flex: 1;
+  min-width: 80px;
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  text-align: center;
+}
+.dues-stat-val { font-size: 1.15rem; font-weight: 800; }
+.dues-stat-lbl { font-size: 0.68rem; color: var(--text-2); }
+.grid-wrap {
+  overflow-x: auto;
+  padding: 0 12px 8px;
+  -webkit-overflow-scrolling: touch;
+}
+.dues-grid {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 500px;
+  font-size: calc(0.75rem * var(--font-scale));
+}
+.dues-grid th {
+  background: var(--bg-header);
+  color: white;
+  padding: 7px 5px;
+  text-align: center;
+  font-weight: 700;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+}
+.dues-grid td {
+  padding: 6px 4px;
+  text-align: center;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.dues-grid td:hover { filter: brightness(0.95); }
+.dues-grid tr:nth-child(even) td { background: var(--bg); }
+.dues-grid td.paid { color: var(--success); font-size: 1rem; }
+.dues-grid td.unpaid { color: var(--danger); font-size: 0.85rem; }
+.dues-grid td.total-cell {
+  font-weight: 700;
+  background: var(--accent-light);
+  cursor: default;
+}
+.dues-grid th.month-col { min-width: 52px; }
+.dues-grid th.apt-col { min-width: 60px; }
+.dues-grid th.total-col { min-width: 50px; background: #0d47a1; }
+
+/* ── Contacts ── */
+.contact-card {
+  background: var(--bg-card);
+  border-radius: 14px;
+  margin: 6px 12px;
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 3px var(--shadow);
+  overflow: hidden;
+}
+.contact-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  cursor: pointer;
+}
+.contact-avatar {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: var(--accent-light);
+  color: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.contact-name { font-weight: 700; font-size: 0.95rem; }
+.contact-sub { font-size: 0.75rem; color: var(--text-2); margin-top: 2px; }
+.contact-body { padding: 0 14px 12px; display: none; }
+.contact-body.open { display: block; }
+.contact-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  font-size: 0.85rem;
+  border-bottom: 1px solid var(--border);
+}
+.contact-row:last-child { border-bottom: none; }
+.contact-row a { color: var(--accent); text-decoration: none; }
+.contact-lbl { color: var(--text-2); font-size: 0.75rem; min-width: 42px; }
+.contact-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+/* ── Forms / Modals ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 500;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--bg-card);
+  width: 100%;
+  max-width: 520px;
+  border-radius: 20px 20px 0 0;
+  max-height: 92vh;
+  overflow-y: auto;
+  padding: 20px 16px calc(20px + env(safe-area-inset-bottom));
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal-handle {
+  width: 40px; height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 0 auto 16px;
+}
+.modal-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin-bottom: 16px;
+  text-align: center;
+}
+.form-group { margin-bottom: 12px; }
+.form-label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-2);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: calc(0.9rem * var(--font-scale));
+  direction: rtl;
+  outline: none;
+  transition: border-color 0.2s;
+  font-family: inherit;
+}
+.form-input:focus, .form-select:focus { border-color: var(--accent); }
+.form-textarea { min-height: 70px; resize: vertical; }
+.form-row { display: flex; gap: 8px; }
+.form-row .form-group { flex: 1; }
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+.btn {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+  font-size: calc(0.9rem * var(--font-scale));
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--accent); color: white; }
+.btn-danger { background: var(--danger); color: white; }
+.btn-ghost {
+  background: var(--bg);
+  color: var(--text-2);
+  border: 1.5px solid var(--border);
+}
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  border-radius: 8px;
+}
+
+/* ── Settings ── */
+.settings-group {
+  background: var(--bg-card);
+  border-radius: 14px;
+  margin: 8px 12px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 14px;
+  border-bottom: 1px solid var(--border);
+  gap: 8px;
+}
+.settings-row:last-child { border-bottom: none; }
+.settings-lbl { font-size: 0.9rem; font-weight: 500; }
+.settings-sub { font-size: 0.75rem; color: var(--text-2); }
+.toggle {
+  position: relative; width: 46px; height: 26px; flex-shrink: 0;
+}
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute; inset: 0;
+  background: var(--border); border-radius: 26px; cursor: pointer;
+  transition: background 0.3s;
+}
+.toggle-slider::before {
+  content: ''; position: absolute;
+  width: 20px; height: 20px;
+  bottom: 3px; right: 3px;
+  background: white; border-radius: 50%;
+  transition: transform 0.3s;
+}
+.toggle input:checked + .toggle-slider { background: var(--accent); }
+.toggle input:checked + .toggle-slider::before { transform: translateX(-20px); }
+.font-btns, .lang-btns {
+  display: flex; gap: 6px; flex-wrap: wrap; padding: 0 14px 12px;
+}
+.font-btn, .lang-btn {
+  padding: 5px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.font-btn.active, .lang-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+  font-weight: 700;
+}
+.settings-group-title {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  color: var(--text-2);
+  letter-spacing: 0.5px;
+  font-weight: 700;
+  padding: 10px 14px 2px;
+}
+
+/* ── Filter bar ── */
+.filter-bar {
+  display: flex;
+  gap: 6px;
+  padding: 6px 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.filter-bar::-webkit-scrollbar { display: none; }
+.filter-chip {
+  padding: 4px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  background: var(--bg-card);
+  color: var(--text-2);
+  font-size: 0.78rem;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.filter-chip.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+  font-weight: 700;
+}
+
+/* ── Provider chip ── */
+.provider-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent-light);
+  color: var(--accent);
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+/* ── Empty state ── */
+.empty-state {
+  text-align: center;
+  padding: 30px 20px;
+  color: var(--text-2);
+}
+.empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 8px; }
+.empty-state p { font-size: 0.88rem; }
+
+/* ── Floating add btn ── */
+.fab {
+  position: fixed;
+  bottom: 76px;
+  left: 16px;
+  width: 50px; height: 50px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: white;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(25,118,210,0.4);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 90;
+  transition: all 0.2s;
+}
+.fab:active { transform: scale(0.92); }
+
+/* ── Misc ── */
+.badge {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+.badge-danger { background: var(--danger-bg); color: var(--danger); }
+.badge-success { background: var(--success-bg); color: var(--success); }
+.badge-warn { background: var(--warning-bg); color: var(--warning); }
+
+.flex-between { display: flex; align-items: center; justify-content: space-between; }
+.flex-gap { display: flex; align-items: center; gap: 8px; }
+
+.month-progress {
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+.month-progress-bar {
+  height: 100%;
+  background: var(--success);
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+
+input[type="date"] { font-size: 16px; }
+input[type="number"] { font-size: 16px; }
+
+.apt-edit-list { display: flex; flex-direction: column; gap: 6px; padding: 0 14px 12px; }
+.apt-edit-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px;
+  background: var(--bg);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+.apt-edit-name { flex: 1; font-weight: 600; }
+
+.snackbar {
+  position: fixed;
+  bottom: calc(70px + env(safe-area-inset-bottom));
+  left: 50%; transform: translateX(-50%);
+  background: #333;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 24px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.3s;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.snackbar.show { opacity: 1; }
+
+@media (min-width: 520px) {
+  .modal { border-radius: 20px; margin: auto; max-height: 85vh; }
+  .modal-overlay { align-items: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- App Header -->
+<div class="app-header">
+  <div class="header-top">
+    <div class="flex-gap">
+      <span style="font-size:1.4rem">🏢</span>
+      <span class="header-title" id="headerTitle">וועד בית</span>
+      <span class="version-badge">v<span id="versionBadge">1.0.0</span></span>
+    </div>
+    <div class="flex-gap">
+      <button onclick="toggleTheme()" style="background:none;border:none;color:white;font-size:1.2rem;cursor:pointer;" id="themeBtn">🌙</button>
+    </div>
+  </div>
+  <div class="building-selector-bar" id="buildingSelector"></div>
+</div>
+
+<!-- Screens -->
+<div id="screenDashboard" class="screen active">
+  <div class="balance-banner" id="balanceBanner">
+    <div class="balance-label">יתרה נוכחית</div>
+    <div class="balance-amount" id="balanceAmount">₪0</div>
+    <div class="balance-sub" id="balanceSub">טוען...</div>
+  </div>
+  <div class="quick-actions">
+    <button class="qa-btn qa-income" onclick="openTxModal('income')">+ הכנסה</button>
+    <button class="qa-btn qa-expense" onclick="openTxModal('expense')">+ הוצאה</button>
+  </div>
+  <div class="section-header" style="margin-top:8px">
+    <span class="section-title">תשלומי החודש</span>
+    <span id="monthLabel" style="font-size:0.8rem;color:var(--text-2)"></span>
+  </div>
+  <div class="card" id="monthlyCard"></div>
+  <div class="section-header">
+    <span class="section-title">תנועות אחרונות</span>
+    <span style="font-size:0.8rem;color:var(--accent);cursor:pointer;" onclick="showScreen('screenTransactions')">הכל</span>
+  </div>
+  <div class="card" id="recentTxCard"></div>
+</div>
+
+<div id="screenDues" class="screen">
+  <div class="dues-controls" id="yearBtns"></div>
+  <div class="dues-summary" id="duesSummary"></div>
+  <div class="grid-wrap"><table class="dues-grid" id="duesGrid"></table></div>
+</div>
+
+<div id="screenTransactions" class="screen">
+  <div class="filter-bar" id="txFilterBar"></div>
+  <div id="txList" style="padding: 0 12px 8px;"></div>
+</div>
+
+<div id="screenContacts" class="screen">
+  <div class="section-header">
+    <span class="section-title">דירות</span>
+    <button class="btn btn-primary btn-sm" onclick="openAptModal()">+ הוסף דירה</button>
+  </div>
+  <div id="contactsList"></div>
+  <div class="section-header" style="margin-top:8px">
+    <span class="section-title">נותני שירות</span>
+    <button class="btn btn-primary btn-sm" onclick="openProviderModal()">+ הוסף</button>
+  </div>
+  <div id="providersList" style="padding:0 12px 8px;"></div>
+</div>
+
+<div id="screenSettings" class="screen">
+  <div class="settings-group-title">הגדרות בניין</div>
+  <div class="settings-group" id="buildingSettingsGroup"></div>
+
+  <div class="settings-group-title" style="margin-top:12px">מראה</div>
+  <div class="settings-group">
+    <div class="settings-row">
+      <div><div class="settings-lbl">מצב כהה</div></div>
+      <label class="toggle">
+        <input type="checkbox" id="darkToggle" onchange="toggleTheme()">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <div class="settings-group-title" style="margin-top:12px">גודל גופן</div>
+  <div class="settings-group">
+    <div class="font-btns">
+      <button class="font-btn" data-scale="0.85" onclick="setFontSize('0.85')">קטן</button>
+      <button class="font-btn" data-scale="1" onclick="setFontSize('1')">בינוני</button>
+      <button class="font-btn" data-scale="1.15" onclick="setFontSize('1.15')">גדול</button>
+      <button class="font-btn" data-scale="1.3" onclick="setFontSize('1.3')">גדול מאוד</button>
+    </div>
+  </div>
+
+  <div class="settings-group-title" style="margin-top:12px">שפה</div>
+  <div class="settings-group">
+    <div class="lang-btns">
+      <button class="lang-btn active" data-lang="he" onclick="setLang('he')">עברית</button>
+      <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">Русский</button>
+      <button class="lang-btn" data-lang="en" onclick="setLang('en')">English</button>
+    </div>
+  </div>
+
+  <div class="settings-group-title" style="margin-top:12px">גיבוי ושחזור</div>
+  <div class="settings-group">
+    <div class="settings-row">
+      <div class="settings-lbl">ייצוא נתונים (JSON)</div>
+      <button class="btn btn-ghost btn-sm" onclick="exportData()">ייצא</button>
+    </div>
+    <div class="settings-row">
+      <div class="settings-lbl">ייבוא נתונים</div>
+      <button class="btn btn-ghost btn-sm" onclick="importData()">ייבא</button>
+    </div>
+  </div>
+
+  <div class="settings-group-title" style="margin-top:12px">אודות</div>
+  <div class="settings-group">
+    <div class="settings-row">
+      <div class="settings-lbl">גרסה</div>
+      <span style="color:var(--text-2);font-size:0.85rem;">v<span id="settingsVersion">1.0.0</span></span>
+    </div>
+    <div class="settings-row" style="cursor:pointer" onclick="resetData()">
+      <div><div class="settings-lbl" style="color:var(--danger)">איפוס כל הנתונים</div><div class="settings-sub">מחיקת כל הבניינים והנתונים</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Navigation -->
+<nav class="bottom-nav">
+  <div class="nav-item active" data-screen="screenDashboard" onclick="showScreen('screenDashboard')">
+    <span class="ni">🏠</span><span>ראשי</span>
+  </div>
+  <div class="nav-item" data-screen="screenDues" onclick="showScreen('screenDues')">
+    <span class="ni">📋</span><span>תשלומים</span>
+  </div>
+  <div class="nav-item" data-screen="screenTransactions" onclick="showScreen('screenTransactions')">
+    <span class="ni">💰</span><span>תנועות</span>
+  </div>
+  <div class="nav-item" data-screen="screenContacts" onclick="showScreen('screenContacts')">
+    <span class="ni">👥</span><span>אנשי קשר</span>
+  </div>
+  <div class="nav-item" data-screen="screenSettings" onclick="showScreen('screenSettings')">
+    <span class="ni">⚙️</span><span>הגדרות</span>
+  </div>
+</nav>
+
+<!-- FAB for transactions screen -->
+<button class="fab" id="fab" onclick="openTxModal()" style="display:none">+</button>
+
+<!-- ═══════════════ MODALS ═══════════════ -->
+
+<!-- Transaction Modal -->
+<div class="modal-overlay" id="txModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="txModalTitle">הוסף תנועה</div>
+    <input type="hidden" id="txEditId">
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">סוג</label>
+        <select class="form-select" id="txType" onchange="onTxTypeChange()">
+          <option value="income">הכנסה</option>
+          <option value="expense">הוצאה</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">סכום (₪)</label>
+        <input type="number" class="form-input" id="txAmount" placeholder="0" min="0" step="0.01">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">תיאור</label>
+      <input type="text" class="form-input" id="txDesc" placeholder="תיאור התנועה">
+    </div>
+    <div class="form-group" id="txCatGroup">
+      <label class="form-label">קטגוריה</label>
+      <select class="form-select" id="txCategory"></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">תאריך</label>
+      <input type="date" class="form-input" id="txDate">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('txModal')">ביטול</button>
+      <button class="btn btn-danger btn-sm" id="txDeleteBtn" onclick="deleteTx()" style="display:none;flex:0.5">מחק</button>
+      <button class="btn btn-primary" onclick="saveTx()">שמור</button>
+    </div>
+  </div>
+</div>
+
+<!-- Building Modal -->
+<div class="modal-overlay" id="buildingModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="buildingModalTitle">הוסף בניין</div>
+    <input type="hidden" id="buildingEditId">
+    <div class="form-group">
+      <label class="form-label">שם הבניין</label>
+      <input type="text" class="form-input" id="buildingName" placeholder="לדוג': רחוב הרצל 12">
+    </div>
+    <div class="form-group">
+      <label class="form-label">כתובת</label>
+      <input type="text" class="form-input" id="buildingAddress" placeholder="כתובת מלאה">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">סכום חודשי לדירה (₪)</label>
+        <input type="number" class="form-input" id="buildingDue" value="100" min="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">יתרה פתיחה (₪)</label>
+        <input type="number" class="form-input" id="buildingBalance" value="0">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('buildingModal')">ביטול</button>
+      <button class="btn btn-danger btn-sm" id="buildingDeleteBtn" onclick="deleteBuilding()" style="display:none;flex:0.5">מחק</button>
+      <button class="btn btn-primary" onclick="saveBuilding()">שמור</button>
+    </div>
+  </div>
+</div>
+
+<!-- Apartment Modal -->
+<div class="modal-overlay" id="aptModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="aptModalTitle">דירה</div>
+    <input type="hidden" id="aptEditId">
+    <div class="form-group">
+      <label class="form-label">שם הדירה</label>
+      <input type="text" class="form-input" id="aptName" placeholder="דירה 1">
+    </div>
+    <div style="font-size:0.82rem;font-weight:700;color:var(--text-2);margin-bottom:6px;">דייר נוכחי</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">שם</label>
+        <input type="text" class="form-input" id="aptResidentName" placeholder="שם הדייר">
+      </div>
+      <div class="form-group">
+        <label class="form-label">טלפון</label>
+        <input type="tel" class="form-input" id="aptResidentPhone" placeholder="050-0000000">
+      </div>
+    </div>
+    <div style="font-size:0.82rem;font-weight:700;color:var(--text-2);margin:8px 0 6px;">בעל הדירה</div>
+    <div class="form-group">
+      <label class="form-label">שם</label>
+      <input type="text" class="form-input" id="aptOwner1Name" placeholder="שם הבעלים">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">טלפון</label>
+        <input type="tel" class="form-input" id="aptOwner1Phone" placeholder="050-0000000">
+      </div>
+      <div class="form-group">
+        <label class="form-label">WhatsApp</label>
+        <input type="tel" class="form-input" id="aptOwner1WA" placeholder="050-0000000">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">אימייל</label>
+        <input type="email" class="form-input" id="aptOwner1Email" placeholder="email@example.com">
+      </div>
+    </div>
+    <div style="font-size:0.82rem;font-weight:700;color:var(--text-2);margin:8px 0 6px;">בעל דירה נוסף (אופציונלי)</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">שם</label>
+        <input type="text" class="form-input" id="aptOwner2Name" placeholder="שם">
+      </div>
+      <div class="form-group">
+        <label class="form-label">טלפון</label>
+        <input type="tel" class="form-input" id="aptOwner2Phone" placeholder="050-0000000">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('aptModal')">ביטול</button>
+      <button class="btn btn-danger btn-sm" id="aptDeleteBtn" onclick="deleteApt()" style="display:none;flex:0.5">מחק</button>
+      <button class="btn btn-primary" onclick="saveApt()">שמור</button>
+    </div>
+  </div>
+</div>
+
+<!-- Provider Modal -->
+<div class="modal-overlay" id="providerModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">נותן שירות</div>
+    <input type="hidden" id="providerEditId">
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">תפקיד</label>
+        <input type="text" class="form-input" id="providerRole" placeholder="גנן, מנקה...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">שם</label>
+        <input type="text" class="form-input" id="providerName" placeholder="שם">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">טלפון</label>
+        <input type="tel" class="form-input" id="providerPhone" placeholder="050-0000000">
+      </div>
+      <div class="form-group">
+        <label class="form-label">עלות חודשית (₪)</label>
+        <input type="number" class="form-input" id="providerCost" placeholder="0">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('providerModal')">ביטול</button>
+      <button class="btn btn-danger btn-sm" id="providerDeleteBtn" onclick="deleteProvider()" style="display:none;flex:0.5">מחק</button>
+      <button class="btn btn-primary" onclick="saveProvider()">שמור</button>
+    </div>
+  </div>
+</div>
+
+<!-- Snackbar -->
+<div class="snackbar" id="snackbar"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  DATA MODEL & INITIALIZATION
+// ═══════════════════════════════════════════════
+
+const MONTHS_HE = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+function buildDefaultData() {
+  const bId = uid();
+
+  // Apartments
+  const apts = [
+    { id: uid(), name: 'דירה 1', resident: { name: 'עובדים זרים', phone: '' },
+      owners: [{ name: 'אריה הופמן', phone: '055-678-6171', email: 'ah786171@gmail.com', whatsapp: '' }] },
+    { id: uid(), name: 'דירה 2', resident: { name: 'מלכה', phone: '' },
+      owners: [{ name: 'אלקחם מלכה', phone: '052-7580089', email: '', whatsapp: '' }] },
+    { id: uid(), name: 'דירה 3', resident: { name: 'עובדים זרים', phone: '' },
+      owners: [{ name: 'יואל היימליך', phone: '052-7695639', email: 'mirimandel84@gmail.com', whatsapp: '053-9483788' }] },
+    { id: uid(), name: 'דירה 4', resident: { name: 'גבריהוט', phone: '054-9408248' },
+      owners: [{ name: 'דורון אמבר', phone: '054-5687575', email: '', whatsapp: '' }] },
+    { id: uid(), name: 'דירה 5', resident: { name: 'עובדים זרים', phone: '' },
+      owners: [{ name: 'אפריים הרשקוביץ', phone: '054-8592512', email: 'a0548592512@gmail.com', whatsapp: '' }] },
+    { id: uid(), name: 'דירה 6', resident: { name: 'דימה', phone: '' },
+      owners: [{ name: 'דימה אושקץ', phone: '050-6775214', email: '', whatsapp: '' }] },
+    { id: uid(), name: 'דירה 7', resident: { name: 'ראיה', phone: '050-9343761' },
+      owners: [
+        { name: 'שומסקי ארקדי', phone: '052-8547054', email: '', whatsapp: '' },
+        { name: 'שומסקי אלה', phone: '058-7083244', email: '', whatsapp: '' }
+      ] },
+    { id: uid(), name: 'דירה 8', resident: { name: 'וולדימיר', phone: '050-2503342' },
+      owners: [
+        { name: 'טרושין נטליה', phone: '054-7767489', email: '', whatsapp: '' },
+        { name: 'זיאבלוב אלכסנדר', phone: '', email: '', whatsapp: '' }
+      ] },
+  ];
+
+  const a = apts; // shorthand
+
+  // Build dues: paid months per apartment
+  const dues = {};
+  apts.forEach((apt, i) => {
+    dues[apt.id] = {};
+    // 2024: all 12 months
+    dues[apt.id][2024] = {};
+    for (let m = 1; m <= 12; m++) dues[apt.id][2024][m] = true;
+    // 2025: all 12 months
+    dues[apt.id][2025] = {};
+    for (let m = 1; m <= 12; m++) dues[apt.id][2025][m] = true;
+    // 2026
+    dues[apt.id][2026] = {};
+  });
+  // 2026 paid months per apartment (0-indexed apt array)
+  const paid2026 = [
+    [1,2,3,4],   // דירה 1
+    [1,2,3],     // דירה 2
+    [1,2,3],     // דירה 3
+    [1,2],       // דירה 4
+    [1,2,3],     // דירה 5
+    [1],         // דירה 6
+    [],          // דירה 7
+    [1,2,3],     // דירה 8
+  ];
+  apts.forEach((apt, i) => {
+    paid2026[i].forEach(m => { dues[apt.id][2026][m] = true; });
+  });
+
+  // Transactions (all from Excel data)
+  const txs = [
+    // ── 2024 ──
+    {id:uid(),date:'2024-09-01',type:'expense',amount:105.59,description:'חשמל - יוני, יולי (שולם באינטרנט ע"י דימה)',category:'חשמל'},
+    {id:uid(),date:'2024-10-14',type:'income',amount:200,description:'וועד בית דירה 8 - אוקטובר, נובמבר 2024',category:'וועד בית'},
+    {id:uid(),date:'2024-10-20',type:'expense',amount:125.54,description:'חשמל - אוגוסט, ספטמבר (שולם באינטרנט ע"י דימה)',category:'חשמל'},
+    {id:uid(),date:'2024-10-25',type:'income',amount:200,description:'וועד בית דירה 1 - ספטמבר, אוקטובר 2024',category:'וועד בית'},
+    {id:uid(),date:'2024-10-31',type:'expense',amount:600,description:'גנן - ספטמבר, אוקטובר 2024',category:'גנן'},
+    {id:uid(),date:'2024-11-01',type:'income',amount:200,description:'וועד בית דירה 7 - ספטמבר, אוקטובר 2024',category:'וועד בית'},
+    {id:uid(),date:'2024-11-11',type:'income',amount:300,description:'וועד בית דירה 5 - אוקטובר-דצמבר 2024',category:'וועד בית'},
+    {id:uid(),date:'2024-11-29',type:'income',amount:500,description:'וועד בית דירה 4 - אוגוסט-דצמבר 2024',category:'וועד בית'},
+    {id:uid(),date:'2024-12-04',type:'income',amount:200,description:'וועד בית דירה 1 - נובמבר-דצמבר 2024',category:'וועד בית'},
+    {id:uid(),date:'2024-12-12',type:'income',amount:300,description:'וועד בית דירה 2 - אוגוסט-דצמבר 2024',category:'וועד בית'},
+    {id:uid(),date:'2024-12-22',type:'income',amount:100,description:'וועד בית דירה 8 - דצמבר 2024',category:'וועד בית'},
+    {id:uid(),date:'2024-12-22',type:'income',amount:100,description:'וועד בית דירה 8 - ינואר 2025',category:'וועד בית'},
+    {id:uid(),date:'2024-12-23',type:'expense',amount:600,description:'גנן - נובמבר-דצמבר 2024',category:'גנן'},
+    {id:uid(),date:'2024-12-23',type:'income',amount:600,description:'וועד בית דירה 3 - יולי-דצמבר 2024',category:'וועד בית'},
+    {id:uid(),date:'2024-12-29',type:'expense',amount:126.25,description:'חשמל - אוקטובר, נובמבר (שולם באינטרנט ע"י דימה)',category:'חשמל'},
+    {id:uid(),date:'2024-12-31',type:'income',amount:600,description:'וועד בית דירה 6 - יולי-דצמבר 2024',category:'וועד בית'},
+    // ── 2025 ──
+    {id:uid(),date:'2025-01-06',type:'income',amount:200,description:'וועד בית דירה 7 - נובמבר-דצמבר 2024',category:'וועד בית'},
+    {id:uid(),date:'2025-01-16',type:'income',amount:200,description:'וועד בית דירה 5 - ינואר-פברואר 2025',category:'וועד בית'},
+    {id:uid(),date:'2025-02-10',type:'expense',amount:40,description:'מנורות למדרגות',category:'ציוד'},
+    {id:uid(),date:'2025-02-17',type:'expense',amount:148.78,description:'חשמל - דצמבר, ינואר (שולם באינטרנט ע"י דימה)',category:'חשמל'},
+    {id:uid(),date:'2025-02-21',type:'income',amount:100,description:'וועד בית דירה 8 - פברואר 2025',category:'וועד בית'},
+    {id:uid(),date:'2025-02-27',type:'expense',amount:600,description:'גנן - ינואר-פברואר 2025',category:'גנן'},
+    {id:uid(),date:'2025-03-07',type:'income',amount:300,description:'וועד בית דירה 4 - ינואר-מרץ 2025',category:'וועד בית'},
+    {id:uid(),date:'2025-03-16',type:'income',amount:100,description:'וועד בית דירה 8 - מרץ 2025',category:'וועד בית'},
+    {id:uid(),date:'2025-03-16',type:'expense',amount:5050,description:'ניקיון מחודש יוני 2024 עד מרץ 2025',category:'ניקיון'},
+    {id:uid(),date:'2025-03-19',type:'income',amount:400,description:'וועד בית דירה 1 - ינואר-אפריל 2025',category:'וועד בית'},
+    {id:uid(),date:'2025-03-24',type:'income',amount:200,description:'וועד בית דירה 5 - מרץ-אפריל 2025',category:'וועד בית'},
+    {id:uid(),date:'2025-04-01',type:'income',amount:300,description:'וועד בית דירה 2 - ינואר-מרץ 2025',category:'וועד בית'},
+    {id:uid(),date:'2025-04-18',type:'income',amount:100,description:'וועד בית דירה 8 - אפריל 2025',category:'וועד בית'},
+    {id:uid(),date:'2025-05-04',type:'expense',amount:138.72,description:'חשמל - פברואר, מרץ (שולם באינטרנט ע"י דימה)',category:'חשמל'},
+    {id:uid(),date:'2025-05-14',type:'income',amount:100,description:'וועד בית דירה 5 - מאי 2025',category:'וועד בית'},
+    {id:uid(),date:'2025-05-15',type:'income',amount:300,description:'וועד בית דירה 2 - אפריל-יוני 2025',category:'וועד בית'},
+    {id:uid(),date:'2025-05-20',type:'income',amount:300,description:'וועד בית דירה 7 - ינואר-מרץ 2025',category:'וועד בית'},
+    {id:uid(),date:'2025-05-20',type:'income',amount:100,description:'וועד בית דירה 8 - מאי 2025',category:'וועד בית'},
+    {id:uid(),date:'2025-05-23',type:'income',amount:200,description:'וועד בית דירה 4 - אפריל-מאי 2025',category:'וועד בית'},
+    {id:uid(),date:'2025-05-25',type:'expense',amount:900,description:'גנן - מרץ-מאי 2025',category:'גנן'},
+    {id:uid(),date:'2025-06-17',type:'income',amount:200,description:'וועד בית דירה 8 - יוני-יולי 2025',category:'וועד בית'},
+    {id:uid(),date:'2025-06-23',type:'expense',amount:144.39,description:'חשמל - אפריל, מאי (שולם באינטרנט ע"י דימה)',category:'חשמל'},
+    {id:uid(),date:'2025-07-28',type:'expense',amount:600,description:'גנן - יוני-יולי 2025',category:'גנן'},
+    {id:uid(),date:'2025-07-29',type:'income',amount:500,description:'וועד בית דירה 5 - יוני-אוקטובר 2025',category:'וועד בית'},
+    {id:uid(),date:'2025-07-30',type:'income',amount:700,description:'וועד בית דירה 3 - ינואר-יולי 2025',category:'וועד בית'},
+    {id:uid(),date:'2025-07-30',type:'income',amount:400,description:'וועד בית דירה 7 - אפריל-יולי 2025',category:'וועד בית'},
+    {id:uid(),date:'2025-08-04',type:'income',amount:400,description:'וועד בית דירה 1 - מאי-אוגוסט 2025',category:'וועד בית'},
+    {id:uid(),date:'2025-08-04',type:'income',amount:200,description:'וועד בית דירה 8 - אוגוסט-ספטמבר 2025',category:'וועד בית'},
+    {id:uid(),date:'2025-08-06',type:'expense',amount:100,description:'ניקיון זבל ליד הכניסה',category:'ניקיון'},
+    {id:uid(),date:'2025-09-12',type:'income',amount:400,description:'וועד בית דירה 4 - יוני-ספטמבר 2025',category:'וועד בית'},
+    {id:uid(),date:'2025-09-14',type:'income',amount:200,description:'וועד בית דירה 7 - אוגוסט-ספטמבר 2025',category:'וועד בית'},
+    {id:uid(),date:'2025-09-28',type:'expense',amount:600,description:'גנן - אוגוסט-ספטמבר 2025',category:'גנן'},
+    {id:uid(),date:'2025-11-19',type:'income',amount:300,description:'וועד בית דירה 2 - יולי-ספטמבר 2025',category:'וועד בית'},
+    {id:uid(),date:'2025-12-10',type:'income',amount:300,description:'וועד בית דירה 2 - אוקטובר-דצמבר 2025',category:'וועד בית'},
+    {id:uid(),date:'2025-12-10',type:'expense',amount:306.97,description:'חשמל - אוגוסט-נובמבר (שולם בטלפון ע"י אוקסנה)',category:'חשמל'},
+    {id:uid(),date:'2025-12-10',type:'income',amount:300,description:'וועד בית דירה 7 - אוקטובר-דצמבר 2025',category:'וועד בית'},
+    {id:uid(),date:'2025-12-11',type:'income',amount:200,description:'וועד בית דירה 5 - נובמבר-דצמבר 2025',category:'וועד בית'},
+    {id:uid(),date:'2025-12-11',type:'income',amount:300,description:'וועד בית דירה 5 - ינואר-מרץ 2026',category:'וועד בית'},
+    {id:uid(),date:'2025-12-16',type:'income',amount:300,description:'וועד בית דירה 1 - ספטמבר-נובמבר 2025',category:'וועד בית'},
+    {id:uid(),date:'2025-12-17',type:'income',amount:300,description:'וועד בית דירה 8 - אוקטובר-דצמבר 2025',category:'וועד בית'},
+    {id:uid(),date:'2025-12-26',type:'income',amount:100,description:'וועד בית דירה 1 - דצמבר 2025',category:'וועד בית'},
+    {id:uid(),date:'2025-12-26',type:'income',amount:400,description:'וועד בית דירה 1 - ספטמבר-נובמבר 2026 (מקדמה)',category:'וועד בית'},
+    {id:uid(),date:'2025-12-27',type:'expense',amount:30,description:'ספר חשבוניות עבור תשלומי וועד',category:'ציוד'},
+    {id:uid(),date:'2025-12-28',type:'expense',amount:900,description:'גנן - אוקטובר-דצמבר 2025',category:'גנן'},
+    // ── 2026 ──
+    {id:uid(),date:'2026-01-23',type:'income',amount:200,description:'וועד בית דירה 4 - ינואר-פברואר 2026',category:'וועד בית'},
+    {id:uid(),date:'2026-01-23',type:'income',amount:300,description:'וועד בית דירה 4 - אוקטובר-דצמבר 2025',category:'וועד בית'},
+    {id:uid(),date:'2026-02-03',type:'income',amount:300,description:'וועד בית דירה 3 - ינואר-מרץ 2026',category:'וועד בית'},
+    {id:uid(),date:'2026-02-03',type:'income',amount:500,description:'וועד בית דירה 3 - אוגוסט-דצמבר 2025',category:'וועד בית'},
+    {id:uid(),date:'2026-02-07',type:'expense',amount:77,description:'חשמל - אוגוסט-נובמבר (שולם באשראי)',category:'חשמל'},
+    {id:uid(),date:'2026-02-07',type:'income',amount:190,description:'וועד בית דירה 6 - השלמה עד סוף דצמבר 2025',category:'וועד בית'},
+    {id:uid(),date:'2026-02-19',type:'income',amount:300,description:'וועד בית דירה 8 - ינואר-מרץ 2026',category:'וועד בית'},
+    {id:uid(),date:'2026-03-11',type:'income',amount:300,description:'וועד בית דירה 2 - ינואר-מרץ 2026',category:'וועד בית'},
+    {id:uid(),date:'2026-04-07',type:'expense',amount:23,description:'מנורות למקלט - דימה אשראי',category:'ציוד'},
+  ];
+
+  return {
+    id: bId,
+    name: 'הבניין שלי',
+    address: '',
+    monthlyDue: 100,
+    initialBalance: 8620,
+    apartments: apts,
+    transactions: txs,
+    dues: dues,
+    serviceProviders: [
+      { id: uid(), role: 'גנן', name: 'רונן', phone: '052-4076794', monthlyCost: 300 },
+      { id: uid(), role: 'מנקה', name: '', phone: '', monthlyCost: 800 },
+    ]
+  };
+}
+
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+let state = { buildings: [], currentBuildingId: null };
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem('vb_state');
+    if (raw) {
+      state = JSON.parse(raw);
+    } else {
+      const defaultBuilding = buildDefaultData();
+      state.buildings = [defaultBuilding];
+      state.currentBuildingId = defaultBuilding.id;
+      saveState();
+    }
+  } catch(e) {
+    console.error(e);
+    const defaultBuilding = buildDefaultData();
+    state.buildings = [defaultBuilding];
+    state.currentBuildingId = defaultBuilding.id;
+  }
+  if (!state.currentBuildingId && state.buildings.length > 0) {
+    state.currentBuildingId = state.buildings[0].id;
+  }
+}
+
+function saveState() {
+  localStorage.setItem('vb_state', JSON.stringify(state));
+}
+
+function getBuilding() {
+  return state.buildings.find(b => b.id === state.currentBuildingId) || state.buildings[0];
+}
+
+// ═══════════════════════════════════════════════
+//  COMPUTED
+// ═══════════════════════════════════════════════
+function calcBalance(building) {
+  if (!building) return 0;
+  let bal = building.initialBalance || 0;
+  (building.transactions || []).forEach(tx => {
+    bal += tx.type === 'income' ? tx.amount : -tx.amount;
+  });
+  return bal;
+}
+
+function getMonthDues(building, year, month) {
+  const paid = [], unpaid = [];
+  (building.apartments || []).forEach(apt => {
+    const isPaid = !!(building.dues?.[apt.id]?.[year]?.[month]);
+    if (isPaid) paid.push(apt);
+    else unpaid.push(apt);
+  });
+  return { paid, unpaid };
+}
+
+function fmt(n) {
+  return '₪' + Number(n).toLocaleString('he-IL', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+}
+
+function fmtDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  if (isNaN(d)) return dateStr;
+  return d.toLocaleDateString('he-IL', { day:'2-digit', month:'2-digit', year:'2-digit' });
+}
+
+function todayISO() {
+  const d = new Date();
+  return d.toISOString().slice(0,10);
+}
+
+function nowMonthYear() {
+  const d = new Date();
+  return { month: d.getMonth() + 1, year: d.getFullYear() };
+}
+
+// ═══════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════
+let currentScreen = 'screenDashboard';
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.toggle('active', n.dataset.screen === id);
+  });
+  document.getElementById('fab').style.display = id === 'screenTransactions' ? 'flex' : 'none';
+  currentScreen = id;
+  renderScreen(id);
+}
+
+function renderScreen(id) {
+  if (id === 'screenDashboard') renderDashboard();
+  else if (id === 'screenDues') renderDues();
+  else if (id === 'screenTransactions') renderTransactions();
+  else if (id === 'screenContacts') renderContacts();
+  else if (id === 'screenSettings') renderSettings();
+}
+
+// ═══════════════════════════════════════════════
+//  BUILDING SELECTOR
+// ═══════════════════════════════════════════════
+function renderBuildingSelector() {
+  const bar = document.getElementById('buildingSelector');
+  bar.innerHTML = state.buildings.map(b =>
+    `<button class="building-chip ${b.id === state.currentBuildingId ? 'active' : ''}"
+      onclick="switchBuilding('${b.id}')">${b.name}</button>`
+  ).join('') +
+  `<button class="building-chip-add" onclick="openBuildingModal()">+ בניין</button>`;
+}
+
+function switchBuilding(id) {
+  state.currentBuildingId = id;
+  saveState();
+  renderBuildingSelector();
+  renderScreen(currentScreen);
+}
+
+// ═══════════════════════════════════════════════
+//  DASHBOARD
+// ═══════════════════════════════════════════════
+function renderDashboard() {
+  const b = getBuilding();
+  if (!b) return;
+
+  const bal = calcBalance(b);
+  document.getElementById('balanceAmount').textContent = fmt(bal);
+
+  const { month, year } = nowMonthYear();
+  document.getElementById('monthLabel').textContent = MONTHS_HE[month-1] + ' ' + year;
+
+  const { paid, unpaid } = getMonthDues(b, year, month);
+  const total = (b.apartments || []).length;
+  const collectedAmt = paid.length * (b.monthlyDue || 100);
+  const targetAmt = total * (b.monthlyDue || 100);
+  const pct = total ? Math.round(paid.length / total * 100) : 0;
+
+  document.getElementById('balanceSub').textContent =
+    `גבייה חודשית: ${fmt(collectedAmt)} מתוך ${fmt(targetAmt)} (${pct}%)`;
+
+  // Monthly card
+  const mCard = document.getElementById('monthlyCard');
+  if (unpaid.length === 0) {
+    mCard.innerHTML = `<div style="text-align:center;padding:12px 0;color:var(--success);font-weight:700;font-size:1rem;">✅ כל הדירות שילמו החודש!</div>`;
+  } else {
+    mCard.innerHTML = `
+      <div class="card-title">לא שילמו החודש (${unpaid.length}/${total})</div>
+      <div class="month-progress"><div class="month-progress-bar" style="width:${pct}%"></div></div>
+      <div style="margin-top:10px">
+        ${unpaid.map(apt => `
+          <div class="unpaid-apt">
+            <div>
+              <div class="apt-name">${apt.name}</div>
+              <div class="apt-info">${apt.owners?.[0]?.name || ''}</div>
+            </div>
+            <button class="pay-btn" onclick="quickPay('${apt.id}',${year},${month})">✓ שולם</button>
+          </div>
+        `).join('')}
+      </div>`;
+  }
+
+  // Recent transactions
+  const txs = [...(b.transactions || [])].sort((a,c) => c.date.localeCompare(a.date)).slice(0,5);
+  const rCard = document.getElementById('recentTxCard');
+  if (txs.length === 0) {
+    rCard.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><p>אין תנועות עדיין</p></div>`;
+  } else {
+    rCard.innerHTML = txs.map(tx => txHTML(tx)).join('');
+  }
+}
+
+function quickPay(aptId, year, month) {
+  const b = getBuilding();
+  if (!b.dues) b.dues = {};
+  if (!b.dues[aptId]) b.dues[aptId] = {};
+  if (!b.dues[aptId][year]) b.dues[aptId][year] = {};
+  b.dues[aptId][year][month] = true;
+  saveState();
+  renderDashboard();
+  showSnack('סומן כשולם ✓');
+}
+
+function txHTML(tx, showBalance) {
+  const isIncome = tx.type === 'income';
+  return `<div class="tx-item" onclick="openTxModal(null,'${tx.id}')">
+    <div class="tx-icon ${tx.type}">${isIncome ? '⬆️' : '⬇️'}</div>
+    <div class="tx-body">
+      <div class="tx-desc">${tx.description}</div>
+      <div class="tx-date">${fmtDate(tx.date)} · ${tx.category || ''}</div>
+    </div>
+    <div class="tx-amount ${tx.type}">${isIncome ? '+' : '-'}${fmt(tx.amount)}</div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════
+//  DUES TRACKER
+// ═══════════════════════════════════════════════
+let duesYear = new Date().getFullYear();
+
+function renderDues() {
+  const b = getBuilding();
+  if (!b) return;
+
+  // Year buttons
+  const years = [2024, 2025, 2026, 2027].filter(y => y <= new Date().getFullYear() + 1);
+  document.getElementById('yearBtns').innerHTML =
+    `<span style="font-size:0.85rem;font-weight:700;color:var(--text-2);">שנה:</span>` +
+    years.map(y => `<button class="year-btn ${y === duesYear ? 'active' : ''}" onclick="setDuesYear(${y})">${y}</button>`).join('');
+
+  const apts = b.apartments || [];
+  const due = b.monthlyDue || 100;
+
+  let totalPaid = 0, totalUnpaid = 0;
+  apts.forEach(apt => {
+    for (let m = 1; m <= 12; m++) {
+      if (b.dues?.[apt.id]?.[duesYear]?.[m]) totalPaid++;
+      else totalUnpaid++;
+    }
+  });
+  const totalExpected = apts.length * 12 * due;
+  const totalCollected = totalPaid * due;
+
+  document.getElementById('duesSummary').innerHTML = `
+    <div class="dues-stat"><div class="dues-stat-val" style="color:var(--success)">${totalPaid}</div><div class="dues-stat-lbl">שולמו</div></div>
+    <div class="dues-stat"><div class="dues-stat-val" style="color:var(--danger)">${totalUnpaid}</div><div class="dues-stat-lbl">לא שולמו</div></div>
+    <div class="dues-stat"><div class="dues-stat-val">${fmt(totalCollected)}</div><div class="dues-stat-lbl">נגבה</div></div>
+    <div class="dues-stat"><div class="dues-stat-val" style="color:var(--text-2)">${fmt(totalExpected - totalCollected)}</div><div class="dues-stat-lbl">חסר</div></div>
+  `;
+
+  // Grid
+  let html = `<thead><tr>
+    <th class="month-col">חודש</th>
+    ${apts.map(a => `<th class="apt-col">${a.name}</th>`).join('')}
+    <th class="total-col">סה"כ</th>
+  </tr></thead><tbody>`;
+
+  for (let m = 1; m <= 12; m++) {
+    let rowPaid = 0;
+    const cells = apts.map(apt => {
+      const paid = !!(b.dues?.[apt.id]?.[duesYear]?.[m]);
+      if (paid) rowPaid++;
+      return `<td class="${paid ? 'paid' : 'unpaid'}" onclick="toggleDue('${apt.id}',${duesYear},${m})">${paid ? '✓' : '✗'}</td>`;
+    });
+    html += `<tr><td style="font-weight:700;cursor:default;background:var(--bg-card)">${MONTHS_HE[m-1]}</td>
+      ${cells.join('')}
+      <td class="total-cell">${fmt(rowPaid * due)}</td>
+    </tr>`;
+  }
+
+  // Totals row
+  const aptTotals = apts.map(apt => {
+    let cnt = 0;
+    for (let m = 1; m <= 12; m++) if (b.dues?.[apt.id]?.[duesYear]?.[m]) cnt++;
+    return cnt;
+  });
+  html += `<tr>
+    <td style="font-weight:800;cursor:default;background:var(--accent-light)">סה"כ</td>
+    ${aptTotals.map(cnt => `<td class="total-cell">${fmt(cnt * due)}</td>`).join('')}
+    <td class="total-cell">${fmt(totalPaid * due)}</td>
+  </tr>`;
+
+  html += '</tbody>';
+  document.getElementById('duesGrid').innerHTML = html;
+}
+
+function setDuesYear(y) {
+  duesYear = y;
+  renderDues();
+}
+
+function toggleDue(aptId, year, month) {
+  const b = getBuilding();
+  if (!b.dues) b.dues = {};
+  if (!b.dues[aptId]) b.dues[aptId] = {};
+  if (!b.dues[aptId][year]) b.dues[aptId][year] = {};
+  const current = b.dues[aptId][year][month];
+  b.dues[aptId][year][month] = !current;
+  saveState();
+  renderDues();
+  showSnack(b.dues[aptId][year][month] ? 'סומן כשולם ✓' : 'סומן כלא שולם');
+}
+
+// ═══════════════════════════════════════════════
+//  TRANSACTIONS
+// ═══════════════════════════════════════════════
+let txFilter = { year: 'all', type: 'all' };
+
+function renderTransactions() {
+  const b = getBuilding();
+  if (!b) return;
+
+  const years = [...new Set((b.transactions || []).map(tx => tx.date.slice(0,4)))].sort().reverse();
+
+  document.getElementById('txFilterBar').innerHTML =
+    `<div class="filter-chip ${txFilter.year==='all'?'active':''}" onclick="setTxFilter('year','all')">הכל</div>` +
+    years.map(y => `<div class="filter-chip ${txFilter.year===y?'active':''}" onclick="setTxFilter('year','${y}')">${y}</div>`).join('') +
+    `<div class="filter-chip ${txFilter.type==='income'?'active':''}" onclick="setTxFilter('type','income')">הכנסות</div>` +
+    `<div class="filter-chip ${txFilter.type==='expense'?'active':''}" onclick="setTxFilter('type','expense')">הוצאות</div>`;
+
+  let txs = [...(b.transactions || [])].sort((a,c) => c.date.localeCompare(a.date));
+  if (txFilter.year !== 'all') txs = txs.filter(tx => tx.date.startsWith(txFilter.year));
+  if (txFilter.type !== 'all') txs = txs.filter(tx => tx.type === txFilter.type);
+
+  if (txs.length === 0) {
+    document.getElementById('txList').innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><p>אין תנועות</p></div>`;
+    return;
+  }
+
+  // Compute running balance (descending order - show current balance first)
+  let runBal = calcBalance(b);
+  const allTxsSorted = [...(b.transactions || [])].sort((a,c) => c.date.localeCompare(a.date));
+
+  const balMap = {};
+  let bal = calcBalance(b);
+  allTxsSorted.forEach(tx => {
+    balMap[tx.id] = bal;
+    bal -= tx.type === 'income' ? tx.amount : -tx.amount;
+  });
+
+  document.getElementById('txList').innerHTML = txs.map(tx => `
+    <div class="tx-item" onclick="openTxModal(null,'${tx.id}')">
+      <div class="tx-icon ${tx.type}">${tx.type==='income'?'⬆️':'⬇️'}</div>
+      <div class="tx-body">
+        <div class="tx-desc">${tx.description}</div>
+        <div class="tx-date">${fmtDate(tx.date)} · <span class="badge ${tx.type==='income'?'badge-success':'badge-danger'}">${tx.category||''}</span></div>
+      </div>
+      <div style="text-align:left">
+        <div class="tx-amount ${tx.type}">${tx.type==='income'?'+':'-'}${fmt(tx.amount)}</div>
+        <div style="font-size:0.68rem;color:var(--text-2);text-align:left">${fmt(balMap[tx.id])}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function setTxFilter(key, val) {
+  if (key === 'type' && txFilter.type === val) { txFilter.type = 'all'; }
+  else txFilter[key] = val;
+  renderTransactions();
+}
+
+// ═══════════════════════════════════════════════
+//  CONTACTS
+// ═══════════════════════════════════════════════
+function renderContacts() {
+  const b = getBuilding();
+  if (!b) return;
+
+  const apts = b.apartments || [];
+  document.getElementById('contactsList').innerHTML = apts.map(apt => `
+    <div class="contact-card">
+      <div class="contact-header" onclick="toggleContact('cc_${apt.id}')">
+        <div class="flex-gap">
+          <div class="contact-avatar">${apt.name.replace('דירה ','')}</div>
+          <div>
+            <div class="contact-name">${apt.name}</div>
+            <div class="contact-sub">
+              ${apt.resident?.name ? `דייר: ${apt.resident.name}` : ''}
+              ${apt.owners?.length ? ` · בעלים: ${apt.owners.map(o=>o.name).filter(Boolean).join(', ')}` : ''}
+            </div>
+          </div>
+        </div>
+        <div class="flex-gap">
+          <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openAptModal('${apt.id}')">✏️</button>
+          <span style="color:var(--text-2)">▾</span>
+        </div>
+      </div>
+      <div class="contact-body" id="cc_${apt.id}">
+        ${apt.resident?.phone ? `<div class="contact-row"><span class="contact-lbl">דייר:</span> <span>${apt.resident.name}</span> <a href="tel:${apt.resident.phone}">${apt.resident.phone}</a></div>` : ''}
+        ${(apt.owners||[]).map(o => `
+          <div class="contact-row">
+            <span class="contact-lbl">בעלים:</span>
+            <span>${o.name}</span>
+            ${o.phone ? `<a href="tel:${o.phone}">${o.phone}</a>` : ''}
+            ${o.whatsapp ? `<a href="https://wa.me/972${o.whatsapp.replace(/^0/,'').replace(/-/g,'')}" style="color:#25d366">💬 WA</a>` : ''}
+          </div>
+          ${o.email ? `<div class="contact-row"><span class="contact-lbl">אימייל:</span><a href="mailto:${o.email}">${o.email}</a></div>` : ''}
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  // Providers
+  const providers = b.serviceProviders || [];
+  document.getElementById('providersList').innerHTML = providers.length === 0
+    ? `<div style="color:var(--text-2);font-size:0.85rem;padding:8px 0;">אין נותני שירות</div>`
+    : providers.map(p => `
+      <div class="contact-card">
+        <div class="contact-header" onclick="toggleContact('cp_${p.id}')">
+          <div class="flex-gap">
+            <div class="contact-avatar" style="background:var(--warning-bg);color:var(--warning)">🔧</div>
+            <div>
+              <div class="contact-name">${p.role} ${p.name ? '– ' + p.name : ''}</div>
+              <div class="contact-sub">${p.monthlyCost ? fmt(p.monthlyCost) + ' לחודש' : ''}</div>
+            </div>
+          </div>
+          <div class="flex-gap">
+            <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openProviderModal('${p.id}')">✏️</button>
+            <span style="color:var(--text-2)">▾</span>
+          </div>
+        </div>
+        <div class="contact-body" id="cp_${p.id}">
+          ${p.phone ? `<div class="contact-row"><span class="contact-lbl">טלפון:</span><a href="tel:${p.phone}">${p.phone}</a></div>` : ''}
+        </div>
+      </div>
+    `).join('');
+}
+
+function toggleContact(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('open');
+}
+
+// ═══════════════════════════════════════════════
+//  SETTINGS
+// ═══════════════════════════════════════════════
+function renderSettings() {
+  const b = getBuilding();
+  if (!b) return;
+
+  document.getElementById('buildingSettingsGroup').innerHTML = `
+    <div class="settings-row" style="cursor:pointer" onclick="openBuildingModal('${b.id}')">
+      <div>
+        <div class="settings-lbl">🏢 ${b.name}</div>
+        <div class="settings-sub">${b.address || 'לחץ לעריכה'} · ${fmt(b.monthlyDue||100)}/חודש</div>
+      </div>
+      <span style="color:var(--text-2)">✏️</span>
+    </div>
+    <div class="settings-row">
+      <div class="settings-lbl">יתרה פתיחה</div>
+      <span style="color:var(--text-2);font-size:0.85rem;">${fmt(b.initialBalance||0)}</span>
+    </div>
+    <div class="settings-row">
+      <div class="settings-lbl">מספר דירות</div>
+      <span style="color:var(--text-2);font-size:0.85rem;">${(b.apartments||[]).length}</span>
+    </div>
+  `;
+
+  // Theme toggle
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.getElementById('darkToggle').checked = isDark;
+
+  // Font size
+  const scale = localStorage.getItem('vb_fontScale') || '1';
+  document.querySelectorAll('.font-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.scale === scale);
+  });
+
+  // Lang
+  const lang = localStorage.getItem('vb_lang') || 'he';
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
+  });
+}
+
+// ═══════════════════════════════════════════════
+//  TRANSACTION MODAL
+// ═══════════════════════════════════════════════
+const expenseCategories = ['חשמל','גנן','ניקיון','ציוד','תיקון','אחר'];
+const incomeCategories = ['וועד בית','החזר','אחר'];
+
+function openTxModal(type, editId) {
+  document.getElementById('txModal').classList.add('open');
+  document.getElementById('txEditId').value = editId || '';
+  document.getElementById('txDeleteBtn').style.display = editId ? 'block' : 'none';
+
+  if (editId) {
+    const b = getBuilding();
+    const tx = b.transactions.find(t => t.id === editId);
+    if (!tx) return;
+    document.getElementById('txModalTitle').textContent = 'עריכת תנועה';
+    document.getElementById('txType').value = tx.type;
+    document.getElementById('txAmount').value = tx.amount;
+    document.getElementById('txDesc').value = tx.description;
+    document.getElementById('txDate').value = tx.date;
+    renderTxCategories(tx.type, tx.category);
+  } else {
+    document.getElementById('txModalTitle').textContent = type === 'expense' ? '+ הוצאה' : '+ הכנסה';
+    document.getElementById('txType').value = type || 'income';
+    document.getElementById('txAmount').value = '';
+    document.getElementById('txDesc').value = '';
+    document.getElementById('txDate').value = todayISO();
+    renderTxCategories(type || 'income', '');
+  }
+}
+
+function renderTxCategories(type, selected) {
+  const cats = type === 'expense' ? expenseCategories : incomeCategories;
+  const sel = document.getElementById('txCategory');
+  sel.innerHTML = cats.map(c => `<option value="${c}" ${c===selected?'selected':''}>${c}</option>`).join('');
+}
+
+function onTxTypeChange() {
+  const type = document.getElementById('txType').value;
+  renderTxCategories(type, '');
+}
+
+function saveTx() {
+  const b = getBuilding();
+  const id = document.getElementById('txEditId').value;
+  const amount = parseFloat(document.getElementById('txAmount').value);
+  if (!amount || isNaN(amount) || amount <= 0) { showSnack('יש להזין סכום תקין'); return; }
+  const desc = document.getElementById('txDesc').value.trim();
+  if (!desc) { showSnack('יש להזין תיאור'); return; }
+
+  const tx = {
+    id: id || uid(),
+    date: document.getElementById('txDate').value || todayISO(),
+    type: document.getElementById('txType').value,
+    amount,
+    description: desc,
+    category: document.getElementById('txCategory').value
+  };
+
+  if (id) {
+    const idx = b.transactions.findIndex(t => t.id === id);
+    if (idx !== -1) b.transactions[idx] = tx;
+  } else {
+    b.transactions.push(tx);
+  }
+  saveState();
+  closeModal('txModal');
+  renderScreen(currentScreen);
+  showSnack('נשמר בהצלחה ✓');
+}
+
+function deleteTx() {
+  const id = document.getElementById('txEditId').value;
+  if (!id || !confirm('למחוק תנועה זו?')) return;
+  const b = getBuilding();
+  b.transactions = b.transactions.filter(t => t.id !== id);
+  saveState();
+  closeModal('txModal');
+  renderScreen(currentScreen);
+  showSnack('נמחק');
+}
+
+// ═══════════════════════════════════════════════
+//  BUILDING MODAL
+// ═══════════════════════════════════════════════
+function openBuildingModal(editId) {
+  document.getElementById('buildingModal').classList.add('open');
+  document.getElementById('buildingEditId').value = editId || '';
+  document.getElementById('buildingDeleteBtn').style.display = editId && state.buildings.length > 1 ? 'block' : 'none';
+
+  if (editId) {
+    const b = state.buildings.find(x => x.id === editId);
+    if (!b) return;
+    document.getElementById('buildingModalTitle').textContent = 'עריכת בניין';
+    document.getElementById('buildingName').value = b.name;
+    document.getElementById('buildingAddress').value = b.address || '';
+    document.getElementById('buildingDue').value = b.monthlyDue || 100;
+    document.getElementById('buildingBalance').value = b.initialBalance || 0;
+  } else {
+    document.getElementById('buildingModalTitle').textContent = 'הוסף בניין';
+    document.getElementById('buildingName').value = '';
+    document.getElementById('buildingAddress').value = '';
+    document.getElementById('buildingDue').value = 100;
+    document.getElementById('buildingBalance').value = 0;
+  }
+}
+
+function saveBuilding() {
+  const id = document.getElementById('buildingEditId').value;
+  const name = document.getElementById('buildingName').value.trim();
+  if (!name) { showSnack('יש להזין שם בניין'); return; }
+
+  if (id) {
+    const b = state.buildings.find(x => x.id === id);
+    if (b) {
+      b.name = name;
+      b.address = document.getElementById('buildingAddress').value.trim();
+      b.monthlyDue = parseFloat(document.getElementById('buildingDue').value) || 100;
+      b.initialBalance = parseFloat(document.getElementById('buildingBalance').value) || 0;
+    }
+  } else {
+    const newB = {
+      id: uid(), name, address: document.getElementById('buildingAddress').value.trim(),
+      monthlyDue: parseFloat(document.getElementById('buildingDue').value) || 100,
+      initialBalance: parseFloat(document.getElementById('buildingBalance').value) || 0,
+      apartments: [], transactions: [], dues: {}, serviceProviders: []
+    };
+    state.buildings.push(newB);
+    state.currentBuildingId = newB.id;
+  }
+  saveState();
+  closeModal('buildingModal');
+  renderBuildingSelector();
+  renderScreen(currentScreen);
+  showSnack('נשמר ✓');
+}
+
+function deleteBuilding() {
+  const id = document.getElementById('buildingEditId').value;
+  if (!id || state.buildings.length <= 1) return;
+  if (!confirm('למחוק בניין זה וכל נתוניו?')) return;
+  state.buildings = state.buildings.filter(b => b.id !== id);
+  state.currentBuildingId = state.buildings[0].id;
+  saveState();
+  closeModal('buildingModal');
+  renderBuildingSelector();
+  renderScreen(currentScreen);
+}
+
+// ═══════════════════════════════════════════════
+//  APARTMENT MODAL
+// ═══════════════════════════════════════════════
+function openAptModal(editId) {
+  document.getElementById('aptModal').classList.add('open');
+  document.getElementById('aptEditId').value = editId || '';
+  document.getElementById('aptDeleteBtn').style.display = editId ? 'block' : 'none';
+
+  if (editId) {
+    const b = getBuilding();
+    const apt = b.apartments.find(a => a.id === editId);
+    if (!apt) return;
+    document.getElementById('aptModalTitle').textContent = 'עריכת דירה';
+    document.getElementById('aptName').value = apt.name;
+    document.getElementById('aptResidentName').value = apt.resident?.name || '';
+    document.getElementById('aptResidentPhone').value = apt.resident?.phone || '';
+    document.getElementById('aptOwner1Name').value = apt.owners?.[0]?.name || '';
+    document.getElementById('aptOwner1Phone').value = apt.owners?.[0]?.phone || '';
+    document.getElementById('aptOwner1Email').value = apt.owners?.[0]?.email || '';
+    document.getElementById('aptOwner1WA').value = apt.owners?.[0]?.whatsapp || '';
+    document.getElementById('aptOwner2Name').value = apt.owners?.[1]?.name || '';
+    document.getElementById('aptOwner2Phone').value = apt.owners?.[1]?.phone || '';
+  } else {
+    document.getElementById('aptModalTitle').textContent = 'דירה חדשה';
+    ['aptName','aptResidentName','aptResidentPhone','aptOwner1Name','aptOwner1Phone','aptOwner1Email','aptOwner1WA','aptOwner2Name','aptOwner2Phone']
+      .forEach(id => document.getElementById(id).value = '');
+  }
+}
+
+function saveApt() {
+  const b = getBuilding();
+  const id = document.getElementById('aptEditId').value;
+  const name = document.getElementById('aptName').value.trim();
+  if (!name) { showSnack('יש להזין שם דירה'); return; }
+
+  const owners = [];
+  const o1name = document.getElementById('aptOwner1Name').value.trim();
+  if (o1name) owners.push({
+    name: o1name,
+    phone: document.getElementById('aptOwner1Phone').value.trim(),
+    email: document.getElementById('aptOwner1Email').value.trim(),
+    whatsapp: document.getElementById('aptOwner1WA').value.trim()
+  });
+  const o2name = document.getElementById('aptOwner2Name').value.trim();
+  if (o2name) owners.push({
+    name: o2name,
+    phone: document.getElementById('aptOwner2Phone').value.trim(),
+    email: '', whatsapp: ''
+  });
+
+  const apt = {
+    id: id || uid(),
+    name,
+    resident: {
+      name: document.getElementById('aptResidentName').value.trim(),
+      phone: document.getElementById('aptResidentPhone').value.trim()
+    },
+    owners
+  };
+
+  if (id) {
+    const idx = b.apartments.findIndex(a => a.id === id);
+    if (idx !== -1) b.apartments[idx] = apt;
+  } else {
+    b.apartments.push(apt);
+    if (!b.dues) b.dues = {};
+    b.dues[apt.id] = {};
+  }
+  saveState();
+  closeModal('aptModal');
+  renderContacts();
+  showSnack('נשמר ✓');
+}
+
+function deleteApt() {
+  const id = document.getElementById('aptEditId').value;
+  if (!id || !confirm('למחוק דירה זו?')) return;
+  const b = getBuilding();
+  b.apartments = b.apartments.filter(a => a.id !== id);
+  if (b.dues) delete b.dues[id];
+  saveState();
+  closeModal('aptModal');
+  renderContacts();
+  showSnack('נמחק');
+}
+
+// ═══════════════════════════════════════════════
+//  PROVIDER MODAL
+// ═══════════════════════════════════════════════
+function openProviderModal(editId) {
+  document.getElementById('providerModal').classList.add('open');
+  document.getElementById('providerEditId').value = editId || '';
+  document.getElementById('providerDeleteBtn').style.display = editId ? 'block' : 'none';
+
+  if (editId) {
+    const b = getBuilding();
+    const p = (b.serviceProviders||[]).find(x => x.id === editId);
+    if (!p) return;
+    document.getElementById('providerRole').value = p.role || '';
+    document.getElementById('providerName').value = p.name || '';
+    document.getElementById('providerPhone').value = p.phone || '';
+    document.getElementById('providerCost').value = p.monthlyCost || '';
+  } else {
+    ['providerRole','providerName','providerPhone','providerCost'].forEach(id => document.getElementById(id).value = '');
+  }
+}
+
+function saveProvider() {
+  const b = getBuilding();
+  if (!b.serviceProviders) b.serviceProviders = [];
+  const id = document.getElementById('providerEditId').value;
+  const role = document.getElementById('providerRole').value.trim();
+  if (!role) { showSnack('יש להזין תפקיד'); return; }
+
+  const p = {
+    id: id || uid(),
+    role,
+    name: document.getElementById('providerName').value.trim(),
+    phone: document.getElementById('providerPhone').value.trim(),
+    monthlyCost: parseFloat(document.getElementById('providerCost').value) || 0
+  };
+
+  if (id) {
+    const idx = b.serviceProviders.findIndex(x => x.id === id);
+    if (idx !== -1) b.serviceProviders[idx] = p;
+  } else {
+    b.serviceProviders.push(p);
+  }
+  saveState();
+  closeModal('providerModal');
+  renderContacts();
+  showSnack('נשמר ✓');
+}
+
+function deleteProvider() {
+  const id = document.getElementById('providerEditId').value;
+  if (!id || !confirm('למחוק?')) return;
+  const b = getBuilding();
+  b.serviceProviders = (b.serviceProviders||[]).filter(p => p.id !== id);
+  saveState();
+  closeModal('providerModal');
+  renderContacts();
+  showSnack('נמחק');
+}
+
+// ═══════════════════════════════════════════════
+//  THEME / FONT / LANG
+// ═══════════════════════════════════════════════
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('vb_theme', next);
+  document.getElementById('themeBtn').textContent = next === 'dark' ? '☀️' : '🌙';
+  const tog = document.getElementById('darkToggle');
+  if (tog) tog.checked = next === 'dark';
+}
+
+function setFontSize(scale) {
+  document.documentElement.style.setProperty('--font-scale', scale);
+  localStorage.setItem('vb_fontScale', scale);
+  document.querySelectorAll('.font-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.scale === scale);
+  });
+}
+
+function setLang(lang) {
+  // For now just update direction for he vs others
+  const dir = lang === 'he' ? 'rtl' : 'ltr';
+  document.documentElement.setAttribute('dir', dir);
+  document.documentElement.setAttribute('lang', lang);
+  localStorage.setItem('vb_lang', lang);
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
+  });
+}
+
+// ═══════════════════════════════════════════════
+//  DATA EXPORT / IMPORT
+// ═══════════════════════════════════════════════
+function exportData() {
+  const data = {
+    appName: APP_NAME,
+    version: APP_VERSION,
+    exportDate: new Date().toISOString(),
+    state
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `vaad-bait-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showSnack('ייצוא הצליח ✓');
+}
+
+function importData() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = async (e) => {
+    try {
+      const text = await e.target.files[0].text();
+      const data = JSON.parse(text);
+      if (!data.state || !data.state.buildings) { showSnack('קובץ לא תקין'); return; }
+      state = data.state;
+      saveState();
+      location.reload();
+    } catch(err) {
+      showSnack('שגיאה בייבוא: ' + err.message);
+    }
+  };
+  input.click();
+}
+
+function resetData() {
+  if (!confirm('למחוק את כל הנתונים? פעולה זו בלתי הפיכה!')) return;
+  localStorage.removeItem('vb_state');
+  location.reload();
+}
+
+// ═══════════════════════════════════════════════
+//  MODAL HELPERS
+// ═══════════════════════════════════════════════
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+
+// ═══════════════════════════════════════════════
+//  SNACKBAR
+// ═══════════════════════════════════════════════
+function showSnack(msg) {
+  const el = document.getElementById('snackbar');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  // Font size
+  const savedScale = localStorage.getItem('vb_fontScale') || '1';
+  document.documentElement.style.setProperty('--font-scale', savedScale);
+
+  // Theme icon
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.getElementById('themeBtn').textContent = isDark ? '☀️' : '🌙';
+
+  // Version
+  document.getElementById('versionBadge').textContent = APP_VERSION;
+  document.getElementById('settingsVersion').textContent = APP_VERSION;
+
+  // Load data
+  loadState();
+
+  // Render
+  renderBuildingSelector();
+  renderDashboard();
+
+  // Lang
+  const savedLang = localStorage.getItem('vb_lang') || 'he';
+  setLang(savedLang);
+
+  // Update check (delayed)
+  if (GITHUB_REPO) setTimeout(checkForUpdates, 3000);
+});
+
+async function checkForUpdates() {
+  if (!GITHUB_REPO) return;
+  try {
+    const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/vaad_bait.html`, { cache: 'no-store' });
+    if (!res.ok) return;
+    const file = await res.json();
+    const content = atob(file.content);
+    const match = content.match(/APP_VERSION\s*=\s*["']([^"']+)["']/);
+    if (match && match[1] !== APP_VERSION) {
+      if (confirm(`עדכון זמין: v${match[1]}\nלהתקין עכשיו?`)) location.reload(true);
+    }
+  } catch(e) {}
+}
+</script>
+</body>
+</html>
