@@ -18,7 +18,7 @@
 // ╔══════════════════════════════════════════════════════════╗
 // ║  APP CONFIGURATION                                        ║
 // ╚══════════════════════════════════════════════════════════╝
-const APP_VERSION = "1.0.3";
+const APP_VERSION = "1.0.4";
 const APP_NAME = "וועד בית";
 const GITHUB_REPO = "dimitryu/VaadBait";
 
@@ -507,7 +507,7 @@ body {
 <div id="screenTransactions" class="screen">
   <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px 2px">
     <span class="section-title" data-i18n="tx_title">תנועות</span>
-    <button class="btn btn-ghost btn-sm" onclick="openReportModal()" style="display:flex;align-items:center;gap:4px;padding:4px 9px;font-size:0.75rem" data-i18n="btn_report">📊 דוח</button>
+    <button class="btn btn-ghost btn-sm" onclick="openReportModal()" style="display:flex;align-items:center;gap:2px;padding:2px 6px;font-size:0.65rem" data-i18n="btn_report">📊 דוח</button>
   </div>
   <div class="filter-bar" id="txFilterBar"></div>
   <div id="txList" style="padding:0 12px 8px;"></div>
@@ -516,12 +516,12 @@ body {
 <div id="screenContacts" class="screen">
   <div class="section-header">
     <span class="section-title" data-i18n="apts_title">דירות</span>
-    <button class="btn btn-primary btn-sm" onclick="openAptModal()" style="padding:4px 9px;font-size:0.75rem" data-i18n="btn_add">+ הוסף</button>
+    <button class="btn btn-primary btn-sm" onclick="openAptModal()" style="padding:2px 6px;font-size:0.65rem" data-i18n="btn_add">+ הוסף</button>
   </div>
   <div id="contactsList"></div>
   <div class="section-header" style="margin-top:8px">
     <span class="section-title" data-i18n="providers_title">נותני שירות</span>
-    <button class="btn btn-primary btn-sm" onclick="openProviderModal()" style="padding:4px 9px;font-size:0.75rem" data-i18n="btn_add">+ הוסף</button>
+    <button class="btn btn-primary btn-sm" onclick="openProviderModal()" style="padding:2px 6px;font-size:0.65rem" data-i18n="btn_add">+ הוסף</button>
   </div>
   <div id="providersList" style="padding:0 12px 8px;"></div>
 </div>
@@ -698,48 +698,17 @@ body {
       <label class="form-label">שם הדירה</label>
       <input type="text" class="form-input" id="aptName" placeholder="דירה 1">
     </div>
-    <div style="font-size:0.82rem;font-weight:700;color:var(--text-2);margin-bottom:6px;">דייר נוכחי</div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">שם</label>
-        <input type="text" class="form-input" id="aptResidentName" placeholder="שם הדייר">
-      </div>
-      <div class="form-group">
-        <label class="form-label">טלפון</label>
-        <input type="tel" class="form-input" id="aptResidentPhone" placeholder="050-0000000">
-      </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin:10px 0 6px">
+      <span style="font-size:0.82rem;font-weight:700;color:var(--text-2)" id="aptResidentsLabel">דיירים</span>
+      <button class="btn btn-ghost btn-sm" onclick="addAptResident()" style="padding:3px 8px;font-size:0.72rem" id="btnAddResident">+ דייר</button>
     </div>
-    <div style="font-size:0.82rem;font-weight:700;color:var(--text-2);margin:8px 0 6px;">בעל הדירה</div>
-    <div class="form-group">
-      <label class="form-label">שם</label>
-      <input type="text" class="form-input" id="aptOwner1Name" placeholder="שם הבעלים">
+    <div id="aptResidentsSection"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin:10px 0 6px">
+      <span style="font-size:0.82rem;font-weight:700;color:var(--text-2)" id="aptOwnersLabel">בעלי דירה</span>
+      <button class="btn btn-ghost btn-sm" onclick="addAptOwner()" style="padding:3px 8px;font-size:0.72rem" id="btnAddOwner">+ בעל דירה</button>
     </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">טלפון</label>
-        <input type="tel" class="form-input" id="aptOwner1Phone">
-      </div>
-      <div class="form-group">
-        <label class="form-label">WhatsApp</label>
-        <input type="tel" class="form-input" id="aptOwner1WA">
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">אימייל</label>
-      <input type="email" class="form-input" id="aptOwner1Email">
-    </div>
-    <div style="font-size:0.82rem;font-weight:700;color:var(--text-2);margin:8px 0 6px;">בעל דירה נוסף (אופציונלי)</div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">שם</label>
-        <input type="text" class="form-input" id="aptOwner2Name">
-      </div>
-      <div class="form-group">
-        <label class="form-label">טלפון</label>
-        <input type="tel" class="form-input" id="aptOwner2Phone">
-      </div>
-    </div>
-    <div class="modal-actions">
+    <div id="aptOwnersSection"></div>
+    <div class="modal-actions" style="margin-top:14px">
       <button class="btn btn-ghost" onclick="closeModal('aptModal')">ביטול</button>
       <button class="btn btn-danger btn-sm" id="aptDeleteBtn" onclick="deleteApt()" style="display:none;flex:0.5">מחק</button>
       <button class="btn btn-primary" onclick="saveApt()">שמור</button>
@@ -894,6 +863,11 @@ const STRINGS = {
     apt_new:'דירה חדשה', apt_edit:'עריכת דירה', apt_name_lbl:'שם הדירה', apt_apt_ph:'דירה 1', apt_resident:'דייר נוכחי', apt_owner1:'בעל הדירה', apt_owner2:'בעל דירה נוסף (אופציונלי)', apt_wa:'WhatsApp',
     prov_title:'נותן שירות', prov_role_lbl:'תפקיד', prov_name_lbl:'שם', prov_phone_lbl:'טלפון', prov_cost_lbl:'עלות חודשית (₪)',
     pay_months_suffix: (n) => `${n} חודשים שולמו ✓`,
+    add_payment: 'הכנסת תשלום',
+    apt_resident_n: (n) => `דייר ${n}`,
+    apt_owner_n: (n) => `בעל דירה ${n}`,
+    btn_add_resident: '+ דייר',
+    btn_add_owner: '+ בעל דירה',
   },
   en: {
     nav_home:'Home', nav_dues:'Dues', nav_tx:'Transactions', nav_contacts:'Contacts', nav_settings:'Settings',
@@ -929,6 +903,11 @@ const STRINGS = {
     apt_new:'New Apartment', apt_edit:'Edit Apartment', apt_name_lbl:'Apartment Name', apt_apt_ph:'Apt 1', apt_resident:'Current Tenant', apt_owner1:'Owner', apt_owner2:'Additional Owner (optional)', apt_wa:'WhatsApp',
     prov_title:'Service Provider', prov_role_lbl:'Role', prov_name_lbl:'Name', prov_phone_lbl:'Phone', prov_cost_lbl:'Monthly Cost (₪)',
     pay_months_suffix: (n) => `${n} month(s) paid ✓`,
+    add_payment: 'Add Payment',
+    apt_resident_n: (n) => `Tenant ${n}`,
+    apt_owner_n: (n) => `Owner ${n}`,
+    btn_add_resident: '+ Tenant',
+    btn_add_owner: '+ Owner',
   },
   ru: {
     nav_home:'Главная', nav_dues:'Взносы', nav_tx:'Операции', nav_contacts:'Контакты', nav_settings:'Настройки',
@@ -964,6 +943,11 @@ const STRINGS = {
     apt_new:'Новая квартира', apt_edit:'Редактировать квартиру', apt_name_lbl:'Название квартиры', apt_apt_ph:'Кв. 1', apt_resident:'Текущий жилец', apt_owner1:'Владелец', apt_owner2:'Доп. владелец (опц.)', apt_wa:'WhatsApp',
     prov_title:'Подрядчик', prov_role_lbl:'Должность', prov_name_lbl:'Имя', prov_phone_lbl:'Телефон', prov_cost_lbl:'Ежемесячная стоимость (₪)',
     pay_months_suffix: (n) => `Оплачено ${n} мес. ✓`,
+    add_payment: 'Добавить платёж',
+    apt_resident_n: (n) => `Жилец ${n}`,
+    apt_owner_n: (n) => `Владелец ${n}`,
+    btn_add_resident: '+ Жилец',
+    btn_add_owner: '+ Владелец',
   }
 };
 
@@ -1335,17 +1319,14 @@ function renderDashboard() {
     <div style="margin-top:10px">`;
   apts.forEach(a => {
     const isPaid = !!(b.dues?.[a.id]?.[year]?.[month]);
-    if (isPaid) {
-      html += `<div class="unpaid-apt">
-        <div><div class="apt-name">${a.name}</div><div class="apt-info">${a.owners?.[0]?.name||''}</div></div>
-        <span style="color:var(--success);font-weight:700;font-size:0.82rem">✓ ${t('paid_lbl')}</span>
-      </div>`;
-    } else {
-      html += `<div class="unpaid-apt">
-        <div><div class="apt-name">${a.name}</div><div class="apt-info">${a.owners?.[0]?.name||''}</div></div>
-        <button class="pay-btn" onclick="openPayModal('${a.id}')">✓ ${t('paid_lbl')}</button>
-      </div>`;
-    }
+    const ownerName = (a.owners?.[0]?.name) || (a.residents?.[0]?.name) || (a.resident?.name) || '';
+    html += `<div class="unpaid-apt">
+      <div>
+        <div class="apt-name">${a.name}${isPaid ? ' <span style="color:var(--success);font-size:0.75rem">✓</span>' : ''}</div>
+        <div class="apt-info">${ownerName}</div>
+      </div>
+      <button class="pay-btn" onclick="openPayModal('${a.id}')" style="${isPaid ? 'background:var(--success-bg);color:var(--success);border-color:var(--success);opacity:0.8' : ''}">${t('add_payment')}</button>
+    </div>`;
   });
   html += '</div>';
   mCard.innerHTML = html;
@@ -1436,6 +1417,11 @@ function renderTransactions() {
 
   if(!txs.length) { document.getElementById('txList').innerHTML=`<div class="empty-state"><div class="empty-icon">📭</div><p>${t('empty_tx2')}</p></div>`; return; }
 
+  // Build running balance map (newest-first)
+  const allSorted = [...(b.transactions||[])].sort((a,c)=>c.date.localeCompare(a.date));
+  const balMap = {}; let runBal = calcBalance(b);
+  allSorted.forEach(tx => { balMap[tx.id] = runBal; runBal -= tx.type==='income' ? tx.amount : -tx.amount; });
+
   document.getElementById('txList').innerHTML = txs.map(tx => `
     <div class="tx-item" onclick="openTxModal(null,'${tx.id}')">
       <div class="tx-icon ${tx.type}">${tx.type==='income'?'⬆️':'⬇️'}</div>
@@ -1444,6 +1430,7 @@ function renderTransactions() {
       </div>
       <div style="text-align:${appLang==='he'?'left':'right'}">
         <div class="tx-amount ${tx.type}">${tx.type==='income'?'+':'-'}${fmt(tx.amount)}</div>
+        <div style="font-size:0.68rem;color:var(--text-2)">${fmt(balMap[tx.id])}</div>
       </div>
     </div>`).join('');
 }
@@ -1455,13 +1442,20 @@ function setTxFilter(key, val) { if(key==='type'&&txFilter.type===val) txFilter.
 // ═══════════════════════════════════════════════
 function renderContacts() {
   const b = getBuilding(); if (!b) return;
-  document.getElementById('contactsList').innerHTML = (b.apartments||[]).map(apt => `
+  document.getElementById('contactsList').innerHTML = (b.apartments||[]).map(apt => {
+    // Support both old (resident singular) and new (residents array) format
+    const residents = apt.residents?.length ? apt.residents : (apt.resident?.name ? [{...apt.resident, email: apt.resident.email||''}] : []);
+    const owners = apt.owners || [];
+    const subParts = [];
+    if (residents.length) subParts.push(t('lbl_tenant') + ': ' + residents.map(r=>r.name).filter(Boolean).join(', '));
+    if (owners.length) subParts.push(owners.map(o=>o.name).filter(Boolean).join(', '));
+    return `
     <div class="contact-card">
       <div class="contact-header" onclick="toggleContact('cc_${apt.id}')">
         <div class="flex-gap">
           <div class="contact-avatar">${apt.name.replace('דירה ','')}</div>
           <div><div class="contact-name">${apt.name}</div>
-            <div class="contact-sub">${apt.resident?.name?t('lbl_tenant')+': '+apt.resident.name:''} ${apt.owners?.length?'· '+apt.owners.map(o=>o.name).filter(Boolean).join(', '):''}</div>
+            <div class="contact-sub">${subParts.join(' · ')}</div>
           </div>
         </div>
         <div class="flex-gap">
@@ -1470,12 +1464,26 @@ function renderContacts() {
         </div>
       </div>
       <div class="contact-body" id="cc_${apt.id}">
-        ${apt.resident?.phone?`<div class="contact-row"><span class="contact-lbl">${t('lbl_tenant')}:</span><span>${apt.resident.name}</span><a href="tel:${apt.resident.phone}">${apt.resident.phone}</a></div>`:''}
-        ${(apt.owners||[]).map(o=>`
-          <div class="contact-row"><span class="contact-lbl">${t('lbl_owner')}:</span><span>${o.name}</span>${o.phone?`<a href="tel:${o.phone}">${o.phone}</a>`:''} ${o.whatsapp?`<a href="https://wa.me/972${o.whatsapp.replace(/^0/,'').replace(/-/g,'')}" style="color:#25d366">💬</a>`:''}</div>
-          ${o.email?`<div class="contact-row"><span class="contact-lbl">${t('lbl_email')}:</span><a href="mailto:${o.email}">${o.email}</a></div>`:''}`).join('')}
+        ${residents.map(r => r.name ? `
+          <div class="contact-row">
+            <span class="contact-lbl">${t('lbl_tenant')}:</span>
+            <span>${r.name}</span>
+            ${r.phone ? `<a href="tel:${r.phone}">${r.phone}</a>` : ''}
+          </div>
+          ${r.email ? `<div class="contact-row"><span class="contact-lbl">${t('lbl_email')}:</span><a href="mailto:${r.email}">${r.email}</a></div>` : ''}
+        ` : '').join('')}
+        ${owners.map(o => o.name ? `
+          <div class="contact-row">
+            <span class="contact-lbl">${t('lbl_owner')}:</span>
+            <span>${o.name}</span>
+            ${o.phone ? `<a href="tel:${o.phone}">${o.phone}</a>` : ''}
+            ${o.whatsapp ? `<a href="https://wa.me/972${o.whatsapp.replace(/^0/,'').replace(/-/g,'')}" style="color:#25d366">💬</a>` : ''}
+          </div>
+          ${o.email ? `<div class="contact-row"><span class="contact-lbl">${t('lbl_email')}:</span><a href="mailto:${o.email}">${o.email}</a></div>` : ''}
+        ` : '').join('')}
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 
   document.getElementById('providersList').innerHTML = (b.serviceProviders||[]).map(p => `
     <div class="contact-card">
@@ -1883,46 +1891,129 @@ function deleteBuilding() {
 }
 
 // ═══════════════════════════════════════════════
-//  APARTMENT MODAL
+//  APARTMENT MODAL — dynamic residents + owners
 // ═══════════════════════════════════════════════
+let aptResidents = [];
+let aptOwners = [];
+
+function getAptResidents(apt) {
+  if (apt.residents && apt.residents.length) return apt.residents.map(r => ({...r}));
+  if (apt.resident && apt.resident.name) return [{name: apt.resident.name, phone: apt.resident.phone||'', email: apt.resident.email||''}];
+  return [{name:'', phone:'', email:''}];
+}
+
+function collectAptPeopleFromDOM() {
+  aptResidents.forEach((r, i) => {
+    r.name  = (document.getElementById(`res_name_${i}`)  || {}).value || r.name;
+    r.phone = (document.getElementById(`res_phone_${i}`) || {}).value || r.phone;
+    r.email = (document.getElementById(`res_email_${i}`) || {}).value || r.email;
+  });
+  aptOwners.forEach((o, i) => {
+    o.name     = (document.getElementById(`own_name_${i}`)  || {}).value || o.name;
+    o.phone    = (document.getElementById(`own_phone_${i}`) || {}).value || o.phone;
+    o.email    = (document.getElementById(`own_email_${i}`) || {}).value || o.email;
+    o.whatsapp = (document.getElementById(`own_wa_${i}`)    || {}).value || o.whatsapp;
+  });
+}
+
+function renderAptPeople() {
+  const pBox = (color) => `border:1.5px solid var(--border);border-radius:10px;padding:10px;margin-bottom:8px;background:var(--bg)`;
+  document.getElementById('aptResidentsSection').innerHTML = aptResidents.map((r, i) => `
+    <div style="${pBox()}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="font-size:0.78rem;font-weight:700;color:var(--accent)">${typeof t('apt_resident_n')==='function'?t('apt_resident_n')(i+1):'דייר '+(i+1)}</span>
+        ${aptResidents.length > 1 ? `<button onclick="removeAptResident(${i})" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:1rem;line-height:1">✕</button>` : ''}
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">${t('prov_name_lbl')||'שם'}</label>
+          <input type="text" class="form-input" id="res_name_${i}" value="${esc(r.name)}" placeholder="שם הדייר"></div>
+        <div class="form-group"><label class="form-label">${t('lbl_phone')}</label>
+          <input type="tel" class="form-input" id="res_phone_${i}" value="${esc(r.phone)}"></div>
+      </div>
+      <div class="form-group"><label class="form-label">${t('lbl_email')}</label>
+        <input type="email" class="form-input" id="res_email_${i}" value="${esc(r.email)}"></div>
+    </div>`).join('');
+
+  document.getElementById('aptOwnersSection').innerHTML = aptOwners.map((o, i) => `
+    <div style="${pBox()}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="font-size:0.78rem;font-weight:700;color:var(--accent)">${typeof t('apt_owner_n')==='function'?t('apt_owner_n')(i+1):'בעל דירה '+(i+1)}</span>
+        ${aptOwners.length > 1 ? `<button onclick="removeAptOwner(${i})" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:1rem;line-height:1">✕</button>` : ''}
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">${t('prov_name_lbl')||'שם'}</label>
+          <input type="text" class="form-input" id="own_name_${i}" value="${esc(o.name)}" placeholder="שם הבעלים"></div>
+        <div class="form-group"><label class="form-label">${t('lbl_phone')}</label>
+          <input type="tel" class="form-input" id="own_phone_${i}" value="${esc(o.phone)}"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">${t('apt_wa')}</label>
+          <input type="tel" class="form-input" id="own_wa_${i}" value="${esc(o.whatsapp)}"></div>
+        <div class="form-group"><label class="form-label">${t('lbl_email')}</label>
+          <input type="email" class="form-input" id="own_email_${i}" value="${esc(o.email)}"></div>
+      </div>
+    </div>`).join('');
+}
+
+function esc(s) { return (s||'').replace(/"/g,'&quot;'); }
+
+function addAptResident() {
+  collectAptPeopleFromDOM();
+  aptResidents.push({name:'', phone:'', email:''});
+  renderAptPeople();
+}
+function removeAptResident(i) {
+  collectAptPeopleFromDOM();
+  aptResidents.splice(i, 1);
+  renderAptPeople();
+}
+function addAptOwner() {
+  collectAptPeopleFromDOM();
+  aptOwners.push({name:'', phone:'', email:'', whatsapp:''});
+  renderAptPeople();
+}
+function removeAptOwner(i) {
+  collectAptPeopleFromDOM();
+  aptOwners.splice(i, 1);
+  renderAptPeople();
+}
+
 function openAptModal(editId) {
   document.getElementById('aptModal').classList.add('open');
-  document.getElementById('aptEditId').value=editId||'';
-  document.getElementById('aptDeleteBtn').style.display=editId?'block':'none';
-  if(editId){
-    const apt=getBuilding().apartments.find(a=>a.id===editId); if(!apt)return;
-    document.getElementById('aptModalTitle').textContent=t('apt_edit');
-    document.getElementById('aptName').value=apt.name;
-    document.getElementById('aptResidentName').value=apt.resident?.name||'';
-    document.getElementById('aptResidentPhone').value=apt.resident?.phone||'';
-    document.getElementById('aptOwner1Name').value=apt.owners?.[0]?.name||'';
-    document.getElementById('aptOwner1Phone').value=apt.owners?.[0]?.phone||'';
-    document.getElementById('aptOwner1Email').value=apt.owners?.[0]?.email||'';
-    document.getElementById('aptOwner1WA').value=apt.owners?.[0]?.whatsapp||'';
-    document.getElementById('aptOwner2Name').value=apt.owners?.[1]?.name||'';
-    document.getElementById('aptOwner2Phone').value=apt.owners?.[1]?.phone||'';
+  document.getElementById('aptEditId').value = editId||'';
+  document.getElementById('aptDeleteBtn').style.display = editId ? 'block' : 'none';
+  document.getElementById('aptName').value = '';
+  if (editId) {
+    const apt = getBuilding().apartments.find(a => a.id === editId); if (!apt) return;
+    document.getElementById('aptModalTitle').textContent = t('apt_edit');
+    document.getElementById('aptName').value = apt.name;
+    aptResidents = getAptResidents(apt);
+    aptOwners = (apt.owners && apt.owners.length) ? apt.owners.map(o => ({...o})) : [{name:'', phone:'', email:'', whatsapp:''}];
   } else {
-    document.getElementById('aptModalTitle').textContent=t('apt_new');
-    ['aptName','aptResidentName','aptResidentPhone','aptOwner1Name','aptOwner1Phone','aptOwner1Email','aptOwner1WA','aptOwner2Name','aptOwner2Phone'].forEach(i=>document.getElementById(i).value='');
+    document.getElementById('aptModalTitle').textContent = t('apt_new');
+    aptResidents = [{name:'', phone:'', email:''}];
+    aptOwners = [{name:'', phone:'', email:'', whatsapp:''}];
   }
+  renderAptPeople();
 }
 
 function saveApt() {
-  const b=getBuilding(); const id=document.getElementById('aptEditId').value;
-  const name=document.getElementById('aptName').value.trim(); if(!name){showSnack(t('snk_no_name'));return;}
-  const owners=[]; const o1=document.getElementById('aptOwner1Name').value.trim();
-  if(o1) owners.push({name:o1,phone:document.getElementById('aptOwner1Phone').value.trim(),email:document.getElementById('aptOwner1Email').value.trim(),whatsapp:document.getElementById('aptOwner1WA').value.trim()});
-  const o2=document.getElementById('aptOwner2Name').value.trim();
-  if(o2) owners.push({name:o2,phone:document.getElementById('aptOwner2Phone').value.trim(),email:'',whatsapp:''});
-  const apt={id:id||uid(),name,resident:{name:document.getElementById('aptResidentName').value.trim(),phone:document.getElementById('aptResidentPhone').value.trim()},owners};
-  if(id){const i=b.apartments.findIndex(a=>a.id===id);if(i!==-1)b.apartments[i]=apt;}
-  else{b.apartments.push(apt);if(!b.dues)b.dues={};b.dues[apt.id]={};}
+  collectAptPeopleFromDOM();
+  const b = getBuilding();
+  const id = document.getElementById('aptEditId').value;
+  const name = document.getElementById('aptName').value.trim();
+  if (!name) { showSnack(t('snk_no_name')); return; }
+  const residents = aptResidents.filter(r => r.name.trim());
+  const owners = aptOwners.filter(o => o.name.trim());
+  const apt = { id: id||uid(), name, residents, owners };
+  if (id) { const i = b.apartments.findIndex(a => a.id === id); if (i !== -1) b.apartments[i] = apt; }
+  else { b.apartments.push(apt); if (!b.dues) b.dues = {}; b.dues[apt.id] = {}; }
   saveBuilding(); closeModal('aptModal'); renderContacts(); showSnack(t('snk_saved'));
 }
 
 function deleteApt() {
-  const id=document.getElementById('aptEditId').value; if(!id||!confirm(t('confirm_del_apt')))return;
-  const b=getBuilding(); b.apartments=b.apartments.filter(a=>a.id!==id); if(b.dues)delete b.dues[id];
+  const id = document.getElementById('aptEditId').value; if (!id || !confirm(t('confirm_del_apt'))) return;
+  const b = getBuilding(); b.apartments = b.apartments.filter(a => a.id !== id); if (b.dues) delete b.dues[id];
   saveBuilding(); closeModal('aptModal'); renderContacts(); showSnack(t('snk_deleted'));
 }
 
