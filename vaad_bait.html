@@ -18,7 +18,7 @@
 // ╔══════════════════════════════════════════════════════════╗
 // ║  APP CONFIGURATION                                        ║
 // ╚══════════════════════════════════════════════════════════╝
-const APP_VERSION = "1.0.4";
+const APP_VERSION = "1.0.5";
 const APP_NAME = "וועד בית";
 const GITHUB_REPO = "dimitryu/VaadBait";
 
@@ -311,7 +311,10 @@ body {
 .month-check-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
 .month-check-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px; border: 2px solid var(--border); border-radius: 12px; cursor: pointer; transition: all 0.18s; background: var(--bg); }
 .month-check-item:has(input:checked) { border-color: var(--accent); background: var(--accent-light); }
-.month-check-item.already-paid { border-color: var(--success); background: var(--success-bg); cursor: default; opacity: 0.7; }
+.month-check-item.already-paid { border-color: var(--success); background: var(--success-bg); cursor: pointer; opacity: 0.85; }
+.month-check-item.mark-unpaid { border-color: var(--danger) !important; background: var(--danger-bg) !important; }
+.month-check-item.mark-unpaid .month-check-name { color: var(--danger) !important; }
+.month-check-item.mark-unpaid .month-check-icon { color: var(--danger); }
 .month-check-item input[type=checkbox] { display: none; }
 .month-check-name { font-size: 0.82rem; font-weight: 700; color: var(--text); }
 .month-check-item:has(input:checked) .month-check-name { color: var(--accent); }
@@ -507,21 +510,21 @@ body {
 <div id="screenTransactions" class="screen">
   <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px 2px">
     <span class="section-title" data-i18n="tx_title">תנועות</span>
-    <button class="btn btn-ghost btn-sm" onclick="openReportModal()" style="display:flex;align-items:center;gap:2px;padding:2px 6px;font-size:0.65rem" data-i18n="btn_report">📊 דוח</button>
+    <button class="btn btn-ghost btn-sm" onclick="openReportModal()" style="display:flex;align-items:center;gap:3px;padding:4px 10px;font-size:0.72rem;flex:none;border-radius:20px" data-i18n="btn_report">📊 דוח</button>
   </div>
-  <div class="filter-bar" id="txFilterBar"></div>
+  <div id="txFilterBars"></div>
   <div id="txList" style="padding:0 12px 8px;"></div>
 </div>
 
 <div id="screenContacts" class="screen">
   <div class="section-header">
     <span class="section-title" data-i18n="apts_title">דירות</span>
-    <button class="btn btn-primary btn-sm" onclick="openAptModal()" style="padding:2px 6px;font-size:0.65rem" data-i18n="btn_add">+ הוסף</button>
+    <button class="btn btn-primary btn-sm" onclick="openAptModal()" style="padding:4px 10px;font-size:0.72rem;flex:none;border-radius:20px" data-i18n="btn_add">+ הוסף</button>
   </div>
   <div id="contactsList"></div>
   <div class="section-header" style="margin-top:8px">
     <span class="section-title" data-i18n="providers_title">נותני שירות</span>
-    <button class="btn btn-primary btn-sm" onclick="openProviderModal()" style="padding:2px 6px;font-size:0.65rem" data-i18n="btn_add">+ הוסף</button>
+    <button class="btn btn-primary btn-sm" onclick="openProviderModal()" style="padding:4px 10px;font-size:0.72rem;flex:none;border-radius:20px" data-i18n="btn_add">+ הוסף</button>
   </div>
   <div id="providersList" style="padding:0 12px 8px;"></div>
 </div>
@@ -1262,7 +1265,7 @@ function openAddBuildingModal() {
 // ═══════════════════════════════════════════════
 let currentScreen = 'screenDashboard';
 let duesYear = new Date().getFullYear();
-let txFilter = { year: 'all', type: 'all' };
+let txFilter = { year: 'all', type: 'all', apt: 'all', cat: 'all' };
 
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -1405,15 +1408,36 @@ function toggleDue(aptId, year, month) {
 function renderTransactions() {
   const b = getBuilding(); if (!b) return;
   const years = [...new Set((b.transactions||[]).map(tx=>tx.date.slice(0,4)))].sort().reverse();
-  document.getElementById('txFilterBar').innerHTML =
-    `<div class="filter-chip ${txFilter.year==='all'?'active':''}" onclick="setTxFilter('year','all')">${t('filter_all')}</div>` +
-    years.map(y=>`<div class="filter-chip ${txFilter.year===y?'active':''}" onclick="setTxFilter('year','${y}')">${y}</div>`).join('') +
-    `<div class="filter-chip ${txFilter.type==='income'?'active':''}" onclick="setTxFilter('type','income')">${t('filter_income')}</div>` +
-    `<div class="filter-chip ${txFilter.type==='expense'?'active':''}" onclick="setTxFilter('type','expense')">${t('filter_expense')}</div>`;
+  const apts = b.apartments || [];
+  const allCats = [...new Set((b.transactions||[]).map(tx=>tx.category).filter(Boolean))];
+
+  const chip = (key, val, label) =>
+    `<div class="filter-chip ${txFilter[key]===val?'active':''}" onclick="setTxFilter('${key}','${val}')">${label}</div>`;
+
+  const row1 = `<div class="filter-bar" style="padding:6px 12px 2px">` +
+    chip('year','all',t('filter_all')) +
+    years.map(y=>chip('year',y,y)).join('') +
+    `</div>`;
+
+  const row2 = `<div class="filter-bar" style="padding:2px 12px">` +
+    chip('type','income',t('filter_income')) +
+    chip('type','expense',t('filter_expense')) +
+    (apts.length ? `<span style="color:var(--border);padding:0 4px;line-height:28px">|</span>` +
+      apts.map(a=>`<div class="filter-chip ${txFilter.apt===a.id?'active':''}" onclick="setTxFilter('apt','${a.id}')">${a.name}</div>`).join('') : '') +
+    `</div>`;
+
+  const row3 = allCats.length ? `<div class="filter-bar" style="padding:2px 12px 6px">` +
+    chip('cat','all',t('filter_all')) +
+    allCats.map(c=>`<div class="filter-chip ${txFilter.cat===c?'active':''}" onclick="setTxFilter('cat','${c}')">${getCatLabel(c)}</div>`).join('') +
+    `</div>` : '';
+
+  document.getElementById('txFilterBars').innerHTML = row1 + row2 + row3;
 
   let txs = [...(b.transactions||[])].sort((a,c)=>c.date.localeCompare(a.date));
   if(txFilter.year!=='all') txs=txs.filter(tx=>tx.date.startsWith(txFilter.year));
   if(txFilter.type!=='all') txs=txs.filter(tx=>tx.type===txFilter.type);
+  if(txFilter.apt!=='all') txs=txs.filter(tx=>tx.aptId===txFilter.apt);
+  if(txFilter.cat!=='all') txs=txs.filter(tx=>tx.category===txFilter.cat);
 
   if(!txs.length) { document.getElementById('txList').innerHTML=`<div class="empty-state"><div class="empty-icon">📭</div><p>${t('empty_tx2')}</p></div>`; return; }
 
@@ -1435,7 +1459,11 @@ function renderTransactions() {
     </div>`).join('');
 }
 
-function setTxFilter(key, val) { if(key==='type'&&txFilter.type===val) txFilter.type='all'; else txFilter[key]=val; renderTransactions(); }
+function setTxFilter(key, val) {
+  if (txFilter[key] === val && key !== 'year') txFilter[key] = 'all';
+  else txFilter[key] = val;
+  renderTransactions();
+}
 
 // ═══════════════════════════════════════════════
 //  CONTACTS
@@ -1448,7 +1476,7 @@ function renderContacts() {
     const owners = apt.owners || [];
     const subParts = [];
     if (residents.length) subParts.push(t('lbl_tenant') + ': ' + residents.map(r=>r.name).filter(Boolean).join(', '));
-    if (owners.length) subParts.push(owners.map(o=>o.name).filter(Boolean).join(', '));
+    if (owners.length) subParts.push(t('lbl_owner') + ': ' + owners.map(o=>o.name).filter(Boolean).join(', '));
     return `
     <div class="contact-card">
       <div class="contact-header" onclick="toggleContact('cc_${apt.id}')">
@@ -1567,13 +1595,17 @@ function openPayModal(aptId) {
 }
 
 function togglePayMonth(el, month) {
-  if (el.classList.contains('already-paid')) return;
+  if (el.classList.contains('already-paid')) {
+    el.classList.toggle('mark-unpaid');
+    const removing = el.classList.contains('mark-unpaid');
+    el.querySelector('.month-check-icon').textContent = removing ? '✕' : '✓';
+    el.querySelector('.month-check-name').style.color = '';
+    updatePayPreview(document.getElementById('payAptId').value);
+    return;
+  }
   const cb = el.querySelector('input');
   cb.checked = !cb.checked;
   el.querySelector('.month-check-icon').textContent = cb.checked ? '✓' : '○';
-  el.style.borderColor = cb.checked ? 'var(--accent)' : 'var(--border)';
-  el.style.background = cb.checked ? 'var(--accent-light)' : 'var(--bg)';
-  el.querySelector('.month-check-name').style.color = cb.checked ? 'var(--accent)' : 'var(--text)';
   updatePayPreview(document.getElementById('payAptId').value);
 }
 
@@ -1595,32 +1627,45 @@ function savePayModal() {
   const checked = Array.from(document.querySelectorAll('#payMonthsGrid input[type=checkbox]:not(:disabled):checked'))
     .map(cb => parseInt(cb.value));
 
-  if (checked.length === 0) { showSnack(t('snk_sel_month')); return; }
+  const toRemove = Array.from(document.querySelectorAll('#payMonthsGrid .month-check-item.mark-unpaid'))
+    .map(el => parseInt(el.querySelector('input').value));
 
-  // Mark months as paid
+  if (checked.length === 0 && toRemove.length === 0) { showSnack(t('snk_sel_month')); return; }
+
   if (!b.dues) b.dues = {};
   if (!b.dues[aptId]) b.dues[aptId] = {};
   if (!b.dues[aptId][year]) b.dues[aptId][year] = {};
-  checked.forEach(m => { b.dues[aptId][year][m] = true; });
 
-  // Always use Hebrew month names in stored description (for consistent dues parsing)
-  const monthNamesHE = checked.sort((a,c)=>a-c).map(m => MONTHS_HE[m-1]);
-  const desc = checked.length === 1
-    ? `וועד בית ${apt.name} - ${monthNamesHE[0]} ${year}`
-    : `וועד בית ${apt.name} - ${monthNamesHE[0]}-${monthNamesHE[monthNamesHE.length-1]} ${year}`;
+  // Remove months marked for removal
+  toRemove.forEach(m => { delete b.dues[aptId][year][m]; });
 
-  const amount = checked.length * (b.monthlyDue || 100);
+  if (checked.length > 0) {
+    // Mark months as paid
+    checked.forEach(m => { b.dues[aptId][year][m] = true; });
 
-  // Add transaction automatically
-  b.transactions.push({
-    id: uid(), date, type: 'income', amount, description: desc, category: 'וועד בית'
-  });
+    // Always use Hebrew month names in stored description (for consistent dues parsing)
+    const monthNamesHE = checked.sort((a,c)=>a-c).map(m => MONTHS_HE[m-1]);
+    const desc = checked.length === 1
+      ? `וועד בית ${apt.name} - ${monthNamesHE[0]} ${year}`
+      : `וועד בית ${apt.name} - ${monthNamesHE[0]}-${monthNamesHE[monthNamesHE.length-1]} ${year}`;
+
+    const amount = checked.length * (b.monthlyDue || 100);
+
+    b.transactions.push({
+      id: uid(), date, type: 'income', amount, description: desc, category: 'וועד בית', aptId
+    });
+  }
 
   saveBuilding();
   closeModal('payModal');
   renderDashboard();
-  const sfx = t('pay_months_suffix');
-  showSnack(`${apt.name} — ${typeof sfx === 'function' ? sfx(checked.length) : checked.length + ' ' + t('pay_months_unit')}`);
+
+  if (toRemove.length > 0 && checked.length === 0) {
+    showSnack(`${apt.name} — ${toRemove.length} ${t('pay_months_unit')} בוטלו`);
+  } else {
+    const sfx = t('pay_months_suffix');
+    showSnack(`${apt.name} — ${typeof sfx === 'function' ? sfx(checked.length) : checked.length + ' ' + t('pay_months_unit')}`);
+  }
 }
 
 // ═══════════════════════════════════════════════
