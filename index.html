@@ -18,7 +18,7 @@
 // ╔══════════════════════════════════════════════════════════╗
 // ║  APP CONFIGURATION                                        ║
 // ╚══════════════════════════════════════════════════════════╝
-const APP_VERSION = "1.1.0";
+const APP_VERSION = "1.2.0";
 const APP_NAME = "וועד בית";
 const GITHUB_REPO = "dimitryu/VaadBait";
 
@@ -252,7 +252,7 @@ body {
 .nav-item {
   display: flex; flex-direction: column; align-items: center; gap: 2px;
   font-size: 0.6rem; color: var(--text-2); cursor: pointer;
-  padding: 4px 8px; border-radius: 8px; transition: color 0.2s; min-width: 52px;
+  padding: 4px 2px; border-radius: 8px; transition: color 0.2s; min-width: 40px;
 }
 .nav-item.active { color: var(--accent); }
 .nav-item .ni { font-size: 1.25rem; }
@@ -277,6 +277,26 @@ body {
 .apt-info { font-size: 0.75rem; color: var(--text-2); }
 .pay-btn { padding: 5px 12px; background: var(--success-bg); color: var(--success); border: 1px solid var(--success); border-radius: 20px; font-size: 0.8rem; cursor: pointer; font-weight: 600; white-space: nowrap; }
 .pay-btn:active { transform: scale(0.95); }
+
+/* ── Projects ── */
+.proj-card { background:var(--bg-card); border-radius:14px; margin-bottom:10px; box-shadow:0 2px 8px var(--shadow); overflow:hidden; }
+.proj-header { display:flex; align-items:center; justify-content:space-between; padding:12px 14px 8px; }
+.proj-name { font-size:0.95rem; font-weight:800; }
+.proj-target { font-size:0.8rem; color:var(--text-2); }
+.proj-progress-wrap { padding:0 14px 8px; }
+.proj-progress-bar-bg { height:8px; background:var(--border); border-radius:4px; overflow:hidden; margin-bottom:4px; }
+.proj-progress-bar { height:100%; background:var(--accent); border-radius:4px; transition:width 0.4s; }
+.proj-progress-lbl { font-size:0.72rem; color:var(--text-2); display:flex; justify-content:space-between; }
+.proj-apts { border-top:1px solid var(--border); }
+.proj-apt-row { display:flex; align-items:center; gap:8px; padding:8px 14px; border-bottom:1px solid var(--border); }
+.proj-apt-row:last-child { border-bottom:none; }
+.proj-apt-name { font-weight:700; font-size:0.82rem; min-width:54px; }
+.proj-apt-person { flex:1; font-size:0.78rem; color:var(--text-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.proj-toggle { padding:3px 10px; border-radius:20px; border:1.5px solid; font-size:0.72rem; font-weight:700; cursor:pointer; white-space:nowrap; transition:all 0.18s; background:transparent; }
+.proj-toggle.paid { border-color:var(--success); color:var(--success); }
+.proj-toggle.unpaid { border-color:var(--danger); color:var(--danger); }
+.wa-btn { background:none; border:none; font-size:1.1rem; cursor:pointer; padding:2px 4px; opacity:0.8; }
+.wa-btn:active { opacity:1; transform:scale(1.2); }
 
 /* ── Transactions ── */
 .tx-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
@@ -595,6 +615,14 @@ body {
   </div>
 </div>
 
+<div id="screenProjects" class="screen">
+  <div class="section-header">
+    <span class="section-title" data-i18n="proj_title">יעדים / פרויקטים</span>
+    <button class="btn btn-primary btn-sm" onclick="openProjectModal()" style="padding:4px 10px;font-size:0.72rem;flex:none;border-radius:20px" data-i18n="btn_add">+ הוסף</button>
+  </div>
+  <div id="projectsList" style="padding:0 12px 8px;"></div>
+</div>
+
 </div><!-- end appShell -->
 
 <!-- Bottom Navigation -->
@@ -613,6 +641,9 @@ body {
   </div>
   <div class="nav-item" data-screen="screenSettings" onclick="showScreen('screenSettings')">
     <span class="ni">⚙️</span><span data-i18n="nav_settings">הגדרות</span>
+  </div>
+  <div class="nav-item" data-screen="screenProjects" onclick="showScreen('screenProjects')">
+    <span class="ni">🎯</span><span data-i18n="nav_projects">יעדים</span>
   </div>
 </nav>
 
@@ -772,6 +803,35 @@ body {
   </div>
 </div>
 
+<!-- Project Modal -->
+<div class="modal-overlay" id="projectModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="projectModalTitle">יעד חדש</div>
+    <input type="hidden" id="projectEditId">
+    <div class="form-group">
+      <label class="form-label">שם הפרויקט</label>
+      <input type="text" class="form-input" id="projectName" placeholder="לדוג': תיקון גג">
+    </div>
+    <div class="form-group">
+      <label class="form-label">סכום יעד כולל (₪)</label>
+      <input type="number" class="form-input" id="projectTarget" placeholder="45000">
+    </div>
+    <div class="form-group">
+      <label class="form-label">סכום לדירה (₪) — ריק = חלוקה שווה</label>
+      <input type="number" class="form-input" id="projectPerApt" placeholder="אוטומטי">
+    </div>
+    <div class="form-group">
+      <label class="form-label">הערה (אופציונלי)</label>
+      <input type="text" class="form-input" id="projectNote" placeholder="">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('projectModal')">ביטול</button>
+      <button class="btn btn-primary" onclick="saveProject()">✓ שמור</button>
+    </div>
+  </div>
+</div>
+
 <!-- Report Modal -->
 <div class="modal-overlay" id="reportModal">
   <div class="modal">
@@ -871,6 +931,19 @@ const STRINGS = {
     apt_owner_n: (n) => `בעל דירה ${n}`,
     btn_add_resident: '+ דייר',
     btn_add_owner: '+ בעל דירה',
+    nav_projects:'יעדים',
+    proj_title:'יעדים / פרויקטים',
+    proj_new:'פרויקט חדש',
+    proj_edit:'עריכת פרויקט',
+    proj_name_lbl:'שם הפרויקט',
+    proj_target_lbl:'סכום יעד (₪)',
+    proj_per_apt:'סכום לדירה (₪)',
+    proj_note:'הערה',
+    proj_collected:'נגבה',
+    proj_empty:'אין פרויקטים עדיין',
+    proj_confirm_del:'למחוק פרויקט זה?',
+    wa_dues_msg: (name, month, year, amount) => `שלום ${name},\nעבור חודש ${month} ${year} ועד הבית טרם שולם.\nסכום: ₪${amount}\nתודה 🙏`,
+    wa_project_msg: (name, projName, amount) => `שלום ${name},\nעבור פרויקט "${projName}" חלקך לתשלום: ₪${amount}\nתודה 🙏`,
   },
   en: {
     nav_home:'Home', nav_dues:'Dues', nav_tx:'Transactions', nav_contacts:'Contacts', nav_settings:'Settings',
@@ -911,6 +984,19 @@ const STRINGS = {
     apt_owner_n: (n) => `Owner ${n}`,
     btn_add_resident: '+ Tenant',
     btn_add_owner: '+ Owner',
+    nav_projects:'Goals',
+    proj_title:'Goals / Projects',
+    proj_new:'New Project',
+    proj_edit:'Edit Project',
+    proj_name_lbl:'Project Name',
+    proj_target_lbl:'Target Amount (₪)',
+    proj_per_apt:'Amount per Apt (₪)',
+    proj_note:'Note',
+    proj_collected:'Collected',
+    proj_empty:'No projects yet',
+    proj_confirm_del:'Delete this project?',
+    wa_dues_msg: (name, month, year, amount) => `Hello ${name},\nFor ${month} ${year} the HOA dues have not been paid.\nAmount: ₪${amount}\nThank you 🙏`,
+    wa_project_msg: (name, projName, amount) => `Hello ${name},\nFor project "${projName}" your share is: ₪${amount}\nThank you 🙏`,
   },
   ru: {
     nav_home:'Главная', nav_dues:'Взносы', nav_tx:'Операции', nav_contacts:'Контакты', nav_settings:'Настройки',
@@ -951,6 +1037,19 @@ const STRINGS = {
     apt_owner_n: (n) => `Владелец ${n}`,
     btn_add_resident: '+ Жилец',
     btn_add_owner: '+ Владелец',
+    nav_projects:'Цели',
+    proj_title:'Цели / Проекты',
+    proj_new:'Новый проект',
+    proj_edit:'Редактировать проект',
+    proj_name_lbl:'Название проекта',
+    proj_target_lbl:'Целевая сумма (₪)',
+    proj_per_apt:'Сумма за квартиру (₪)',
+    proj_note:'Заметка',
+    proj_collected:'Собрано',
+    proj_empty:'Проектов пока нет',
+    proj_confirm_del:'Удалить этот проект?',
+    wa_dues_msg: (name, month, year, amount) => `Здравствуйте, ${name}!\nЗа ${month} ${year} взнос ТСЖ не оплачен.\nСумма: ₪${amount}\nСпасибо 🙏`,
+    wa_project_msg: (name, projName, amount) => `Здравствуйте, ${name}!\nПо проекту "${projName}" ваша доля: ₪${amount}\nСпасибо 🙏`,
   }
 };
 
@@ -1282,6 +1381,7 @@ function renderScreen(id) {
   else if (id === 'screenTransactions') renderTransactions();
   else if (id === 'screenContacts') renderContacts();
   else if (id === 'screenSettings') renderSettings();
+  else if (id === 'screenProjects') renderProjects();
 }
 
 // ═══════════════════════════════════════════════
@@ -1323,12 +1423,20 @@ function renderDashboard() {
   apts.forEach(a => {
     const isPaid = !!(b.dues?.[a.id]?.[year]?.[month]);
     const ownerName = (a.owners?.[0]?.name) || (a.residents?.[0]?.name) || (a.resident?.name) || '';
+    const phone = getAptPhone(a);
+    const contactName = getAptContactName(a);
+    const { month: curMonth, year: curYear } = nowMY();
+    const monthName = getMonths()[curMonth-1];
+    const waMsg = !isPaid && phone ? t('wa_dues_msg')(contactName || a.name, monthName, curYear, b.monthlyDue||100) : '';
     html += `<div class="unpaid-apt">
       <div>
         <div class="apt-name">${a.name}${isPaid ? ' <span style="color:var(--success);font-size:0.75rem">✓</span>' : ''}</div>
         <div class="apt-info">${ownerName}</div>
       </div>
-      <button class="pay-btn" onclick="openPayModal('${a.id}')" style="${isPaid ? 'background:var(--success-bg);color:var(--success);border-color:var(--success);opacity:0.8' : ''}">${t('add_payment')}</button>
+      <div style="display:flex;align-items:center;gap:6px">
+        ${!isPaid && phone ? `<button class="wa-btn" onclick="sendWA('${phone}',decodeURIComponent('${encodeURIComponent(waMsg)}'))">💬</button>` : ''}
+        <button class="pay-btn" onclick="openPayModal('${a.id}')" style="${isPaid ? 'background:var(--success-bg);color:var(--success);border-color:var(--success);opacity:0.8' : ''}">${t('add_payment')}</button>
+      </div>
     </div>`;
   });
   html += '</div>';
@@ -2227,6 +2335,143 @@ function resetData() {
 // ═══════════════════════════════════════════════
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+
+// ═══════════════════════════════════════════════
+//  PROJECTS
+// ═══════════════════════════════════════════════
+function renderProjects() {
+  const b = getBuilding(); if (!b) return;
+  const projects = b.projects || [];
+  const apts = b.apartments || [];
+
+  if (!projects.length) {
+    document.getElementById('projectsList').innerHTML = `<div class="empty-state"><div class="empty-icon">🎯</div><p>${t('proj_empty')}</p></div>`;
+    return;
+  }
+
+  document.getElementById('projectsList').innerHTML = projects.map(proj => {
+    const perApt = proj.perAptAmount || (apts.length ? Math.ceil(proj.targetAmount / apts.length) : 0);
+    const paidApts = apts.filter(a => proj.paid?.[a.id]);
+    const collected = paidApts.length * perApt;
+    const pct = proj.targetAmount ? Math.min(100, Math.round(collected / proj.targetAmount * 100)) : 0;
+
+    const aptRows = apts.map(a => {
+      const isPaid = !!(proj.paid?.[a.id]);
+      const personName = (a.owners?.[0]?.name) || (a.residents?.[0]?.name) || (a.resident?.name) || '';
+      const phone = getAptPhone(a);
+      const waMsg = phone ? t('wa_project_msg')(personName || a.name, proj.name, perApt) : '';
+      return `<div class="proj-apt-row">
+        <span class="proj-apt-name">${a.name}</span>
+        <span class="proj-apt-person">${personName}</span>
+        <button class="proj-toggle ${isPaid?'paid':'unpaid'}" onclick="toggleProjectPaid('${proj.id}','${a.id}')">${isPaid?'✓ שולם':'✗ לא שולם'}</button>
+        ${phone ? `<button class="wa-btn" onclick="sendWA('${phone}',decodeURIComponent('${encodeURIComponent(waMsg)}'))">💬</button>` : ''}
+      </div>`;
+    }).join('');
+
+    return `<div class="proj-card">
+      <div class="proj-header">
+        <div>
+          <div class="proj-name">🎯 ${proj.name}</div>
+          <div class="proj-target">${fmt(proj.targetAmount)} · ${fmt(perApt)} לדירה${proj.note ? ' · '+proj.note : ''}</div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-ghost btn-sm" onclick="openProjectModal('${proj.id}')">✏️</button>
+          <button class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="deleteProject('${proj.id}')">🗑️</button>
+        </div>
+      </div>
+      <div class="proj-progress-wrap">
+        <div class="proj-progress-bar-bg"><div class="proj-progress-bar" style="width:${pct}%"></div></div>
+        <div class="proj-progress-lbl"><span>${t('proj_collected')}: ${fmt(collected)}</span><span>${pct}% · ${paidApts.length}/${apts.length}</span></div>
+      </div>
+      <div class="proj-apts">${aptRows}</div>
+    </div>`;
+  }).join('');
+}
+
+function openProjectModal(editId) {
+  const b = getBuilding();
+  document.getElementById('projectModal').classList.add('open');
+  document.getElementById('projectEditId').value = editId || '';
+  if (editId) {
+    const proj = (b.projects||[]).find(p=>p.id===editId);
+    if (!proj) return;
+    document.getElementById('projectModalTitle').textContent = t('proj_edit');
+    document.getElementById('projectName').value = proj.name;
+    document.getElementById('projectTarget').value = proj.targetAmount;
+    document.getElementById('projectPerApt').value = proj.perAptAmount || '';
+    document.getElementById('projectNote').value = proj.note || '';
+  } else {
+    document.getElementById('projectModalTitle').textContent = t('proj_new');
+    document.getElementById('projectName').value = '';
+    document.getElementById('projectTarget').value = '';
+    document.getElementById('projectPerApt').value = '';
+    document.getElementById('projectNote').value = '';
+  }
+}
+
+function saveProject() {
+  const b = getBuilding();
+  const name = document.getElementById('projectName').value.trim();
+  const target = parseFloat(document.getElementById('projectTarget').value) || 0;
+  const perApt = parseFloat(document.getElementById('projectPerApt').value) || 0;
+  const note = document.getElementById('projectNote').value.trim();
+  const editId = document.getElementById('projectEditId').value;
+
+  if (!name) { showSnack(t('snk_no_name')); return; }
+  if (!target) { showSnack(t('snk_no_amount')); return; }
+
+  if (!b.projects) b.projects = [];
+
+  if (editId) {
+    const proj = b.projects.find(p=>p.id===editId);
+    if (proj) { proj.name=name; proj.targetAmount=target; proj.perAptAmount=perApt; proj.note=note; }
+  } else {
+    b.projects.push({ id:uid(), name, targetAmount:target, perAptAmount:perApt, note, createdDate:todayISO(), paid:{} });
+  }
+
+  saveBuilding();
+  closeModal('projectModal');
+  renderProjects();
+  showSnack(t('snk_saved'));
+}
+
+function deleteProject(projId) {
+  if (!confirm(t('proj_confirm_del'))) return;
+  const b = getBuilding();
+  b.projects = (b.projects||[]).filter(p=>p.id!==projId);
+  saveBuilding(); renderProjects();
+  showSnack(t('snk_deleted'));
+}
+
+function toggleProjectPaid(projId, aptId) {
+  const b = getBuilding();
+  const proj = (b.projects||[]).find(p=>p.id===projId);
+  if (!proj) return;
+  if (!proj.paid) proj.paid = {};
+  proj.paid[aptId] = !proj.paid[aptId];
+  saveBuilding(); renderProjects();
+}
+
+// ═══════════════════════════════════════════════
+//  WHATSAPP
+// ═══════════════════════════════════════════════
+function getAptPhone(apt) {
+  const owner = (apt.owners||[]).find(o=>o.whatsapp||o.phone);
+  if (owner) return owner.whatsapp || owner.phone;
+  const resident = (apt.residents||[]).find(r=>r.phone);
+  if (resident) return resident.phone;
+  if (apt.resident?.phone) return apt.resident.phone;
+  return null;
+}
+
+function getAptContactName(apt) {
+  return (apt.owners?.[0]?.name) || (apt.residents?.[0]?.name) || (apt.resident?.name) || apt.name;
+}
+
+function sendWA(phone, msg) {
+  const clean = String(phone).replace(/[-\s\(\)]/g,'').replace(/^\+?972/,'972').replace(/^0/,'972');
+  window.open(`https://wa.me/${clean}?text=${encodeURIComponent(msg)}`, '_blank');
+}
 
 // ═══════════════════════════════════════════════
 //  SNACKBAR
