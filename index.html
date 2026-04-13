@@ -1422,16 +1422,19 @@ function renderTransactions() {
   const row2 = `<div class="filter-bar" style="padding:2px 12px">` +
     chip('type','income',t('filter_income')) +
     chip('type','expense',t('filter_expense')) +
-    (apts.length ? `<span style="color:var(--border);padding:0 4px;line-height:28px">|</span>` +
-      apts.map(a=>`<div class="filter-chip ${txFilter.apt===a.id?'active':''}" onclick="setTxFilter('apt','${a.id}')">${a.name}</div>`).join('') : '') +
     `</div>`;
+
+  const row2b = apts.length ? `<div class="filter-bar" style="padding:2px 12px">` +
+    chip('apt','all',t('filter_all')) +
+    apts.map(a=>`<div class="filter-chip ${txFilter.apt===a.id?'active':''}" onclick="setTxFilter('apt','${a.id}')">${a.name}</div>`).join('') +
+    `</div>` : '';
 
   const row3 = allCats.length ? `<div class="filter-bar" style="padding:2px 12px 6px">` +
     chip('cat','all',t('filter_all')) +
     allCats.map(c=>`<div class="filter-chip ${txFilter.cat===c?'active':''}" onclick="setTxFilter('cat','${c}')">${getCatLabel(c)}</div>`).join('') +
     `</div>` : '';
 
-  document.getElementById('txFilterBars').innerHTML = row1 + row2 + row3;
+  document.getElementById('txFilterBars').innerHTML = row1 + row2 + row2b + row3;
 
   let txs = [...(b.transactions||[])].sort((a,c)=>c.date.localeCompare(a.date));
   if(txFilter.year!=='all') txs=txs.filter(tx=>tx.date.startsWith(txFilter.year));
