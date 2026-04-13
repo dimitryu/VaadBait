@@ -18,7 +18,7 @@
 // ╔══════════════════════════════════════════════════════════╗
 // ║  APP CONFIGURATION                                        ║
 // ╚══════════════════════════════════════════════════════════╝
-const APP_VERSION = "1.0.8";
+const APP_VERSION = "1.0.9";
 const APP_NAME = "וועד בית";
 const GITHUB_REPO = "dimitryu/VaadBait";
 
@@ -1370,19 +1370,12 @@ function renderDues() {
     years.map(y => `<button class="year-btn ${y===duesYear?'active':''}" onclick="setDuesYear(${y})">${y}</button>`).join('');
 
   const apts = b.apartments || [];
-  const due = b.monthlyDue || 100;
-  const yr = Number(duesYear); // ensure numeric comparison
   let totalPaid = 0;
-  apts.forEach(a => {
-    const aptDuesForYear = b.dues?.[a.id]?.[yr] || b.dues?.[a.id]?.[String(yr)] || {};
-    for (let m = 1; m <= 12; m++) if (aptDuesForYear[m] || aptDuesForYear[String(m)]) totalPaid++;
-  });
+  apts.forEach(a => { for(let m=1;m<=12;m++) if(b.dues?.[a.id]?.[duesYear]?.[m]) totalPaid++; });
   const totalUnpaid = apts.length * 12 - totalPaid;
   document.getElementById('duesSummary').innerHTML = `
     <div class="dues-stat"><div class="dues-stat-val" style="color:var(--success)">${totalPaid}</div><div class="dues-stat-lbl">${t('dues_paid')}</div></div>
-    <div class="dues-stat"><div class="dues-stat-val" style="color:var(--danger)">${totalUnpaid}</div><div class="dues-stat-lbl">${t('dues_missing')}</div></div>
-    <div class="dues-stat"><div class="dues-stat-val">${fmt(totalPaid*due)}</div><div class="dues-stat-lbl">${t('dues_collected')}</div></div>
-    <div class="dues-stat"><div class="dues-stat-val" style="color:var(--text-2)">${fmt(totalUnpaid*due)}</div><div class="dues-stat-lbl">${t('dues_remaining')}</div></div>`;
+    <div class="dues-stat"><div class="dues-stat-val" style="color:var(--danger)">${totalUnpaid}</div><div class="dues-stat-lbl">${t('dues_missing')}</div></div>`;
 
   const months = getMonths();
   let html = `<thead><tr><th class="month-col">${t('month_col')}</th>${apts.map(a=>`<th class="apt-col">${a.name}</th>`).join('')}</tr></thead><tbody>`;
