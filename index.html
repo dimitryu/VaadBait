@@ -18,7 +18,7 @@
 // ╔══════════════════════════════════════════════════════════╗
 // ║  APP CONFIGURATION                                        ║
 // ╚══════════════════════════════════════════════════════════╝
-const APP_VERSION = "1.0.5";
+const APP_VERSION = "1.0.7";
 const APP_NAME = "וועד בית";
 const GITHUB_REPO = "dimitryu/VaadBait";
 
@@ -1371,8 +1371,12 @@ function renderDues() {
 
   const apts = b.apartments || [];
   const due = b.monthlyDue || 100;
+  const yr = Number(duesYear); // ensure numeric comparison
   let totalPaid = 0;
-  apts.forEach(a => { for(let m=1;m<=12;m++) if(b.dues?.[a.id]?.[duesYear]?.[m]) totalPaid++; });
+  apts.forEach(a => {
+    const aptDuesForYear = b.dues?.[a.id]?.[yr] || b.dues?.[a.id]?.[String(yr)] || {};
+    for (let m = 1; m <= 12; m++) if (aptDuesForYear[m] || aptDuesForYear[String(m)]) totalPaid++;
+  });
   const totalUnpaid = apts.length * 12 - totalPaid;
   document.getElementById('duesSummary').innerHTML = `
     <div class="dues-stat"><div class="dues-stat-val" style="color:var(--success)">${totalPaid}</div><div class="dues-stat-lbl">${t('dues_paid')}</div></div>
