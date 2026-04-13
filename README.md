@@ -12,8 +12,8 @@
 - ייצוא/ייבוא גיבוי JSON
 
 ## שימוש
-פתח את `vaad_bait.html` בדפדפן — לא נדרשת התקנה.
+פתח את `index.html` בדפדפן — לא נדרשת התקנה.
 
 ## GitHub Pages
 האפליקציה זמינה בכתובת:
-`https://dimitryu.github.io/VaadBait/vaad_bait.html`
+`https://dimitryu.github.io/VaadBait/`

@@ -1436,7 +1436,10 @@ function renderTransactions() {
   let txs = [...(b.transactions||[])].sort((a,c)=>c.date.localeCompare(a.date));
   if(txFilter.year!=='all') txs=txs.filter(tx=>tx.date.startsWith(txFilter.year));
   if(txFilter.type!=='all') txs=txs.filter(tx=>tx.type===txFilter.type);
-  if(txFilter.apt!=='all') txs=txs.filter(tx=>tx.aptId===txFilter.apt);
+  if(txFilter.apt!=='all') {
+    const aptObj = (b.apartments||[]).find(a=>a.id===txFilter.apt);
+    txs=txs.filter(tx=>tx.aptId===txFilter.apt || (aptObj && tx.description && tx.description.includes(aptObj.name)));
+  }
   if(txFilter.cat!=='all') txs=txs.filter(tx=>tx.category===txFilter.cat);
 
   if(!txs.length) { document.getElementById('txList').innerHTML=`<div class="empty-state"><div class="empty-icon">📭</div><p>${t('empty_tx2')}</p></div>`; return; }

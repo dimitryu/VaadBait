@@ -2,7 +2,7 @@
   "name": "וועד בית",
   "short_name": "וועד בית",
   "description": "אפליקציית ניהול וועד הבית",
-  "start_url": "./vaad_bait.html",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
@@ -29,14 +29,14 @@
       "name": "מעקב תשלומים",
       "short_name": "תשלומים",
       "description": "פתח מעקב תשלומים",
-      "url": "./vaad_bait.html#dues",
+      "url": "./index.html#dues",
       "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "הוסף תנועה",
       "short_name": "הוסף",
       "description": "הוסף הכנסה או הוצאה",
-      "url": "./vaad_bait.html#add",
+      "url": "./index.html#add",
       "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
     }
   ],

@@ -1,6 +1,6 @@
 const CACHE_NAME = 'vaad-bait-v1.0.5';
 const ASSETS = [
-  './vaad_bait.html',
+  './index.html',
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png',
