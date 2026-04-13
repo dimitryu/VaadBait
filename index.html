@@ -18,7 +18,7 @@
 // ╔══════════════════════════════════════════════════════════╗
 // ║  APP CONFIGURATION                                        ║
 // ╚══════════════════════════════════════════════════════════╝
-const APP_VERSION = "1.0.6";
+const APP_VERSION = "1.0.5";
 const APP_NAME = "וועד בית";
 const GITHUB_REPO = "dimitryu/VaadBait";
 
@@ -1265,7 +1265,7 @@ function openAddBuildingModal() {
 // ═══════════════════════════════════════════════
 let currentScreen = 'screenDashboard';
 let duesYear = new Date().getFullYear();
-let txFilter = { year: String(new Date().getFullYear()), type: 'all', apt: 'all', cat: 'all' };
+let txFilter = { year: 'all', type: 'all', apt: 'all', cat: 'all' };
 
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -1447,13 +1447,10 @@ function renderTransactions() {
 
   if(!txs.length) { document.getElementById('txList').innerHTML=`<div class="empty-state"><div class="empty-icon">📭</div><p>${t('empty_tx2')}</p></div>`; return; }
 
-  // Build running balance map for the filtered set (newest-first within filtered txs)
-  const balMap = {};
-  let runBal = 0;
-  // sum only the filtered transactions to get period total at the end
-  txs.forEach(tx => { runBal += tx.type==='income' ? tx.amount : -tx.amount; });
-  // walk newest→oldest, peeling off each tx to get "balance after this tx"
-  [...txs].forEach(tx => { balMap[tx.id] = runBal; runBal -= tx.type==='income' ? tx.amount : -tx.amount; });
+  // Build running balance map (newest-first)
+  const allSorted = [...(b.transactions||[])].sort((a,c)=>c.date.localeCompare(a.date));
+  const balMap = {}; let runBal = calcBalance(b);
+  allSorted.forEach(tx => { balMap[tx.id] = runBal; runBal -= tx.type==='income' ? tx.amount : -tx.amount; });
 
   document.getElementById('txList').innerHTML = txs.map(tx => `
     <div class="tx-item" onclick="openTxModal(null,'${tx.id}')">
