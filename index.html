@@ -18,7 +18,7 @@
 // ╔══════════════════════════════════════════════════════════╗
 // ║  APP CONFIGURATION                                        ║
 // ╚══════════════════════════════════════════════════════════╝
-const APP_VERSION = "1.2.3";
+const APP_VERSION = "1.2.4";
 const APP_NAME = "וועד בית";
 const GITHUB_REPO = "dimitryu/VaadBait";
 
@@ -2552,13 +2552,13 @@ function buildDuesMsg(b, apt) {
   if (!unpaid.length) return `שלום רב,\nכל תשלומי הוועד עד כה מסודרים ✓\n\nתודה רבה,\nועד הבית`;
   const monthsStr = fmtMonthList(unpaid);
   const total = unpaid.length * due;
-  return `שלום רב, ✍️\n\nלצורך הסדרת רישומי ועד הבית, להלן פירוט חוב וועד הבית עבור דירתכם לשנת ${year}:\n\n📅 חודשים שלא שולמו: ${monthsStr}.\n💰 סך הכל לתשלום: ₪${total.toLocaleString()}.\n\nנודה לכם מאוד על הסדרת התשלום בהקדם לטובת המשך התחזוקה השוטפת של הבניין. 🏗️\n\nתודה רבה,\nועד הבית`;
+  return `שלום רב, 📝\n\nלצורך הסדרת רישומי ועד הבית, להלן פירוט חוב וועד הבית עבור דירתכם לשנת ${year}:\n\n📅 חודשים שלא שולמו: ${monthsStr}.\n💰 סך הכל לתשלום: ₪${total.toLocaleString()}.\n\nנודה לכם מאוד על הסדרת התשלום בהקדם לטובת המשך התחזוקה השוטפת של הבניין. 🏢\n\nתודה רבה,\nועד הבית`;
 }
 
 // Builds project message
 function buildProjectMsg(b, apt, proj) {
   const perApt = proj.perAptAmount || Math.ceil(proj.targetAmount / Math.max((b.apartments||[]).length, 1));
-  return `שלום רב, ✍️\n\nלצורך הסדרת רישומי ועד הבית, להלן פירוט עבור דירתכם:\n\n🎯 פרויקט: ${proj.name}\n💰 חלקך לתשלום: ₪${perApt.toLocaleString()}.\n\nנודה לכם מאוד על הסדרת התשלום בהקדם לטובת המשך התחזוקה השוטפת של הבניין. 🏗️\n\nתודה רבה,\nועד הבית`;
+  return `שלום רב, 📝\n\nלצורך הסדרת רישומי ועד הבית, להלן פירוט עבור דירתכם:\n\n🎯 פרויקט: ${proj.name}\n💰 חלקך לתשלום: ₪${perApt.toLocaleString()}.\n\nנודה לכם מאוד על הסדרת התשלום בהקדם לטובת המשך התחזוקה השוטפת של הבניין. 🏢\n\nתודה רבה,\nועד הבית`;
 }
 
 // Opens WA+Email contact selector modal
@@ -2637,8 +2637,12 @@ function sendWA(phone, msg) {
 
 function sendEmail(email, msg) {
   const subject = encodeURIComponent('ועד הבית — הודעה חשובה');
-  const body = encodeURIComponent(msg);
-  window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(msg).then(() => {
+      showSnack('ההודעה הועתקה ללוח — הדבק אותה בגוף המייל');
+    }).catch(() => {});
+  }
+  window.open(`mailto:${email}?subject=${subject}`, '_blank');
 }
 
 // ═══════════════════════════════════════════════
