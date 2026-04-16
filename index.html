@@ -18,7 +18,7 @@
 // ╔══════════════════════════════════════════════════════════╗
 // ║  APP CONFIGURATION                                        ║
 // ╚══════════════════════════════════════════════════════════╝
-const APP_VERSION = "1.2.5";
+const APP_VERSION = "1.2.6";
 const APP_NAME = "וועד בית";
 const GITHUB_REPO = "dimitryu/VaadBait";
 
@@ -304,6 +304,14 @@ body {
 .wa-contact-meta { font-size:0.74rem; color:var(--text-2); }
 .wa-contact-cb { width:20px; height:20px; accent-color:var(--accent); cursor:pointer; flex-shrink:0; }
 .wa-msg-area { width:100%; min-height:90px; resize:vertical; font-family:inherit; font-size:0.82rem; direction:rtl; }
+/* Cloud Sync */
+.sync-code-box { font-family:monospace; background:var(--accent-light); border:2px dashed var(--accent); border-radius:10px; padding:10px 14px; text-align:center; font-size:1rem; letter-spacing:2px; cursor:pointer; color:var(--accent); font-weight:700; margin:4px 0; word-break:break-all; }
+.sync-dot { width:9px; height:9px; border-radius:50%; display:inline-block; flex-shrink:0; }
+.sync-dot.ok  { background:var(--success); }
+.sync-dot.busy{ background:var(--warning); animation:sdpulse 1s infinite; }
+.sync-dot.err { background:var(--danger); }
+@keyframes sdpulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.sync-help { font-size:0.75rem; color:var(--text-2); line-height:1.7; margin-bottom:8px; }
 .wa-section-lbl { font-size:0.78rem; font-weight:700; color:var(--text-2); margin-bottom:6px; }
 .wa-send-all { background:#25d366; color:white; border:none; border-radius:12px; padding:11px; font-size:0.9rem; font-weight:700; cursor:pointer; width:100%; margin-top:8px; }
 .wa-send-all:active { opacity:0.85; }
@@ -603,6 +611,9 @@ body {
       <button class="btn btn-ghost btn-sm" onclick="importData()" data-i18n="btn_import">ייבא</button>
     </div>
   </div>
+
+  <div class="settings-group-title" style="margin-top:12px">🔄 סנכרון בין מכשירים</div>
+  <div class="settings-group" id="cloudSyncGroup"></div>
 
   <div class="settings-group-title" style="margin-top:12px" data-i18n="grp_install">התקנה על הטלפון</div>
   <div class="settings-group">
@@ -1251,10 +1262,14 @@ function loadBuilding(id) {
   currentBuildingId = id;
   setCurrentBuildingId(id);
   currentBuilding = getBuildingData(id);
+  stopSyncPoll();
+  if (currentBuilding?.syncCode && getSyncDbUrl()) startSyncPoll();
 }
 
 function saveBuilding() {
+  if (currentBuilding) currentBuilding.updatedAt = Date.now();
   saveBuildingData(currentBuildingId, currentBuilding);
+  if (currentBuilding?.syncCode && getSyncDbUrl()) cloudPush();
 }
 
 // ═══════════════════════════════════════════════
@@ -1704,6 +1719,7 @@ function renderSettings() {
   document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === appLang));
   // Update all static i18n labels
   document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+  renderSyncSection();
 }
 
 // ═══════════════════════════════════════════════
@@ -2650,9 +2666,11 @@ function sendWA(phone, msg) {
 
 function sendEmail(email, msg) {
   const subject = encodeURIComponent('ועד הבית — הודעה חשובה');
-  // Encode body: normalise newlines to CRLF then percent-encode
   const body = encodeURIComponent(msg.replace(/\r?\n/g, '\r\n'));
+  // Copy to clipboard as fallback (Outlook sometimes garbles mailto body)
+  navigator.clipboard?.writeText(msg).catch(() => {});
   window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
+  setTimeout(() => showSnack('אם ההודעה לא הופיעה בגוף המייל — הדבק מהלוח (Ctrl+V)'), 1200);
 }
 
 function sendEmailManual() {
@@ -2660,6 +2678,206 @@ function sendEmailManual() {
   const email = (input && input.value || '').trim();
   if (!email || !email.includes('@')) { showSnack('יש להזין כתובת אימייל תקינה'); return; }
   sendEmail(email, document.getElementById('waMessageText').value);
+}
+
+// ═══════════════════════════════════════════════
+//  CLOUD SYNC — Firebase Realtime Database REST
+//  No SDK needed — plain JSON GET/PUT requests
+//  Setup: create free Firebase project, enable
+//  Realtime Database, set rules to public,
+//  copy the DB URL (ends in .firebaseio.com)
+// ═══════════════════════════════════════════════
+let syncPollTimer = null;
+
+function getSyncDbUrl() { return (localStorage.getItem('vb_sync_db') || '').replace(/\/$/, ''); }
+function setSyncDbUrl(url) { localStorage.setItem('vb_sync_db', url); }
+
+function cloudUrl(syncCode) {
+  return `${getSyncDbUrl()}/vaad_bait_sync/${syncCode}.json`;
+}
+
+async function cloudPush() {
+  const b = currentBuilding;
+  if (!b || !b.syncCode || !getSyncDbUrl()) return;
+  try {
+    updateSyncDot('busy');
+    const resp = await fetch(cloudUrl(b.syncCode), {
+      method: 'PUT',
+      body: JSON.stringify({ data: JSON.stringify(b), updatedAt: b.updatedAt || Date.now() }),
+      headers: { 'Content-Type': 'application/json' }
+    });
+    if (resp.ok) updateSyncDot('ok');
+    else updateSyncDot('err');
+  } catch { updateSyncDot('err'); }
+}
+
+async function cloudPull() {
+  const b = currentBuilding;
+  if (!b || !b.syncCode || !getSyncDbUrl()) return;
+  try {
+    const resp = await fetch(cloudUrl(b.syncCode));
+    if (!resp.ok) return;
+    const json = await resp.json();
+    if (!json?.data) return;
+    const cloudAt = json.updatedAt || 0;
+    const localAt = b.updatedAt || 0;
+    if (cloudAt > localAt) {
+      const cloudData = JSON.parse(json.data);
+      currentBuilding = cloudData;
+      saveBuildingData(currentBuildingId, cloudData);
+      renderScreen(currentScreen);
+      updateSyncDot('ok');
+    } else {
+      updateSyncDot('ok');
+    }
+  } catch { updateSyncDot('err'); }
+}
+
+function updateSyncDot(state) {
+  const dot = document.getElementById('syncStatusDot');
+  const lbl = document.getElementById('syncStatusLbl');
+  if (!dot || !lbl) return;
+  dot.className = `sync-dot ${state}`;
+  lbl.textContent = state === 'ok' ? 'מסונכרן ✓' : state === 'busy' ? 'מסנכרן...' : 'שגיאת סנכרון ⚠️';
+}
+
+function startSyncPoll() {
+  stopSyncPoll();
+  cloudPull();
+  syncPollTimer = setInterval(cloudPull, 30000);
+}
+
+function stopSyncPoll() {
+  if (syncPollTimer) { clearInterval(syncPollTimer); syncPollTimer = null; }
+}
+
+function renderSyncSection() {
+  const el = document.getElementById('cloudSyncGroup');
+  if (!el) return;
+  const dbUrl = getSyncDbUrl();
+  const b = currentBuilding;
+  const syncCode = b?.syncCode || '';
+
+  if (!dbUrl) {
+    el.innerHTML = `
+      <div class="settings-row" style="flex-direction:column;align-items:stretch;gap:10px;padding:12px 0">
+        <div class="sync-help">
+          שמור נתונים בענן וגישה מכל מכשיר. נדרש חשבון Firebase חינמי:<br>
+          1. כנס ל-<b>firebase.google.com</b> → צור פרויקט<br>
+          2. לחץ <b>Realtime Database</b> → צור מסד נתונים<br>
+          3. ב-Rules הגדר: <code style="background:var(--accent-light);padding:1px 5px;border-radius:4px">".read":true,".write":true</code><br>
+          4. העתק את ה-URL והדבק כאן:
+        </div>
+        <input type="url" id="syncDbUrlInput" class="form-input" placeholder="https://my-project-default-rtdb.firebaseio.com" dir="ltr">
+        <button class="btn btn-primary" onclick="activateSync()">הפעל סנכרון</button>
+      </div>`;
+  } else if (!syncCode) {
+    el.innerHTML = `
+      <div class="settings-row">
+        <div><div class="settings-lbl">Firebase מחובר</div>
+          <div class="settings-sub" dir="ltr" style="font-size:0.7rem">${dbUrl.replace('https://','')}</div></div>
+        <button class="btn btn-ghost btn-sm" onclick="clearSyncDb()">הסר</button>
+      </div>
+      <div class="settings-row" style="flex-direction:column;align-items:stretch;gap:8px;padding-bottom:8px">
+        <button class="btn btn-primary" onclick="generateSyncCode()">📤 הפעל סנכרון לבניין זה</button>
+        <div style="text-align:center;font-size:0.78rem;color:var(--text-2);margin:2px 0">— או ייבא מבניין קיים —</div>
+        <div style="display:flex;gap:8px">
+          <input type="text" id="importCodeInput" class="form-input" placeholder="קוד סנכרון מהמכשיר השני" dir="ltr" style="flex:1">
+          <button class="btn btn-ghost btn-sm" onclick="importFromSyncCode()" style="flex:none;white-space:nowrap">ייבא</button>
+        </div>
+      </div>`;
+  } else {
+    el.innerHTML = `
+      <div class="settings-row">
+        <div><div class="settings-lbl">Firebase מחובר</div>
+          <div class="settings-sub" dir="ltr" style="font-size:0.7rem">${dbUrl.replace('https://','')}</div></div>
+        <button class="btn btn-ghost btn-sm" onclick="clearSyncDb()">הסר</button>
+      </div>
+      <div class="settings-row">
+        <div style="display:flex;align-items:center;gap:7px">
+          <span class="sync-dot ok" id="syncStatusDot"></span>
+          <span id="syncStatusLbl" style="font-size:0.82rem;color:var(--text-2)">מסונכרן ✓</span>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="cloudPull().then(()=>showSnack('עודכן מהענן ✓'))">רענן</button>
+      </div>
+      <div class="settings-row" style="flex-direction:column;align-items:stretch;gap:4px;padding-bottom:8px">
+        <div class="settings-lbl" style="font-size:0.82rem">קוד סנכרון — שתף עם המכשיר השני:</div>
+        <div class="sync-code-box" onclick="copySyncCode()">${syncCode}</div>
+        <div class="settings-sub" style="text-align:center">לחץ להעתקה</div>
+      </div>
+      <div class="settings-row">
+        <div class="settings-lbl" style="color:var(--danger);font-size:0.85rem">ביטול סנכרון לבניין זה</div>
+        <button class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="removeSyncCode()">בטל</button>
+      </div>`;
+  }
+}
+
+function activateSync() {
+  const url = (document.getElementById('syncDbUrlInput')?.value || '').trim();
+  if (!url || !url.includes('firebaseio.com')) { showSnack('יש להזין כתובת Firebase תקינה'); return; }
+  setSyncDbUrl(url);
+  renderSyncSection();
+}
+
+function clearSyncDb() {
+  if (!confirm('הסר הגדרות סנכרון Firebase?')) return;
+  localStorage.removeItem('vb_sync_db');
+  stopSyncPoll();
+  renderSyncSection();
+}
+
+function generateSyncCode() {
+  if (!currentBuilding) return;
+  currentBuilding.syncCode = uid();
+  currentBuilding.updatedAt = Date.now();
+  saveBuildingData(currentBuildingId, currentBuilding);
+  cloudPush().then(() => {
+    startSyncPoll();
+    renderSyncSection();
+    showSnack('סנכרון הופעל! שתף את הקוד עם המכשיר השני');
+  });
+}
+
+async function importFromSyncCode() {
+  const code = (document.getElementById('importCodeInput')?.value || '').trim();
+  if (!code) { showSnack('יש להזין קוד סנכרון'); return; }
+  updateSyncDot('busy');
+  try {
+    const resp = await fetch(`${getSyncDbUrl()}/vaad_bait_sync/${code}.json`);
+    if (!resp.ok) throw new Error('network');
+    const json = await resp.json();
+    if (!json?.data) throw new Error('no-data');
+    const cloudData = JSON.parse(json.data);
+    cloudData.syncCode = code;
+    cloudData.updatedAt = json.updatedAt || Date.now();
+    currentBuilding = cloudData;
+    saveBuildingData(currentBuildingId, cloudData);
+    const idx = getIndex();
+    const entry = idx.find(e => e.id === currentBuildingId);
+    if (entry) { entry.name = cloudData.name; entry.manager = cloudData.manager; saveIndex(idx); }
+    startSyncPoll();
+    renderScreen(currentScreen);
+    renderSyncSection();
+    showSnack('הבניין יובא בהצלחה מהענן ✓');
+  } catch(e) {
+    updateSyncDot('err');
+    showSnack(e.message === 'no-data' ? 'קוד לא נמצא בענן — בדוק שהוזן נכון' : 'שגיאת חיבור לענן');
+  }
+}
+
+function removeSyncCode() {
+  if (!confirm('בטל סנכרון לבניין זה?')) return;
+  delete currentBuilding.syncCode;
+  delete currentBuilding.updatedAt;
+  saveBuildingData(currentBuildingId, currentBuilding);
+  stopSyncPoll();
+  renderSyncSection();
+}
+
+function copySyncCode() {
+  const code = currentBuilding?.syncCode;
+  if (!code) return;
+  navigator.clipboard?.writeText(code).then(() => showSnack('קוד הועתק ✓')).catch(() => showSnack(code));
 }
 
 // ═══════════════════════════════════════════════
