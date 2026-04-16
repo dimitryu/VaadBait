@@ -18,7 +18,7 @@
 // ╔══════════════════════════════════════════════════════════╗
 // ║  APP CONFIGURATION                                        ║
 // ╚══════════════════════════════════════════════════════════╝
-const APP_VERSION = "1.3.0";
+const APP_VERSION = "1.3.1";
 const APP_NAME = "וועד בית";
 const GITHUB_REPO = "dimitryu/VaadBait";
 
@@ -537,13 +537,6 @@ body {
 .search-highlight { background:rgba(255,235,0,0.4); border-radius:2px; }
 
 /* ── Quick Actions Section (dashboard) ── */
-.dash-quick-section { margin:8px 12px 0; }
-.dash-quick-title { font-size:0.72rem; font-weight:700; color:var(--text-2); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
-.dash-quick-btns { display:flex; gap:8px; }
-.dq-btn { flex:1; padding:10px 8px; border:none; border-radius:12px; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:inherit; transition:all 0.2s; text-align:center; }
-.dq-btn:active { transform:scale(0.96); }
-.dq-btn-green { background:var(--success-bg); color:var(--success); }
-.dq-btn-blue { background:var(--accent-light); color:var(--accent); }
 
 /* ── Presentation Mode ── */
 #presentationOverlay {
@@ -670,14 +663,6 @@ body {
       <button class="chart-toggle" onclick="toggleChart()">הסתר</button>
     </div>
     <canvas id="incomeExpenseChart" height="140"></canvas>
-  </div>
-  <!-- Quick Actions (Feature 11) -->
-  <div class="dash-quick-section">
-    <div class="dash-quick-title">פעולות מהירות</div>
-    <div class="dash-quick-btns">
-      <button class="dq-btn dq-btn-green" onclick="markAllCurrentMonth()">✅ סמן חודש לכולם</button>
-      <button class="dq-btn dq-btn-blue" onclick="openBroadcastModal(true)">📢 תזכורת לחייבים</button>
-    </div>
   </div>
   <div class="section-header" style="margin-top:8px">
     <span class="section-title" data-i18n="monthly_payments">תשלומים</span>
@@ -2844,13 +2829,13 @@ function buildDuesMsg(b, apt) {
   if (!unpaid.length) return `שלום רב,\nכל תשלומי הוועד עד כה מסודרים ✓\n\nתודה רבה,\nועד הבית`;
   const monthsStr = fmtMonthList(unpaid);
   const total = unpaid.length * due;
-  return `שלום רב, 📝\n\nלצורך הסדרת רישומי ועד הבית, להלן פירוט חוב וועד הבית עבור דירתכם לשנת ${year}:\n\n📅 חודשים שלא שולמו: ${monthsStr}.\n💰 סך הכל לתשלום: ₪${total.toLocaleString()}.\n\nנודה לכם מאוד על הסדרת התשלום בהקדם לטובת המשך התחזוקה השוטפת של הבניין. 🏢\n\nתודה רבה,\nועד הבית`;
+  return `שלום רב,\n\nלצורך הסדרת רישומי ועד הבית, להלן פירוט חוב וועד הבית עבור דירתכם לשנת ${year}:\n\n*חודשים שלא שולמו:* ${monthsStr}.\n*סך הכל לתשלום:* ₪${total.toLocaleString()}.\n\nנודה לכם מאוד על הסדרת התשלום בהקדם לטובת המשך התחזוקה השוטפת של הבניין.\n\nתודה רבה,\nועד הבית`;
 }
 
 // Builds project message
 function buildProjectMsg(b, apt, proj) {
   const perApt = proj.perAptAmount || Math.ceil(proj.targetAmount / Math.max((b.apartments||[]).length, 1));
-  return `שלום רב, 📝\n\nלצורך הסדרת רישומי ועד הבית, להלן פירוט עבור דירתכם:\n\n🎯 פרויקט: ${proj.name}\n💰 חלקך לתשלום: ₪${perApt.toLocaleString()}.\n\nנודה לכם מאוד על הסדרת התשלום בהקדם לטובת המשך התחזוקה השוטפת של הבניין. 🏢\n\nתודה רבה,\nועד הבית`;
+  return `שלום רב,\n\nלצורך הסדרת רישומי ועד הבית, להלן פירוט עבור דירתכם:\n\n*פרויקט:* ${proj.name}\n*חלקך לתשלום:* ₪${perApt.toLocaleString()}.\n\nנודה לכם מאוד על הסדרת התשלום בהקדם לטובת המשך התחזוקה השוטפת של הבניין.\n\nתודה רבה,\nועד הבית`;
 }
 
 // Opens WA+Email contact selector modal
@@ -3623,7 +3608,7 @@ const BC_TEMPLATES = {
     const { month, year } = nowMY();
     const monthName = MONTHS_HE[month-1];
     const due = b?.monthlyDue || 100;
-    return `שלום רב,\n\nתזכורת ידידותית — וועד הבית לחודש ${monthName} ${year} טרם שולם.\n\nסכום לתשלום: ₪${due.toLocaleString()}\n\nנודה לכם על הסדרת התשלום בהקדם. 🙏\n\nתודה,\nועד הבית — ${b?.name||''}`;
+    return `שלום רב,\n\nתזכורת ידידותית — וועד הבית לחודש ${monthName} ${year} טרם שולם.\n\n*סכום לתשלום:* ₪${due.toLocaleString()}\n\nנודה לכם על הסדרת התשלום בהקדם.\n\nתודה,\nועד הבית — ${b?.name||''}`;
   },
   general: () => {
     const b = getBuilding();
@@ -3764,28 +3749,6 @@ function performSearch() {
 // ═══════════════════════════════════════════════
 //  FEATURE 11: QUICK ACTIONS
 // ═══════════════════════════════════════════════
-function markAllCurrentMonth() {
-  const b = getBuilding(); if (!b) return;
-  const { month, year } = nowMY();
-  const apts = b.apartments || [];
-  const monthName = MONTHS_HE[month - 1];
-  const unpaid = apts.filter(a => !b.dues?.[a.id]?.[year]?.[month]);
-  if (!unpaid.length) { showSnack('כל הדירות כבר שילמו החודש ✓'); return; }
-  if (!confirm(`סמן ${monthName} ${year} כשולם עבור כל ${unpaid.length} הדירות שלא שילמו?`)) return;
-  if (!b.dues) b.dues = {};
-  unpaid.forEach(apt => {
-    if (!b.dues[apt.id]) b.dues[apt.id] = {};
-    if (!b.dues[apt.id][year]) b.dues[apt.id][year] = {};
-    b.dues[apt.id][year][month] = true;
-    // Add transaction
-    const desc = `וועד בית ${apt.name} - ${monthName} ${year}`;
-    const due = b.monthlyDue || 100;
-    b.transactions.push({ id: uid(), date: todayISO(), type:'income', amount: due, description: desc, category:'וועד בית', aptId: apt.id });
-  });
-  saveBuilding();
-  renderDashboard();
-  showSnack(`${unpaid.length} דירות סומנו כשולמות ✓`);
-}
 
 // ═══════════════════════════════════════════════
 //  FEATURE 12: PRESENTATION MODE
