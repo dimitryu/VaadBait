@@ -18,7 +18,7 @@
 // ╔══════════════════════════════════════════════════════════╗
 // ║  APP CONFIGURATION                                        ║
 // ╚══════════════════════════════════════════════════════════╝
-const APP_VERSION = "1.2.4";
+const APP_VERSION = "1.2.5";
 const APP_NAME = "וועד בית";
 const GITHUB_REPO = "dimitryu/VaadBait";
 
@@ -2594,10 +2594,10 @@ function openWAModal(aptId, msgType, projId) {
       </div>`).join('');
   } else { phoneSection.style.display = 'none'; }
 
-  // Email section
+  // Email section — always visible
   const emailSection = document.getElementById('waEmailSection');
+  emailSection.style.display = '';
   if (emails.length) {
-    emailSection.style.display = '';
     document.getElementById('waEmailList').innerHTML = emails.map((c, i) => `
       <div class="wa-contact-row">
         <input type="checkbox" class="em-contact-cb" id="emcb_${i}" data-email="${c.email}" checked>
@@ -2607,7 +2607,14 @@ function openWAModal(aptId, msgType, projId) {
         </div>
         <button class="wa-btn" onclick="sendEmail('${c.email}',document.getElementById('waMessageText').value)">📧</button>
       </div>`).join('');
-  } else { emailSection.style.display = 'none'; }
+  } else {
+    document.getElementById('waEmailList').innerHTML = `
+      <div class="wa-contact-row" style="gap:8px">
+        <input type="email" id="manualEmailInput" class="form-input"
+          placeholder="הכנס כתובת אימייל" style="flex:1;font-size:0.88rem;padding:7px 10px;min-width:0">
+        <button class="wa-btn" onclick="sendEmailManual()">📧</button>
+      </div>`;
+  }
 
   document.getElementById('waModal').classList.add('open');
 }
@@ -2621,12 +2628,18 @@ function sendWAToSelected() {
   closeModal('waModal');
 }
 
-// Sends email to all checked email contacts
+// Sends email to all checked email contacts (or manual input)
 function sendEmailToSelected() {
   const msg = document.getElementById('waMessageText').value;
   const checked = [...document.querySelectorAll('.em-contact-cb:checked')];
-  if (!checked.length) { showSnack('יש לבחור לפחות איש קשר אחד'); return; }
-  checked.forEach((cb, i) => setTimeout(() => sendEmail(cb.dataset.email, msg), i * 800));
+  const manualInput = document.getElementById('manualEmailInput');
+  const manualEmail = manualInput ? manualInput.value.trim() : '';
+  if (!checked.length && !manualEmail) { showSnack('יש לבחור לפחות איש קשר אחד'); return; }
+  if (manualEmail) {
+    if (!manualEmail.includes('@')) { showSnack('יש להזין כתובת אימייל תקינה'); return; }
+    sendEmail(manualEmail, msg);
+  }
+  checked.forEach((cb, i) => setTimeout(() => sendEmail(cb.dataset.email, msg), (manualEmail ? 1 : i) * 800));
   closeModal('waModal');
 }
 
@@ -2637,12 +2650,16 @@ function sendWA(phone, msg) {
 
 function sendEmail(email, msg) {
   const subject = encodeURIComponent('ועד הבית — הודעה חשובה');
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(msg).then(() => {
-      showSnack('ההודעה הועתקה ללוח — הדבק אותה בגוף המייל');
-    }).catch(() => {});
-  }
-  window.open(`mailto:${email}?subject=${subject}`, '_blank');
+  // Encode body: normalise newlines to CRLF then percent-encode
+  const body = encodeURIComponent(msg.replace(/\r?\n/g, '\r\n'));
+  window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
+}
+
+function sendEmailManual() {
+  const input = document.getElementById('manualEmailInput');
+  const email = (input && input.value || '').trim();
+  if (!email || !email.includes('@')) { showSnack('יש להזין כתובת אימייל תקינה'); return; }
+  sendEmail(email, document.getElementById('waMessageText').value);
 }
 
 // ═══════════════════════════════════════════════
