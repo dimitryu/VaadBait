@@ -18,7 +18,7 @@
 // ╔══════════════════════════════════════════════════════════╗
 // ║  APP CONFIGURATION                                        ║
 // ╚══════════════════════════════════════════════════════════╝
-const APP_VERSION = "1.2.6";
+const APP_VERSION = "1.2.7";
 const APP_NAME = "וועד בית";
 const GITHUB_REPO = "dimitryu/VaadBait";
 
@@ -2814,7 +2814,8 @@ function renderSyncSection() {
 
 function activateSync() {
   const url = (document.getElementById('syncDbUrlInput')?.value || '').trim();
-  if (!url || !url.includes('firebaseio.com')) { showSnack('יש להזין כתובת Firebase תקינה'); return; }
+  const valid = url && (url.includes('firebaseio.com') || url.includes('firebasedatabase.app'));
+  if (!valid) { showSnack('יש להזין כתובת Firebase תקינה'); return; }
   setSyncDbUrl(url);
   renderSyncSection();
 }
