@@ -18,7 +18,7 @@
 // ╔══════════════════════════════════════════════════════════╗
 // ║  APP CONFIGURATION                                        ║
 // ╚══════════════════════════════════════════════════════════╝
-const APP_VERSION = "1.2.8";
+const APP_VERSION = "1.3.0";
 const APP_NAME = "וועד בית";
 const GITHUB_REPO = "dimitryu/VaadBait";
 
@@ -446,6 +446,128 @@ body {
   .modal { border-radius: 20px; margin: auto; max-height: 85vh; }
   .modal-overlay { align-items: center; }
 }
+
+/* ── Notification Banner ── */
+#notifBanner {
+  background: linear-gradient(135deg, #f57c00, #ff9800);
+  color: white;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  z-index: 150;
+  animation: slideDown 0.4s ease;
+}
+@keyframes slideDown { from { transform: translateY(-40px); opacity:0; } to { transform: translateY(0); opacity:1; } }
+#notifBanner .notif-text { flex:1; font-size:0.85rem; font-weight:600; }
+#notifBanner .notif-close { background:none; border:none; color:white; font-size:1.1rem; cursor:pointer; padding:2px 6px; }
+
+/* ── Chart Section ── */
+.chart-section { margin: 8px 12px; }
+.chart-toggle { font-size:0.75rem; color:var(--accent); cursor:pointer; background:none; border:none; font-family:inherit; }
+#incomeExpenseChart { width:100%; border-radius:10px; display:block; }
+
+/* ── History Modal ── */
+.history-table { width:100%; border-collapse:collapse; font-size:0.72rem; margin-bottom:10px; }
+.history-table th { background:var(--bg-header); color:white; padding:5px 4px; text-align:center; font-size:0.68rem; }
+.history-table td { padding:4px 3px; text-align:center; border:1px solid var(--border); background:var(--bg-card); }
+.history-table tr:nth-child(even) td { background:var(--bg); }
+.ht-paid { color:var(--success); font-weight:700; }
+.ht-unpaid { color:var(--danger); font-size:0.7rem; }
+.ht-future { color:var(--text-2); opacity:0.5; }
+.ht-year-col { font-weight:700; font-size:0.72rem; background:var(--bg-card) !important; }
+
+/* ── Receipt Snack ── */
+#receiptCard {
+  position: fixed;
+  bottom: calc(76px + env(safe-area-inset-bottom));
+  left: 12px; right: 12px;
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  border: 1px solid var(--border);
+  z-index: 9990;
+  display: none;
+  animation: slideUp 0.35s ease;
+}
+#receiptCard.show { display: block; }
+.receipt-title { font-size:0.88rem; font-weight:800; margin-bottom:8px; }
+.receipt-detail { font-size:0.78rem; color:var(--text-2); margin-bottom:10px; line-height:1.5; }
+.receipt-actions { display:flex; gap:8px; }
+
+/* ── Broadcast Modal ── */
+.bc-contact-row { display:flex; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid var(--border); }
+.bc-contact-row:last-child { border-bottom:none; }
+.bc-contact-info { flex:1; font-size:0.82rem; }
+.bc-contact-name { font-weight:700; display:block; }
+.bc-contact-meta { font-size:0.72rem; color:var(--text-2); }
+.bc-template-chips { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+.bc-chip { padding:4px 10px; border:1.5px solid var(--accent); border-radius:20px; font-size:0.75rem; color:var(--accent); cursor:pointer; background:none; font-family:inherit; }
+.bc-chip:active { background:var(--accent); color:white; }
+
+/* ── Search Bar ── */
+#searchBar {
+  background: var(--bg-header);
+  padding: 0 14px 10px;
+  display: none;
+}
+#searchBar.open { display: block; animation: slideDown 0.25s ease; }
+#searchInput {
+  width:100%; padding:9px 12px; border-radius:10px; border:none;
+  background:rgba(255,255,255,0.2); color:white; font-size:1rem;
+  direction:rtl; outline:none; font-family:inherit;
+}
+#searchInput::placeholder { color:rgba(255,255,255,0.6); }
+#searchResults {
+  background:var(--bg-card); border-radius:12px; margin-top:6px;
+  box-shadow:0 4px 16px var(--shadow); overflow:hidden; max-height:60vh; overflow-y:auto;
+  display:none;
+}
+#searchResults.has-results { display:block; }
+.sr-group-lbl { font-size:0.72rem; font-weight:700; color:var(--text-2); text-transform:uppercase; padding:8px 12px 4px; background:var(--bg); border-bottom:1px solid var(--border); }
+.sr-item { display:flex; align-items:center; gap:10px; padding:10px 12px; border-bottom:1px solid var(--border); cursor:pointer; }
+.sr-item:last-child { border-bottom:none; }
+.sr-item:active { background:var(--accent-light); }
+.sr-item-icon { font-size:1.1rem; flex-shrink:0; }
+.sr-item-text { flex:1; }
+.sr-item-name { font-size:0.88rem; font-weight:600; }
+.sr-item-sub { font-size:0.72rem; color:var(--text-2); }
+.search-highlight { background:rgba(255,235,0,0.4); border-radius:2px; }
+
+/* ── Quick Actions Section (dashboard) ── */
+.dash-quick-section { margin:8px 12px 0; }
+.dash-quick-title { font-size:0.72rem; font-weight:700; color:var(--text-2); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
+.dash-quick-btns { display:flex; gap:8px; }
+.dq-btn { flex:1; padding:10px 8px; border:none; border-radius:12px; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:inherit; transition:all 0.2s; text-align:center; }
+.dq-btn:active { transform:scale(0.96); }
+.dq-btn-green { background:var(--success-bg); color:var(--success); }
+.dq-btn-blue { background:var(--accent-light); color:var(--accent); }
+
+/* ── Presentation Mode ── */
+#presentationOverlay {
+  position:fixed; inset:0; background:#0a1628; color:white;
+  z-index:9999; display:none; flex-direction:column;
+  align-items:center; justify-content:center; padding:30px 20px;
+  text-align:center; overflow-y:auto;
+}
+#presentationOverlay.active { display:flex; }
+.pres-building { font-size:1.3rem; opacity:0.7; margin-bottom:4px; }
+.pres-date { font-size:1rem; opacity:0.55; margin-bottom:20px; }
+.pres-balance { font-size:4rem; font-weight:900; color:#64b5f6; margin-bottom:8px; letter-spacing:-2px; }
+.pres-balance-lbl { font-size:1rem; opacity:0.6; margin-bottom:28px; }
+.pres-dues-title { font-size:1.2rem; font-weight:700; margin-bottom:10px; }
+.pres-progress-wrap { width:100%; max-width:500px; height:16px; background:rgba(255,255,255,0.15); border-radius:8px; overflow:hidden; margin-bottom:6px; }
+.pres-progress-bar { height:100%; background:#4caf50; border-radius:8px; transition:width 0.5s; }
+.pres-progress-lbl { font-size:0.9rem; opacity:0.7; margin-bottom:24px; }
+.pres-table { width:100%; max-width:600px; border-collapse:collapse; font-size:1rem; margin-bottom:20px; }
+.pres-table th { border-bottom:1px solid rgba(255,255,255,0.2); padding:8px 12px; font-size:0.85rem; opacity:0.7; text-align:right; }
+.pres-table td { padding:10px 12px; border-bottom:1px solid rgba(255,255,255,0.1); text-align:right; }
+.pres-row-paid td { background:rgba(76,175,80,0.1); }
+.pres-row-unpaid td { background:rgba(244,67,54,0.1); }
+.pres-close-btn { position:fixed; top:14px; left:14px; background:rgba(255,255,255,0.15); border:none; color:white; border-radius:50%; width:36px; height:36px; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.pres-refresh-lbl { position:fixed; bottom:14px; right:14px; font-size:0.72rem; opacity:0.4; }
 </style>
 </head>
 <body>
@@ -512,10 +634,22 @@ body {
       <span class="version-badge">v<span id="versionBadge"></span></span>
     </div>
     <div class="flex-gap" style="flex-shrink:0">
+      <button onclick="toggleSearchBar()" style="background:none;border:none;color:white;font-size:1.2rem;cursor:pointer;" title="חיפוש">🔍</button>
       <button onclick="toggleTheme()" style="background:none;border:none;color:white;font-size:1.2rem;cursor:pointer;" id="themeBtn">🌙</button>
     </div>
   </div>
   <div class="building-selector-bar" id="buildingSelector"></div>
+  <!-- Search Bar (Feature 10) -->
+  <div id="searchBar">
+    <input type="text" id="searchInput" placeholder="חפש דירה, דייר, תנועה..." oninput="onSearchInput()" onkeydown="onSearchKey(event)">
+    <div id="searchResults"></div>
+  </div>
+</div>
+<!-- Notification Banner (Feature 1) -->
+<div id="notifBanner" style="display:none">
+  <span style="font-size:1.2rem">🔔</span>
+  <span class="notif-text" id="notifBannerText"></span>
+  <button class="notif-close" onclick="dismissNotifBanner()">✕</button>
 </div>
 
 <!-- Screens -->
@@ -529,9 +663,28 @@ body {
     <button class="qa-btn qa-income" onclick="openTxModal('income')" data-i18n="btn_income">➕ הכנסה</button>
     <button class="qa-btn qa-expense" onclick="openTxModal('expense')" data-i18n="btn_expense">➖ הוצאה</button>
   </div>
+  <!-- Chart (Feature 4) -->
+  <div class="chart-section card" id="chartSection" style="padding:10px 12px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <span style="font-size:0.78rem;font-weight:700;color:var(--text-2)">📊 הכנסות / הוצאות — 6 חודשים אחרונים</span>
+      <button class="chart-toggle" onclick="toggleChart()">הסתר</button>
+    </div>
+    <canvas id="incomeExpenseChart" height="140"></canvas>
+  </div>
+  <!-- Quick Actions (Feature 11) -->
+  <div class="dash-quick-section">
+    <div class="dash-quick-title">פעולות מהירות</div>
+    <div class="dash-quick-btns">
+      <button class="dq-btn dq-btn-green" onclick="markAllCurrentMonth()">✅ סמן חודש לכולם</button>
+      <button class="dq-btn dq-btn-blue" onclick="openBroadcastModal(true)">📢 תזכורת לחייבים</button>
+    </div>
+  </div>
   <div class="section-header" style="margin-top:8px">
     <span class="section-title" data-i18n="monthly_payments">תשלומים</span>
-    <span id="monthLabel" style="font-size:0.8rem;color:var(--text-2)"></span>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span id="monthLabel" style="font-size:0.8rem;color:var(--text-2)"></span>
+      <button onclick="openBroadcastModal(false)" style="background:none;border:none;color:var(--accent);font-size:0.78rem;cursor:pointer;padding:2px 4px;">📢</button>
+    </div>
   </div>
   <div class="card" id="monthlyCard"></div>
   <div class="section-header">
@@ -578,6 +731,22 @@ body {
     <div class="settings-row">
       <div><div class="settings-lbl" data-i18n="dark_mode">מצב כהה</div></div>
       <label class="toggle"><input type="checkbox" id="darkToggle" onchange="toggleTheme()"><span class="toggle-slider"></span></label>
+    </div>
+  </div>
+
+  <div class="settings-group-title" style="margin-top:12px">🔔 התראות</div>
+  <div class="settings-group">
+    <div class="settings-row">
+      <div><div class="settings-lbl">תזכורות גבייה</div><div class="settings-sub">התראה בפתיחת האפליקציה בימים 1–7 לחודש</div></div>
+      <label class="toggle"><input type="checkbox" id="notifToggle" onchange="toggleNotifSetting()"><span class="toggle-slider"></span></label>
+    </div>
+  </div>
+
+  <div class="settings-group-title" style="margin-top:12px">🖥️ מצב הצגה</div>
+  <div class="settings-group">
+    <div class="settings-row" style="cursor:pointer" onclick="openPresentationMode()">
+      <div><div class="settings-lbl">🖥️ מצב אסיפת דיירים</div><div class="settings-sub">מסך מלא עם נתוני הבניין להקרנה</div></div>
+      <span style="color:var(--accent)">›</span>
     </div>
   </div>
 
@@ -928,9 +1097,86 @@ body {
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('reportModal')" data-i18n="btn_cancel">ביטול</button>
+      <button class="btn btn-ghost" onclick="generateAnnualPDF()" style="background:var(--warning-bg);color:var(--warning);flex:0.8">🖨️ PDF שנתי</button>
       <button class="btn btn-primary" onclick="generateReport()" data-i18n="btn_gen">📥 הפק דוח</button>
     </div>
   </div>
+</div>
+
+<!-- History Modal (Feature 2) -->
+<div class="modal-overlay" id="historyModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="historyModalTitle">היסטוריית תשלומים</div>
+    <div id="historyModalContent"></div>
+    <div class="modal-actions" style="margin-top:8px">
+      <button class="btn btn-ghost" onclick="closeModal('historyModal')">סגור</button>
+    </div>
+  </div>
+</div>
+
+<!-- Receipt Card (Feature 3) -->
+<div id="receiptCard">
+  <div class="receipt-title">📄 שלח קבלה לדייר?</div>
+  <div class="receipt-detail" id="receiptDetail"></div>
+  <div class="receipt-actions">
+    <button class="btn btn-ghost" style="flex:none;padding:8px 14px" onclick="closeReceiptCard()">סגור</button>
+    <button class="btn btn-primary" onclick="sendReceiptWA()" style="background:#25d366">💬 שלח WhatsApp</button>
+  </div>
+</div>
+
+<!-- Broadcast Modal (Feature 7) -->
+<div class="modal-overlay" id="broadcastModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📢 הודעה לדיירים</div>
+    <div style="margin-bottom:8px">
+      <div class="wa-section-lbl" style="margin-bottom:6px">תבניות מהירות:</div>
+      <div class="bc-template-chips">
+        <button class="bc-chip" onclick="setBcTemplate('assembly')">📅 אסיפת דיירים</button>
+        <button class="bc-chip" onclick="setBcTemplate('maintenance')">🔧 עבודות תחזוקה</button>
+        <button class="bc-chip" onclick="setBcTemplate('dues')">💰 תזכורת וועד</button>
+        <button class="bc-chip" onclick="setBcTemplate('general')">📝 הודעה כללית</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">הודעה:</label>
+      <textarea class="form-input wa-msg-area" id="bcMessageText" style="min-height:100px"></textarea>
+    </div>
+    <div class="wa-section-lbl" style="margin:6px 0 4px">בחר נמענים:</div>
+    <div style="display:flex;gap:8px;margin-bottom:6px">
+      <button class="btn btn-ghost btn-sm" onclick="selectAllBcContacts(true)">בחר הכל</button>
+      <button class="btn btn-ghost btn-sm" onclick="selectAllBcContacts(false)">נקה הכל</button>
+    </div>
+    <div id="bcContactList" style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:10px;padding:0 10px"></div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="wa-send-all" style="flex:1" onclick="sendBroadcastWA()">💬 שלח WhatsApp לנבחרים</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:6px">
+      <button class="email-send-all" style="background:#d93025;flex:1" onclick="sendBroadcastEmail('gmail')">Gmail</button>
+      <button class="email-send-all" style="background:var(--text-2);flex:1" onclick="sendBroadcastEmail('default')">מייל</button>
+    </div>
+    <div class="modal-actions" style="margin-top:8px">
+      <button class="btn btn-ghost" onclick="closeModal('broadcastModal')">סגור</button>
+    </div>
+  </div>
+</div>
+
+<!-- Presentation Overlay (Feature 12) -->
+<div id="presentationOverlay">
+  <button class="pres-close-btn" onclick="closePresentationMode()">✕</button>
+  <div class="pres-building" id="presBuilding"></div>
+  <div class="pres-date" id="presDate"></div>
+  <div class="pres-balance" id="presBalance"></div>
+  <div class="pres-balance-lbl">יתרה נוכחית בקופה</div>
+  <div class="pres-dues-title" id="presDuesTitle"></div>
+  <div class="pres-progress-wrap"><div class="pres-progress-bar" id="presProgressBar"></div></div>
+  <div class="pres-progress-lbl" id="presProgressLbl"></div>
+  <table class="pres-table" id="presTable">
+    <thead><tr><th>דירה</th><th>דייר/בעלים</th><th>סטטוס</th></tr></thead>
+    <tbody id="presTableBody"></tbody>
+  </table>
+  <div class="pres-refresh-lbl">מתרענן אוטומטית כל 30 שניות · לחץ ESC לסגירה</div>
 </div>
 
 <div class="snackbar" id="snackbar"></div>
@@ -1374,6 +1620,8 @@ function showApp() {
   renderBuildingSelector();
   renderDashboard();
   initInstallPrompt();
+  // Feature 1: Check notifications
+  initNotifications();
 }
 
 function switchUser() {
@@ -1494,6 +1742,7 @@ function renderDashboard() {
         <div class="apt-info">${ownerName}</div>
       </div>
       <div style="display:flex;align-items:center;gap:6px">
+        <button class="wa-btn" onclick="openHistoryModal('${a.id}')" title="היסטוריה">📋</button>
         ${!isPaid && hasPhone ? `<button class="wa-btn" onclick="openWAModal('${a.id}','dues')">💬</button>` : ''}
         <button class="pay-btn" onclick="openPayModal('${a.id}')" style="${isPaid ? 'background:var(--success-bg);color:var(--success);border-color:var(--success);opacity:0.8' : ''}">${t('add_payment')}</button>
       </div>
@@ -1507,6 +1756,9 @@ function renderDashboard() {
   rCard.innerHTML = txs.length === 0
     ? `<div class="empty-state"><div class="empty-icon">📭</div><p>${t('empty_tx')}</p></div>`
     : txs.map(tx => txRowHTML(tx)).join('');
+
+  // Feature 4: Draw chart
+  drawIncomeExpenseChart();
 }
 
 function quickPay(aptId, year, month) {
@@ -1546,9 +1798,9 @@ function renderDues() {
     <div class="dues-stat"><div class="dues-stat-val" style="color:var(--danger)">${totalUnpaid}</div><div class="dues-stat-lbl">${t('dues_missing')}</div></div>`;
 
   const months = getMonths();
-  let html = `<thead><tr><th class="month-col">${t('month_col')}</th>${apts.map(a=>`<th class="apt-col">${a.name}</th>`).join('')}</tr></thead><tbody>`;
+  let html = `<thead><tr><th class="month-col">${t('month_col')}</th>${apts.map(a=>`<th class="apt-col" style="cursor:pointer" onclick="openHistoryModal('${a.id}')" title="היסטוריה">${a.name} 📋</th>`).join('')}</tr></thead><tbody>`;
   for(let m=1;m<=12;m++) {
-    const cells = apts.map(a => { const p=!!(b.dues?.[a.id]?.[duesYear]?.[m]); return `<td class="${p?'paid':'unpaid'}">${p?'✓':'✗'}</td>`; });
+    const cells = apts.map(a => { const p=!!(b.dues?.[a.id]?.[duesYear]?.[m]); return `<td class="${p?'paid':'unpaid'}" onclick="toggleDue('${a.id}',${duesYear},${m})" style="cursor:pointer">${p?'✓':'✗'}</td>`; });
     html += `<tr><td style="font-weight:700;background:var(--bg-card);cursor:default">${months[m-1]}</td>${cells.join('')}</tr>`;
   }
   html += '</tbody>';
@@ -1735,6 +1987,9 @@ function renderSettings() {
   document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
   updateEmailClientUI();
   renderSyncSection();
+  // Notification toggle
+  const notifToggle = document.getElementById('notifToggle');
+  if (notifToggle) notifToggle.checked = localStorage.getItem('vb_notif_enabled') !== 'false';
 }
 
 // ═══════════════════════════════════════════════
@@ -1838,6 +2093,12 @@ function savePayModal() {
   } else {
     const sfx = t('pay_months_suffix');
     showSnack(`${apt.name} — ${typeof sfx === 'function' ? sfx(checked.length) : checked.length + ' ' + t('pay_months_unit')}`);
+    // Feature 3: Show receipt card
+    if (checked.length > 0) {
+      const amount = checked.length * (b.monthlyDue || 100);
+      const monthNames = checked.sort((a,c)=>a-c).map(m => MONTHS_HE[m-1]).join(', ');
+      showReceiptCard(aptId, apt.name, monthNames, amount);
+    }
   }
 }
 
@@ -2911,6 +3172,674 @@ function copySyncCode() {
   const code = currentBuilding?.syncCode;
   if (!code) return;
   navigator.clipboard?.writeText(code).then(() => showSnack('קוד הועתק ✓')).catch(() => showSnack(code));
+}
+
+// ═══════════════════════════════════════════════
+//  FEATURE 1: NOTIFICATIONS
+// ═══════════════════════════════════════════════
+function initNotifications() {
+  const enabled = localStorage.getItem('vb_notif_enabled') !== 'false';
+  const toggle = document.getElementById('notifToggle');
+  if (toggle) toggle.checked = enabled;
+
+  if (!enabled) return;
+
+  const now = new Date();
+  const day = now.getDate();
+  const month = now.getMonth() + 1;
+  const year = now.getFullYear();
+
+  if (day > 7) return; // Only days 1-7
+
+  const key = `vb_notif_shown_${year}_${month}`;
+  if (localStorage.getItem(key)) return; // Already shown this month
+
+  const b = getBuilding(); if (!b) return;
+  const apts = b.apartments || [];
+  const unpaidApts = apts.filter(a => !b.dues?.[a.id]?.[year]?.[month]);
+  if (unpaidApts.length === 0) return;
+
+  const monthName = MONTHS_HE[month - 1];
+  const msg = `${unpaidApts.length} דירות עדיין לא שילמו לחודש ${monthName}`;
+
+  // In-app banner
+  const banner = document.getElementById('notifBanner');
+  const text = document.getElementById('notifBannerText');
+  if (banner && text) {
+    text.textContent = msg;
+    banner.style.display = 'flex';
+  }
+
+  // Browser notification
+  if ('Notification' in window) {
+    if (Notification.permission === 'granted') {
+      new Notification('וועד בית 🔔', { body: msg, icon: './icons/icon-192.png' });
+    } else if (Notification.permission !== 'denied') {
+      Notification.requestPermission().then(perm => {
+        if (perm === 'granted') {
+          new Notification('וועד בית 🔔', { body: msg, icon: './icons/icon-192.png' });
+        }
+      });
+    }
+  }
+
+  localStorage.setItem(key, '1');
+}
+
+function toggleNotifSetting() {
+  const toggle = document.getElementById('notifToggle');
+  localStorage.setItem('vb_notif_enabled', toggle.checked ? 'true' : 'false');
+}
+
+function dismissNotifBanner() {
+  document.getElementById('notifBanner').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════
+//  FEATURE 2: PAYMENT HISTORY MODAL
+// ═══════════════════════════════════════════════
+function openHistoryModal(aptId) {
+  const b = getBuilding(); if (!b) return;
+  const apt = (b.apartments||[]).find(a => a.id === aptId); if (!apt) return;
+  const due = b.monthlyDue || 100;
+
+  document.getElementById('historyModal').classList.add('open');
+  document.getElementById('historyModalTitle').textContent = `📋 ${apt.name} — היסטוריית תשלומים`;
+
+  const now = new Date();
+  const curYear = now.getFullYear();
+  const curMonth = now.getMonth() + 1;
+
+  const years = [curYear - 2, curYear - 1, curYear].filter(y => y >= 2024);
+  const months = getMonths();
+
+  let paidCount = 0;
+  let debtMonths = 0;
+
+  // Build header row
+  let html = `<div style="overflow-x:auto"><table class="history-table"><thead><tr>
+    <th>שנה</th>${months.map(m => `<th>${m.slice(0,3)}</th>`).join('')}
+  </tr></thead><tbody>`;
+
+  years.forEach(year => {
+    html += `<tr><td class="ht-year-col">${year}</td>`;
+    for (let m = 1; m <= 12; m++) {
+      const isPaid = !!(b.dues?.[aptId]?.[year]?.[m]);
+      const isFuture = (year > curYear) || (year === curYear && m > curMonth);
+      if (isPaid) { paidCount++; html += `<td class="ht-paid">✓</td>`; }
+      else if (isFuture) { html += `<td class="ht-future">—</td>`; }
+      else { debtMonths++; html += `<td class="ht-unpaid">✗</td>`; }
+    }
+    html += `</tr>`;
+  });
+
+  html += `</tbody></table></div>`;
+
+  const totalDebt = debtMonths * due;
+  html += `<div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
+    <div class="dues-stat" style="flex:1"><div class="dues-stat-val" style="color:var(--success)">${paidCount}</div><div class="dues-stat-lbl">חודשים ששולמו</div></div>
+    <div class="dues-stat" style="flex:1"><div class="dues-stat-val" style="color:var(--danger)">${fmt(totalDebt)}</div><div class="dues-stat-lbl">חוב כולל (${debtMonths} חודשים)</div></div>
+  </div>`;
+
+  document.getElementById('historyModalContent').innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════
+//  FEATURE 3: RECEIPT CARD
+// ═══════════════════════════════════════════════
+let _receiptAptId = null;
+let _receiptMsg = '';
+
+function showReceiptCard(aptId, aptName, months, amount) {
+  _receiptAptId = aptId;
+  const monthName = months;
+  _receiptMsg = `שלום! קיבלנו תשלום וועד בית עבור דירתכם ✓\n\nחודשים: ${monthName}\nסכום: ${fmt(amount)}\n\nתודה רבה,\nועד הבית`;
+  document.getElementById('receiptDetail').textContent = `${aptName} | ${monthName} | ${fmt(amount)}`;
+  document.getElementById('receiptCard').classList.add('show');
+  setTimeout(() => closeReceiptCard(), 20000); // auto-close after 20s
+}
+
+function closeReceiptCard() {
+  document.getElementById('receiptCard').classList.remove('show');
+}
+
+function sendReceiptWA() {
+  const b = getBuilding(); if (!b || !_receiptAptId) return;
+  const apt = (b.apartments||[]).find(a => a.id === _receiptAptId);
+  closeReceiptCard();
+  if (!apt) return;
+  // Open waModal pre-populated
+  document.getElementById('waModalTitle').textContent = `${apt.name} — קבלה`;
+  document.getElementById('waMessageText').value = _receiptMsg;
+  const phones = getAllAptContacts(apt);
+  const emails = getAllAptEmails(apt);
+  const phoneSection = document.getElementById('waPhoneSection');
+  if (phones.length) {
+    phoneSection.style.display = '';
+    document.getElementById('waContactList').innerHTML = phones.map((c, i) => `
+      <div class="wa-contact-row">
+        <input type="checkbox" class="wa-contact-cb" id="wacb_${i}" data-phone="${c.phone}" checked>
+        <div class="wa-contact-info">
+          <span class="wa-contact-name">${c.name}</span>
+          <span class="wa-contact-meta">${c.type} · ${c.phone}</span>
+        </div>
+        <button class="wa-btn" onclick="sendWA('${c.phone}',document.getElementById('waMessageText').value)">💬</button>
+      </div>`).join('');
+  } else { phoneSection.style.display = 'none'; }
+  const emailSection = document.getElementById('waEmailSection');
+  if (emails.length) {
+    emailSection.style.display = '';
+    document.getElementById('waEmailList').innerHTML = emails.map((c, i) => `
+      <div class="wa-contact-row">
+        <input type="checkbox" class="em-contact-cb" id="emcb_${i}" data-email="${c.email}" checked>
+        <div class="wa-contact-info">
+          <span class="wa-contact-name">${c.name}</span>
+          <span class="wa-contact-meta">${c.type} · ${c.email}</span>
+        </div>
+      </div>`).join('');
+  } else { emailSection.style.display = 'none'; }
+  document.getElementById('waModal').classList.add('open');
+}
+
+// ═══════════════════════════════════════════════
+//  FEATURE 4: INCOME/EXPENSE CHART (Canvas)
+// ═══════════════════════════════════════════════
+function drawIncomeExpenseChart() {
+  const hidden = localStorage.getItem('vb_chart_hidden') === '1';
+  const section = document.getElementById('chartSection');
+  const canvas = document.getElementById('incomeExpenseChart');
+  if (!section || !canvas) return;
+
+  const toggleBtn = section.querySelector('.chart-toggle');
+  if (hidden) {
+    canvas.style.display = 'none';
+    if (toggleBtn) toggleBtn.textContent = 'הצג';
+    return;
+  }
+  canvas.style.display = 'block';
+  if (toggleBtn) toggleBtn.textContent = 'הסתר';
+
+  const b = getBuilding(); if (!b) return;
+  const txs = b.transactions || [];
+
+  // Get last 6 months
+  const now = new Date();
+  const months6 = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    months6.push({ year: d.getFullYear(), month: d.getMonth() + 1, label: MONTHS_HE[d.getMonth()].slice(0,3) });
+  }
+
+  const income6 = months6.map(({year, month}) =>
+    txs.filter(tx => tx.type==='income' && tx.date.startsWith(`${year}-${String(month).padStart(2,'0')}`))
+       .reduce((s,tx) => s + tx.amount, 0));
+  const expense6 = months6.map(({year, month}) =>
+    txs.filter(tx => tx.type==='expense' && tx.date.startsWith(`${year}-${String(month).padStart(2,'0')}`))
+       .reduce((s,tx) => s + tx.amount, 0));
+
+  const maxVal = Math.max(...income6, ...expense6, 1);
+
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.parentElement.clientWidth - 24;
+  canvas.width = W * dpr;
+  canvas.height = 140 * dpr;
+  canvas.style.width = W + 'px';
+  canvas.style.height = '140px';
+
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, W, 140);
+
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const textColor = isDark ? '#7a8aaa' : '#5a6478';
+  const gridColor = isDark ? '#2a3550' : '#dde3ec';
+
+  const padL = 44, padR = 8, padT = 10, padB = 28;
+  const chartW = W - padL - padR;
+  const chartH = 140 - padT - padB;
+
+  // Grid lines
+  ctx.strokeStyle = gridColor;
+  ctx.lineWidth = 0.5;
+  for (let i = 0; i <= 4; i++) {
+    const y = padT + (chartH * i / 4);
+    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(W - padR, y); ctx.stroke();
+    const val = maxVal * (4 - i) / 4;
+    ctx.fillStyle = textColor;
+    ctx.font = '9px sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(val >= 1000 ? Math.round(val/1000)+'k' : Math.round(val), padL - 3, y + 3);
+  }
+
+  const n = months6.length;
+  const groupW = chartW / n;
+  const barW = Math.min(groupW * 0.35, 18);
+
+  months6.forEach((m, i) => {
+    const x = padL + i * groupW + groupW / 2;
+
+    // Income bar (green)
+    const incH = income6[i] ? (income6[i] / maxVal) * chartH : 0;
+    ctx.fillStyle = isDark ? '#66bb6a' : '#43a047';
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(x - barW - 1, padT + chartH - incH, barW, incH, [3,3,0,0]);
+    else ctx.rect(x - barW - 1, padT + chartH - incH, barW, incH);
+    ctx.fill();
+
+    // Expense bar (red)
+    const expH = expense6[i] ? (expense6[i] / maxVal) * chartH : 0;
+    ctx.fillStyle = isDark ? '#ef5350' : '#e53935';
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(x + 1, padT + chartH - expH, barW, expH, [3,3,0,0]);
+    else ctx.rect(x + 1, padT + chartH - expH, barW, expH);
+    ctx.fill();
+
+    // Month label
+    ctx.fillStyle = textColor;
+    ctx.font = '9px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(m.label, x, 140 - padB + 12);
+  });
+
+  // Legend
+  ctx.font = '9px sans-serif';
+  ctx.fillStyle = isDark ? '#66bb6a' : '#43a047';
+  ctx.fillRect(padL, 130, 8, 8);
+  ctx.fillStyle = textColor;
+  ctx.textAlign = 'right';
+  ctx.fillText('הכנסות', padL + 46, 138);
+  ctx.fillStyle = isDark ? '#ef5350' : '#e53935';
+  ctx.fillRect(padL + 52, 130, 8, 8);
+  ctx.fillStyle = textColor;
+  ctx.fillText('הוצאות', padL + 96, 138);
+}
+
+function toggleChart() {
+  const hidden = localStorage.getItem('vb_chart_hidden') === '1';
+  localStorage.setItem('vb_chart_hidden', hidden ? '0' : '1');
+  drawIncomeExpenseChart();
+}
+
+// ═══════════════════════════════════════════════
+//  FEATURE 5: ANNUAL PDF REPORT
+// ═══════════════════════════════════════════════
+function generateAnnualPDF() {
+  const b = getBuilding(); if (!b) return;
+  const now = new Date();
+  const year = now.getFullYear();
+
+  const txs = [...(b.transactions||[])].filter(tx => tx.date.startsWith(String(year))).sort((a,c)=>a.date.localeCompare(c.date));
+  const apts = b.apartments || [];
+  const months = MONTHS_HE;
+
+  const totalIncome = txs.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+  const totalExpense = txs.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  const balance = calcBalance(b);
+
+  // Summary by category
+  const catSummary = {};
+  txs.forEach(tx => {
+    const key = (tx.type === 'income' ? 'in_' : 'ex_') + (tx.category || 'אחר');
+    catSummary[key] = (catSummary[key] || 0) + tx.amount;
+  });
+
+  const catRows = Object.entries(catSummary).map(([k,v]) => {
+    const isInc = k.startsWith('in_');
+    const cat = k.slice(3);
+    return `<tr><td>${cat}</td><td style="color:${isInc?'#2e7d32':'#c62828'}">${isInc?'הכנסה':'הוצאה'}</td><td style="font-weight:700;color:${isInc?'#2e7d32':'#c62828'}">${isInc?'+':'-'}₪${v.toLocaleString('he-IL',{minimumFractionDigits:0,maximumFractionDigits:2})}</td></tr>`;
+  }).join('');
+
+  // Dues summary
+  let duesRows = '';
+  months.forEach((mName, mi) => {
+    const m = mi + 1;
+    const paid = apts.filter(a => b.dues?.[a.id]?.[year]?.[m]).length;
+    const total = apts.length;
+    duesRows += `<tr><td>${mName}</td><td>${paid}/${total}</td><td>${fmt(paid*(b.monthlyDue||100))}</td></tr>`;
+  });
+
+  // Full transactions table
+  const txRows = txs.map(tx => `<tr>
+    <td>${fmtDate(tx.date)}</td>
+    <td>${tx.description}</td>
+    <td>${tx.category||''}</td>
+    <td style="color:${tx.type==='income'?'#2e7d32':'#c62828'};font-weight:700">${tx.type==='income'?'+':'-'}₪${tx.amount.toLocaleString('he-IL',{minimumFractionDigits:0,maximumFractionDigits:2})}</td>
+  </tr>`).join('');
+
+  const html = `<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head><meta charset="UTF-8"><title>דוח שנתי ${year} — ${b.name}</title>
+<style>
+  body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;direction:rtl;padding:20px 28px;color:#1a2233;background:#f8f9fc;font-size:14px}
+  h1{color:#1565c0;margin-bottom:4px;font-size:1.5rem}
+  h2{color:#1565c0;font-size:1rem;margin:20px 0 8px;border-bottom:2px solid #e3f0ff;padding-bottom:4px}
+  .meta{color:#666;font-size:0.85rem;margin-bottom:16px}
+  .summary-row{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+  .sum-box{background:white;border-radius:10px;padding:12px 16px;border:1px solid #dde3ec;flex:1;min-width:120px}
+  .sum-val{font-size:1.25rem;font-weight:800}
+  .sum-lbl{font-size:0.72rem;color:#666;margin-top:2px}
+  table{width:100%;border-collapse:collapse;background:white;border-radius:10px;overflow:hidden;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,0.07)}
+  th{background:#1976d2;color:white;padding:8px 7px;text-align:right;font-size:0.8rem}
+  td{padding:6px 7px;border-bottom:1px solid #eee;font-size:0.82rem;vertical-align:middle}
+  tr:last-child td{border-bottom:none}
+  tr:nth-child(even) td{background:#f8f9fc}
+  @media print{body{padding:8px;background:white}.no-print{display:none}table{page-break-inside:avoid}}
+</style></head>
+<body>
+<div class="no-print" style="margin-bottom:12px">
+  <button onclick="window.print()" style="padding:8px 18px;background:#1976d2;color:white;border:none;border-radius:8px;cursor:pointer;font-size:0.9rem;font-weight:700">🖨️ הדפס / PDF</button>
+</div>
+<h1>📊 דוח שנתי ${year} — ${b.name}</h1>
+<div class="meta">מנהל: ${b.manager||'—'} · ${apts.length} דירות · סכום חודשי: ${fmt(b.monthlyDue||100)}</div>
+
+<div class="summary-row">
+  <div class="sum-box"><div class="sum-val" style="color:#2e7d32">+₪${totalIncome.toLocaleString('he-IL',{minimumFractionDigits:0,maximumFractionDigits:2})}</div><div class="sum-lbl">סה"כ הכנסות ${year}</div></div>
+  <div class="sum-box"><div class="sum-val" style="color:#c62828">-₪${totalExpense.toLocaleString('he-IL',{minimumFractionDigits:0,maximumFractionDigits:2})}</div><div class="sum-lbl">סה"כ הוצאות ${year}</div></div>
+  <div class="sum-box"><div class="sum-val" style="color:#1565c0">₪${balance.toLocaleString('he-IL',{minimumFractionDigits:0,maximumFractionDigits:2})}</div><div class="sum-lbl">יתרה נוכחית כוללת</div></div>
+</div>
+
+<h2>📅 סיכום גבייה חודשית</h2>
+<table><thead><tr><th>חודש</th><th>דירות ששילמו</th><th>סכום נגבה</th></tr></thead><tbody>${duesRows}</tbody></table>
+
+<h2>📂 סיכום לפי קטגוריה</h2>
+<table><thead><tr><th>קטגוריה</th><th>סוג</th><th>סכום</th></tr></thead><tbody>${catRows}</tbody></table>
+
+<h2>💰 כל התנועות ${year}</h2>
+<table><thead><tr><th>תאריך</th><th>תיאור</th><th>קטגוריה</th><th>סכום</th></tr></thead><tbody>${txRows}</tbody></table>
+</body></html>`;
+
+  const win = window.open('', '_blank');
+  if (win) { win.document.write(html); win.document.close(); setTimeout(() => win.print(), 800); }
+  closeModal('reportModal');
+}
+
+// ═══════════════════════════════════════════════
+//  FEATURE 7: BROADCAST MESSAGE
+// ═══════════════════════════════════════════════
+let _bcDebtorsOnly = false;
+let _bcDebtorAptIds = [];
+
+function openBroadcastModal(debtorsOnly) {
+  _bcDebtorsOnly = debtorsOnly;
+  const b = getBuilding(); if (!b) return;
+  const apts = b.apartments || [];
+  const { month, year } = nowMY();
+
+  // Collect all unique contacts
+  const allContacts = [];
+  const seen = new Set();
+  apts.forEach(apt => {
+    const isDebtor = !b.dues?.[apt.id]?.[year]?.[month];
+    const contacts = getAllAptContacts(apt);
+    contacts.forEach(c => {
+      const key = c.phone;
+      if (!seen.has(key)) {
+        seen.add(key);
+        allContacts.push({ ...c, aptId: apt.id, aptName: apt.name, isDebtor });
+      }
+    });
+  });
+
+  _bcDebtorAptIds = apts.filter(a => !b.dues?.[a.id]?.[year]?.[month]).map(a => a.id);
+
+  document.getElementById('broadcastModal').classList.add('open');
+
+  if (debtorsOnly) {
+    // Pre-fill dues reminder
+    setBcTemplate('dues');
+  } else {
+    document.getElementById('bcMessageText').value = '';
+  }
+
+  document.getElementById('bcContactList').innerHTML = allContacts.length
+    ? allContacts.map((c, i) => {
+        const checked = debtorsOnly ? c.isDebtor : true;
+        return `<div class="bc-contact-row">
+          <input type="checkbox" class="bc-contact-cb" id="bccb_${i}" data-phone="${c.phone}" ${checked ? 'checked' : ''}>
+          <div class="bc-contact-info">
+            <span class="bc-contact-name">${c.name}</span>
+            <span class="bc-contact-meta">${c.aptName} · ${c.type} · ${c.phone}</span>
+          </div>
+        </div>`;
+      }).join('')
+    : '<div style="padding:12px;color:var(--text-2);font-size:0.85rem">אין אנשי קשר עם מספר טלפון</div>';
+}
+
+function selectAllBcContacts(val) {
+  document.querySelectorAll('.bc-contact-cb').forEach(cb => cb.checked = val);
+}
+
+const BC_TEMPLATES = {
+  assembly: () => {
+    const b = getBuilding();
+    return `שלום רב,\n\nמוזמנים לאסיפת דיירים של הבניין.\n\nנושאים לדיון: תחזוקה שוטפת, תקציב שנתי, וכל נושא אחר שיעלה.\n\nנא לאשר נוכחות.\n\nתודה,\nועד הבית — ${b?.name||''}`;
+  },
+  maintenance: () => {
+    const b = getBuilding();
+    return `שלום רב,\n\nנודיע כי יבוצעו עבודות תחזוקה בבניין בקרוב.\n\nאנחנו מתנצלים על כל אי נוחות שתיגרם.\n\nלפרטים נוספים ניתן לפנות לועד הבית.\n\nתודה,\nועד הבית — ${b?.name||''}`;
+  },
+  dues: () => {
+    const b = getBuilding();
+    const { month, year } = nowMY();
+    const monthName = MONTHS_HE[month-1];
+    const due = b?.monthlyDue || 100;
+    return `שלום רב,\n\nתזכורת ידידותית — וועד הבית לחודש ${monthName} ${year} טרם שולם.\n\nסכום לתשלום: ₪${due.toLocaleString()}\n\nנודה לכם על הסדרת התשלום בהקדם. 🙏\n\nתודה,\nועד הבית — ${b?.name||''}`;
+  },
+  general: () => {
+    const b = getBuilding();
+    return `שלום רב,\n\n[הודעה כללית]\n\nתודה,\nועד הבית — ${b?.name||''}`;
+  }
+};
+
+function setBcTemplate(key) {
+  const fn = BC_TEMPLATES[key];
+  if (fn) document.getElementById('bcMessageText').value = fn();
+}
+
+function sendBroadcastWA() {
+  const msg = document.getElementById('bcMessageText').value;
+  if (!msg.trim()) { showSnack('יש להזין הודעה'); return; }
+  const checked = [...document.querySelectorAll('.bc-contact-cb:checked')];
+  if (!checked.length) { showSnack('יש לבחור לפחות איש קשר אחד'); return; }
+  checked.forEach((cb, i) => setTimeout(() => sendWA(cb.dataset.phone, msg), i * 600));
+  closeModal('broadcastModal');
+  showSnack(`נשלח ל-${checked.length} אנשי קשר`);
+}
+
+function sendBroadcastEmail(client) {
+  const msg = document.getElementById('bcMessageText').value;
+  const b = getBuilding(); if (!b) return;
+  const apts = b.apartments || [];
+  const checked = [...document.querySelectorAll('.bc-contact-cb:checked')];
+  const phones = new Set(checked.map(cb => cb.dataset.phone));
+  // Find emails for selected contacts
+  const emails = [];
+  const seenEmails = new Set();
+  apts.forEach(apt => {
+    getAllAptContacts(apt).forEach(c => {
+      if (phones.has(c.phone)) {
+        getAllAptEmails(apt).forEach(e => {
+          if (!seenEmails.has(e.email)) { seenEmails.add(e.email); emails.push(e.email); }
+        });
+      }
+    });
+  });
+  if (!emails.length) { showSnack('לא נמצאו כתובות מייל לנבחרים'); return; }
+  emails.forEach((email, i) => setTimeout(() => sendEmail(email, msg, client), i * 800));
+  closeModal('broadcastModal');
+}
+
+// ═══════════════════════════════════════════════
+//  FEATURE 10: GLOBAL SEARCH
+// ═══════════════════════════════════════════════
+let _searchTimer = null;
+
+function toggleSearchBar() {
+  const bar = document.getElementById('searchBar');
+  const isOpen = bar.classList.toggle('open');
+  if (isOpen) {
+    document.getElementById('searchInput').focus();
+    document.getElementById('searchResults').innerHTML = '';
+    document.getElementById('searchResults').classList.remove('has-results');
+  } else {
+    document.getElementById('searchInput').value = '';
+  }
+}
+
+function onSearchKey(e) {
+  if (e.key === 'Escape') toggleSearchBar();
+}
+
+function onSearchInput() {
+  clearTimeout(_searchTimer);
+  _searchTimer = setTimeout(performSearch, 200);
+}
+
+function performSearch() {
+  const q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+  const results = document.getElementById('searchResults');
+  if (!q || q.length < 1) { results.innerHTML=''; results.classList.remove('has-results'); return; }
+
+  const b = getBuilding(); if (!b) return;
+  const apts = b.apartments || [];
+  const txs = b.transactions || [];
+
+  const aptMatches = [];
+  const contactMatches = [];
+  const txMatches = [];
+
+  apts.forEach(apt => {
+    if (apt.name.toLowerCase().includes(q)) {
+      aptMatches.push({ icon:'🏠', name: apt.name, sub: '', screenId: 'screenDues' });
+    }
+    (apt.owners||[]).forEach(o => {
+      if ((o.name||'').toLowerCase().includes(q) || (o.phone||'').includes(q)) {
+        contactMatches.push({ icon:'👤', name: o.name, sub: `בעל דירה · ${apt.name}`, screenId: 'screenContacts' });
+      }
+    });
+    const residents = apt.residents?.length ? apt.residents : (apt.resident?.name ? [apt.resident] : []);
+    residents.forEach(r => {
+      if ((r.name||'').toLowerCase().includes(q) || (r.phone||'').includes(q)) {
+        contactMatches.push({ icon:'🧍', name: r.name, sub: `דייר · ${apt.name}`, screenId: 'screenContacts' });
+      }
+    });
+  });
+
+  (b.serviceProviders||[]).forEach(p => {
+    if ((p.name||'').toLowerCase().includes(q) || (p.role||'').toLowerCase().includes(q)) {
+      contactMatches.push({ icon:'🔧', name: `${p.role}${p.name?' – '+p.name:''}`, sub: 'נותן שירות', screenId: 'screenContacts' });
+    }
+  });
+
+  txs.forEach(tx => {
+    if ((tx.description||'').toLowerCase().includes(q) || (tx.category||'').toLowerCase().includes(q)) {
+      txMatches.push({ icon: tx.type==='income'?'⬆️':'⬇️', name: tx.description, sub: `${fmtDate(tx.date)} · ${tx.type==='income'?'+':'-'}${fmt(tx.amount)}`, screenId: 'screenTransactions' });
+    }
+  });
+
+  function srItem(r) {
+    return `<div class="sr-item" onclick="showScreen('${r.screenId}');toggleSearchBar()"><span class="sr-item-icon">${r.icon}</span><div class="sr-item-text"><div class="sr-item-name">${r.name}</div>${r.sub?`<div class="sr-item-sub">${r.sub}</div>`:''}</div></div>`;
+  }
+
+  let html = '';
+  if (aptMatches.length) {
+    html += `<div class="sr-group-lbl">🏠 דירות (${aptMatches.length})</div>`;
+    html += aptMatches.slice(0,5).map(r => srItem(r)).join('');
+  }
+  if (contactMatches.length) {
+    html += `<div class="sr-group-lbl">👥 אנשי קשר (${contactMatches.length})</div>`;
+    html += contactMatches.slice(0,5).map(r => srItem(r)).join('');
+  }
+  if (txMatches.length) {
+    html += `<div class="sr-group-lbl">💰 תנועות (${txMatches.length})</div>`;
+    html += txMatches.slice(0,5).map(r => srItem(r)).join('');
+  }
+
+  if (!html) html = `<div class="sr-item" style="cursor:default;color:var(--text-2)"><span class="sr-item-icon">🔍</span><div class="sr-item-text"><div class="sr-item-name">אין תוצאות עבור "${q}"</div></div></div>`;
+
+  results.innerHTML = html;
+  results.classList.add('has-results');
+}
+
+// ═══════════════════════════════════════════════
+//  FEATURE 11: QUICK ACTIONS
+// ═══════════════════════════════════════════════
+function markAllCurrentMonth() {
+  const b = getBuilding(); if (!b) return;
+  const { month, year } = nowMY();
+  const apts = b.apartments || [];
+  const monthName = MONTHS_HE[month - 1];
+  const unpaid = apts.filter(a => !b.dues?.[a.id]?.[year]?.[month]);
+  if (!unpaid.length) { showSnack('כל הדירות כבר שילמו החודש ✓'); return; }
+  if (!confirm(`סמן ${monthName} ${year} כשולם עבור כל ${unpaid.length} הדירות שלא שילמו?`)) return;
+  if (!b.dues) b.dues = {};
+  unpaid.forEach(apt => {
+    if (!b.dues[apt.id]) b.dues[apt.id] = {};
+    if (!b.dues[apt.id][year]) b.dues[apt.id][year] = {};
+    b.dues[apt.id][year][month] = true;
+    // Add transaction
+    const desc = `וועד בית ${apt.name} - ${monthName} ${year}`;
+    const due = b.monthlyDue || 100;
+    b.transactions.push({ id: uid(), date: todayISO(), type:'income', amount: due, description: desc, category:'וועד בית', aptId: apt.id });
+  });
+  saveBuilding();
+  renderDashboard();
+  showSnack(`${unpaid.length} דירות סומנו כשולמות ✓`);
+}
+
+// ═══════════════════════════════════════════════
+//  FEATURE 12: PRESENTATION MODE
+// ═══════════════════════════════════════════════
+let _presTimer = null;
+
+function openPresentationMode() {
+  const overlay = document.getElementById('presentationOverlay');
+  overlay.classList.add('active');
+  updatePresentationData();
+  _presTimer = setInterval(updatePresentationData, 30000);
+  document.documentElement.requestFullscreen?.().catch(()=>{});
+  document.addEventListener('keydown', onPresKey);
+}
+
+function closePresentationMode() {
+  document.getElementById('presentationOverlay').classList.remove('active');
+  if (_presTimer) { clearInterval(_presTimer); _presTimer = null; }
+  if (document.fullscreenElement) document.exitFullscreen?.().catch(()=>{});
+  document.removeEventListener('keydown', onPresKey);
+}
+
+function onPresKey(e) { if (e.key === 'Escape') closePresentationMode(); }
+
+function updatePresentationData() {
+  const b = getBuilding(); if (!b) return;
+  const { month, year } = nowMY();
+  const apts = b.apartments || [];
+  const monthName = MONTHS_HE[month - 1];
+  const bal = calcBalance(b);
+
+  const now = new Date();
+  document.getElementById('presBuilding').textContent = `🏢 ${b.name}`;
+  document.getElementById('presDate').textContent = now.toLocaleDateString('he-IL', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  document.getElementById('presBalance').textContent = fmt(bal);
+
+  const paid = apts.filter(a => b.dues?.[a.id]?.[year]?.[month]);
+  const total = apts.length;
+  const pct = total ? Math.round(paid.length / total * 100) : 0;
+
+  document.getElementById('presDuesTitle').textContent = `גבייה ${monthName} ${year}`;
+  document.getElementById('presProgressBar').style.width = pct + '%';
+  document.getElementById('presProgressLbl').textContent = `${paid.length}/${total} דירות שילמו (${pct}%)`;
+
+  const tbody = document.getElementById('presTableBody');
+  tbody.innerHTML = apts.map(apt => {
+    const isPaid = !!(b.dues?.[apt.id]?.[year]?.[month]);
+    const person = (apt.owners?.[0]?.name) || (apt.residents?.[0]?.name) || (apt.resident?.name) || '';
+    return `<tr class="${isPaid ? 'pres-row-paid' : 'pres-row-unpaid'}">
+      <td>${apt.name}</td>
+      <td>${person}</td>
+      <td style="font-weight:700;color:${isPaid?'#4caf50':'#f44336'}">${isPaid ? '✓ שולם' : '✗ לא שולם'}</td>
+    </tr>`;
+  }).join('');
 }
 
 // ═══════════════════════════════════════════════
