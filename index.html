@@ -18,7 +18,7 @@
 // ╔══════════════════════════════════════════════════════════╗
 // ║  APP CONFIGURATION                                        ║
 // ╚══════════════════════════════════════════════════════════╝
-const APP_VERSION = "1.2.1";
+const APP_VERSION = "1.2.2";
 const APP_NAME = "וועד בית";
 const GITHUB_REPO = "dimitryu/VaadBait";
 
@@ -2517,10 +2517,10 @@ function buildDuesWAMsg(b, apt, contactName) {
   const unpaid = getUnpaidMonths(b, apt.id);
   const { year } = nowMY();
   const due = b.monthlyDue || 100;
-  if (!unpaid.length) return `שלום ${contactName},\nכל תשלומי הוועד עד כה מסודרים ✓`;
+  if (!unpaid.length) return `שלום,\nכל תשלומי הוועד עד כה מסודרים ✓`;
   const names = unpaid.map(m => MONTHS_HE[m-1]).join(', ');
   const total = unpaid.length * due;
-  return `שלום ${contactName},\nחודשים שלא שולם עבורם ועד בית (${year}):\n${names}\n\nסכום כולל לתשלום: ₪${total.toLocaleString()}\nנא להסדיר בהקדם 🙏`;
+  return `שלום,\nחודשים שלא שולם עבורם ועד בית (${year}):\n${names}\n\nסכום כולל לתשלום: ₪${total.toLocaleString()}\nתודה`;
 }
 
 // Opens WA contact selector modal
@@ -2541,7 +2541,7 @@ function openWAModal(aptId, msgType, projId) {
     const proj = (b.projects||[]).find(p=>p.id===projId);
     const perApt = proj ? (proj.perAptAmount || Math.ceil(proj.targetAmount / (b.apartments||[]).length)) : 0;
     const firstContact = contacts[0]?.name || apt.name;
-    msg = `שלום ${firstContact},\nעבור פרויקט "${proj?.name || ''}" חלקך לתשלום: ₪${perApt.toLocaleString()}\nנא להסדיר בהקדם 🙏`;
+    msg = `שלום,\nעבור פרויקט "${proj?.name || ''}" חלקך לתשלום: ₪${perApt.toLocaleString()}\nתודה`;
   }
 
   document.getElementById('waModalTitle').textContent = `💬 ${apt.name} — שליחת WhatsApp`;
