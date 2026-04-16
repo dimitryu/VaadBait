@@ -18,7 +18,7 @@
 // ╔══════════════════════════════════════════════════════════╗
 // ║  APP CONFIGURATION                                        ║
 // ╚══════════════════════════════════════════════════════════╝
-const APP_VERSION = "1.2.0";
+const APP_VERSION = "1.2.1";
 const APP_NAME = "וועד בית";
 const GITHUB_REPO = "dimitryu/VaadBait";
 
@@ -297,6 +297,15 @@ body {
 .proj-toggle.unpaid { border-color:var(--danger); color:var(--danger); }
 .wa-btn { background:none; border:none; font-size:1.1rem; cursor:pointer; padding:2px 4px; opacity:0.8; }
 .wa-btn:active { opacity:1; transform:scale(1.2); }
+.wa-contact-row { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--border); }
+.wa-contact-row:last-child { border-bottom:none; }
+.wa-contact-info { flex:1; }
+.wa-contact-name { font-weight:700; font-size:0.88rem; display:block; }
+.wa-contact-meta { font-size:0.74rem; color:var(--text-2); }
+.wa-contact-cb { width:20px; height:20px; accent-color:var(--accent); cursor:pointer; flex-shrink:0; }
+.wa-msg-area { width:100%; min-height:90px; resize:vertical; font-family:inherit; font-size:0.82rem; direction:rtl; }
+.wa-send-all { background:#25d366; color:white; border:none; border-radius:12px; padding:11px; font-size:0.9rem; font-weight:700; cursor:pointer; width:100%; margin-top:8px; }
+.wa-send-all:active { opacity:0.85; }
 
 /* ── Transactions ── */
 .tx-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
@@ -828,6 +837,21 @@ body {
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('projectModal')">ביטול</button>
       <button class="btn btn-primary" onclick="saveProject()">✓ שמור</button>
+    </div>
+  </div>
+</div>
+
+<!-- WhatsApp Contact Selector Modal -->
+<div class="modal-overlay" id="waModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="waModalTitle">💬 שליחת WhatsApp</div>
+    <div id="waContactList" style="margin-bottom:10px"></div>
+    <label class="form-label" style="margin-bottom:4px">הודעה (ניתן לערוך):</label>
+    <textarea class="form-input wa-msg-area" id="waMessageText"></textarea>
+    <button class="wa-send-all" onclick="sendWAToSelected()">💬 שלח לנבחרים</button>
+    <div class="modal-actions" style="margin-top:8px">
+      <button class="btn btn-ghost" style="flex:none;padding:8px 18px" onclick="closeModal('waModal')">סגור</button>
     </div>
   </div>
 </div>
@@ -1423,18 +1447,14 @@ function renderDashboard() {
   apts.forEach(a => {
     const isPaid = !!(b.dues?.[a.id]?.[year]?.[month]);
     const ownerName = (a.owners?.[0]?.name) || (a.residents?.[0]?.name) || (a.resident?.name) || '';
-    const phone = getAptPhone(a);
-    const contactName = getAptContactName(a);
-    const { month: curMonth, year: curYear } = nowMY();
-    const monthName = getMonths()[curMonth-1];
-    const waMsg = !isPaid && phone ? t('wa_dues_msg')(contactName || a.name, monthName, curYear, b.monthlyDue||100) : '';
+    const hasPhone = !!getAllAptContacts(a).length;
     html += `<div class="unpaid-apt">
       <div>
         <div class="apt-name">${a.name}${isPaid ? ' <span style="color:var(--success);font-size:0.75rem">✓</span>' : ''}</div>
         <div class="apt-info">${ownerName}</div>
       </div>
       <div style="display:flex;align-items:center;gap:6px">
-        ${!isPaid && phone ? `<button class="wa-btn" onclick="sendWA('${phone}',decodeURIComponent('${encodeURIComponent(waMsg)}'))">💬</button>` : ''}
+        ${!isPaid && hasPhone ? `<button class="wa-btn" onclick="openWAModal('${a.id}','dues')">💬</button>` : ''}
         <button class="pay-btn" onclick="openPayModal('${a.id}')" style="${isPaid ? 'background:var(--success-bg);color:var(--success);border-color:var(--success);opacity:0.8' : ''}">${t('add_payment')}</button>
       </div>
     </div>`;
@@ -2358,13 +2378,12 @@ function renderProjects() {
     const aptRows = apts.map(a => {
       const isPaid = !!(proj.paid?.[a.id]);
       const personName = (a.owners?.[0]?.name) || (a.residents?.[0]?.name) || (a.resident?.name) || '';
-      const phone = getAptPhone(a);
-      const waMsg = phone ? t('wa_project_msg')(personName || a.name, proj.name, perApt) : '';
+      const hasPhone = !!getAllAptContacts(a).length;
       return `<div class="proj-apt-row">
         <span class="proj-apt-name">${a.name}</span>
         <span class="proj-apt-person">${personName}</span>
         <button class="proj-toggle ${isPaid?'paid':'unpaid'}" onclick="toggleProjectPaid('${proj.id}','${a.id}')">${isPaid?'✓ שולם':'✗ לא שולם'}</button>
-        ${phone ? `<button class="wa-btn" onclick="sendWA('${phone}',decodeURIComponent('${encodeURIComponent(waMsg)}'))">💬</button>` : ''}
+        ${!isPaid && hasPhone ? `<button class="wa-btn" onclick="openWAModal('${a.id}','project','${proj.id}')">💬</button>` : ''}
       </div>`;
     }).join('');
 
@@ -2466,6 +2485,89 @@ function getAptPhone(apt) {
 
 function getAptContactName(apt) {
   return (apt.owners?.[0]?.name) || (apt.residents?.[0]?.name) || (apt.resident?.name) || apt.name;
+}
+
+// Returns all contacts with phone numbers for an apartment
+function getAllAptContacts(apt) {
+  const contacts = [];
+  (apt.owners||[]).forEach(o => {
+    const phone = o.whatsapp || o.phone;
+    if (o.name && phone) contacts.push({ name: o.name, phone, type: 'בעל דירה' });
+  });
+  const residents = apt.residents?.length ? apt.residents : (apt.resident?.name ? [apt.resident] : []);
+  residents.forEach(r => {
+    if (r.name && r.phone) contacts.push({ name: r.name, phone: r.phone, type: 'דייר' });
+  });
+  return contacts;
+}
+
+// Returns unpaid month numbers (1-12) up to current month for this year
+function getUnpaidMonths(b, aptId) {
+  const { year } = nowMY();
+  const curMonth = new Date().getMonth() + 1;
+  const unpaid = [];
+  for (let m = 1; m <= curMonth; m++) {
+    if (!b.dues?.[aptId]?.[year]?.[m]) unpaid.push(m);
+  }
+  return unpaid;
+}
+
+// Builds dues WA message listing all unpaid months
+function buildDuesWAMsg(b, apt, contactName) {
+  const unpaid = getUnpaidMonths(b, apt.id);
+  const { year } = nowMY();
+  const due = b.monthlyDue || 100;
+  if (!unpaid.length) return `שלום ${contactName},\nכל תשלומי הוועד עד כה מסודרים ✓`;
+  const names = unpaid.map(m => MONTHS_HE[m-1]).join(', ');
+  const total = unpaid.length * due;
+  return `שלום ${contactName},\nחודשים שלא שולם עבורם ועד בית (${year}):\n${names}\n\nסכום כולל לתשלום: ₪${total.toLocaleString()}\nנא להסדיר בהקדם 🙏`;
+}
+
+// Opens WA contact selector modal
+function openWAModal(aptId, msgType, projId) {
+  const b = getBuilding();
+  const apt = (b.apartments||[]).find(a=>a.id===aptId);
+  if (!apt) return;
+
+  const contacts = getAllAptContacts(apt);
+  if (!contacts.length) { showSnack('אין מספר טלפון לדירה זו'); return; }
+
+  // Build message
+  let msg = '';
+  if (msgType === 'dues') {
+    const firstContact = contacts[0]?.name || apt.name;
+    msg = buildDuesWAMsg(b, apt, firstContact);
+  } else if (msgType === 'project' && projId) {
+    const proj = (b.projects||[]).find(p=>p.id===projId);
+    const perApt = proj ? (proj.perAptAmount || Math.ceil(proj.targetAmount / (b.apartments||[]).length)) : 0;
+    const firstContact = contacts[0]?.name || apt.name;
+    msg = `שלום ${firstContact},\nעבור פרויקט "${proj?.name || ''}" חלקך לתשלום: ₪${perApt.toLocaleString()}\nנא להסדיר בהקדם 🙏`;
+  }
+
+  document.getElementById('waModalTitle').textContent = `💬 ${apt.name} — שליחת WhatsApp`;
+  document.getElementById('waMessageText').value = msg;
+  document.getElementById('waContactList').innerHTML = contacts.map((c, i) => `
+    <div class="wa-contact-row">
+      <input type="checkbox" class="wa-contact-cb" id="wacb_${i}" data-phone="${c.phone}" checked>
+      <div class="wa-contact-info">
+        <span class="wa-contact-name">${c.name}</span>
+        <span class="wa-contact-meta">${c.type} · ${c.phone}</span>
+      </div>
+      <button class="wa-btn" onclick="sendWA('${c.phone}', document.getElementById('waMessageText').value)" title="שלח רק לאיש קשר זה">💬</button>
+    </div>`).join('');
+
+  document.getElementById('waModal').classList.add('open');
+}
+
+// Sends to all checked contacts
+function sendWAToSelected() {
+  const msg = document.getElementById('waMessageText').value;
+  const checked = [...document.querySelectorAll('.wa-contact-cb:checked')];
+  if (!checked.length) { showSnack('יש לבחור לפחות איש קשר אחד'); return; }
+  checked.forEach((cb, i) => {
+    setTimeout(() => sendWA(cb.dataset.phone, msg), i * 600);
+  });
+  closeModal('waModal');
 }
 
 function sendWA(phone, msg) {
