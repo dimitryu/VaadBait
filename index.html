@@ -18,7 +18,7 @@
 // ╔══════════════════════════════════════════════════════════╗
 // ║  APP CONFIGURATION                                        ║
 // ╚══════════════════════════════════════════════════════════╝
-const APP_VERSION = "1.2.2";
+const APP_VERSION = "1.2.3";
 const APP_NAME = "וועד בית";
 const GITHUB_REPO = "dimitryu/VaadBait";
 
@@ -304,8 +304,11 @@ body {
 .wa-contact-meta { font-size:0.74rem; color:var(--text-2); }
 .wa-contact-cb { width:20px; height:20px; accent-color:var(--accent); cursor:pointer; flex-shrink:0; }
 .wa-msg-area { width:100%; min-height:90px; resize:vertical; font-family:inherit; font-size:0.82rem; direction:rtl; }
+.wa-section-lbl { font-size:0.78rem; font-weight:700; color:var(--text-2); margin-bottom:6px; }
 .wa-send-all { background:#25d366; color:white; border:none; border-radius:12px; padding:11px; font-size:0.9rem; font-weight:700; cursor:pointer; width:100%; margin-top:8px; }
 .wa-send-all:active { opacity:0.85; }
+.email-send-all { background:var(--accent); color:white; border:none; border-radius:12px; padding:11px; font-size:0.9rem; font-weight:700; cursor:pointer; width:100%; margin-top:8px; }
+.email-send-all:active { opacity:0.85; }
 
 /* ── Transactions ── */
 .tx-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
@@ -841,15 +844,23 @@ body {
   </div>
 </div>
 
-<!-- WhatsApp Contact Selector Modal -->
+<!-- WhatsApp / Email Contact Selector Modal -->
 <div class="modal-overlay" id="waModal">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title" id="waModalTitle">💬 שליחת WhatsApp</div>
-    <div id="waContactList" style="margin-bottom:10px"></div>
+    <div class="modal-title" id="waModalTitle">שליחת הודעה</div>
     <label class="form-label" style="margin-bottom:4px">הודעה (ניתן לערוך):</label>
     <textarea class="form-input wa-msg-area" id="waMessageText"></textarea>
-    <button class="wa-send-all" onclick="sendWAToSelected()">💬 שלח לנבחרים</button>
+    <div id="waPhoneSection" style="margin-top:10px">
+      <div class="wa-section-lbl">💬 WhatsApp</div>
+      <div id="waContactList"></div>
+      <button class="wa-send-all" onclick="sendWAToSelected()">💬 שלח WhatsApp לנבחרים</button>
+    </div>
+    <div id="waEmailSection" style="margin-top:10px">
+      <div class="wa-section-lbl">📧 אימייל</div>
+      <div id="waEmailList"></div>
+      <button class="email-send-all" onclick="sendEmailToSelected()">📧 שלח אימייל לנבחרים</button>
+    </div>
     <div class="modal-actions" style="margin-top:8px">
       <button class="btn btn-ghost" style="flex:none;padding:8px 18px" onclick="closeModal('waModal')">סגור</button>
     </div>
@@ -2501,6 +2512,19 @@ function getAllAptContacts(apt) {
   return contacts;
 }
 
+// Returns all contacts with email for an apartment
+function getAllAptEmails(apt) {
+  const contacts = [];
+  (apt.owners||[]).forEach(o => {
+    if (o.name && o.email) contacts.push({ name: o.name, email: o.email, type: 'בעל דירה' });
+  });
+  const residents = apt.residents?.length ? apt.residents : (apt.resident?.name ? [apt.resident] : []);
+  residents.forEach(r => {
+    if (r.name && r.email) contacts.push({ name: r.name, email: r.email, type: 'דייר' });
+  });
+  return contacts;
+}
+
 // Returns unpaid month numbers (1-12) up to current month for this year
 function getUnpaidMonths(b, aptId) {
   const { year } = nowMY();
@@ -2512,67 +2536,109 @@ function getUnpaidMonths(b, aptId) {
   return unpaid;
 }
 
-// Builds dues WA message listing all unpaid months
-function buildDuesWAMsg(b, apt, contactName) {
+// Formats month list with Hebrew conjunction (ו before last item)
+function fmtMonthList(monthNums) {
+  const names = monthNums.map(m => MONTHS_HE[m-1]);
+  if (names.length === 1) return names[0];
+  if (names.length === 2) return `${names[0]} ו${names[1]}`;
+  return names.slice(0,-1).join(', ') + ' ו' + names[names.length-1];
+}
+
+// Builds the standard dues message
+function buildDuesMsg(b, apt) {
   const unpaid = getUnpaidMonths(b, apt.id);
   const { year } = nowMY();
   const due = b.monthlyDue || 100;
-  if (!unpaid.length) return `שלום,\nכל תשלומי הוועד עד כה מסודרים ✓`;
-  const names = unpaid.map(m => MONTHS_HE[m-1]).join(', ');
+  if (!unpaid.length) return `שלום רב,\nכל תשלומי הוועד עד כה מסודרים ✓\n\nתודה רבה,\nועד הבית`;
+  const monthsStr = fmtMonthList(unpaid);
   const total = unpaid.length * due;
-  return `שלום,\nחודשים שלא שולם עבורם ועד בית (${year}):\n${names}\n\nסכום כולל לתשלום: ₪${total.toLocaleString()}\nתודה`;
+  return `שלום רב, ✍️\n\nלצורך הסדרת רישומי ועד הבית, להלן פירוט חוב וועד הבית עבור דירתכם לשנת ${year}:\n\n📅 חודשים שלא שולמו: ${monthsStr}.\n💰 סך הכל לתשלום: ₪${total.toLocaleString()}.\n\nנודה לכם מאוד על הסדרת התשלום בהקדם לטובת המשך התחזוקה השוטפת של הבניין. 🏗️\n\nתודה רבה,\nועד הבית`;
 }
 
-// Opens WA contact selector modal
+// Builds project message
+function buildProjectMsg(b, apt, proj) {
+  const perApt = proj.perAptAmount || Math.ceil(proj.targetAmount / Math.max((b.apartments||[]).length, 1));
+  return `שלום רב, ✍️\n\nלצורך הסדרת רישומי ועד הבית, להלן פירוט עבור דירתכם:\n\n🎯 פרויקט: ${proj.name}\n💰 חלקך לתשלום: ₪${perApt.toLocaleString()}.\n\nנודה לכם מאוד על הסדרת התשלום בהקדם לטובת המשך התחזוקה השוטפת של הבניין. 🏗️\n\nתודה רבה,\nועד הבית`;
+}
+
+// Opens WA+Email contact selector modal
 function openWAModal(aptId, msgType, projId) {
   const b = getBuilding();
   const apt = (b.apartments||[]).find(a=>a.id===aptId);
   if (!apt) return;
 
-  const contacts = getAllAptContacts(apt);
-  if (!contacts.length) { showSnack('אין מספר טלפון לדירה זו'); return; }
+  const phones = getAllAptContacts(apt);
+  const emails = getAllAptEmails(apt);
+  if (!phones.length && !emails.length) { showSnack('אין פרטי קשר לדירה זו'); return; }
 
   // Build message
-  let msg = '';
-  if (msgType === 'dues') {
-    const firstContact = contacts[0]?.name || apt.name;
-    msg = buildDuesWAMsg(b, apt, firstContact);
-  } else if (msgType === 'project' && projId) {
-    const proj = (b.projects||[]).find(p=>p.id===projId);
-    const perApt = proj ? (proj.perAptAmount || Math.ceil(proj.targetAmount / (b.apartments||[]).length)) : 0;
-    const firstContact = contacts[0]?.name || apt.name;
-    msg = `שלום,\nעבור פרויקט "${proj?.name || ''}" חלקך לתשלום: ₪${perApt.toLocaleString()}\nתודה`;
-  }
+  let msg = msgType === 'dues' ? buildDuesMsg(b, apt)
+    : msgType === 'project' && projId ? buildProjectMsg(b, apt, (b.projects||[]).find(p=>p.id===projId)||{name:'',targetAmount:0})
+    : '';
 
-  document.getElementById('waModalTitle').textContent = `💬 ${apt.name} — שליחת WhatsApp`;
+  document.getElementById('waModalTitle').textContent = `${apt.name} — שליחת הודעה`;
   document.getElementById('waMessageText').value = msg;
-  document.getElementById('waContactList').innerHTML = contacts.map((c, i) => `
-    <div class="wa-contact-row">
-      <input type="checkbox" class="wa-contact-cb" id="wacb_${i}" data-phone="${c.phone}" checked>
-      <div class="wa-contact-info">
-        <span class="wa-contact-name">${c.name}</span>
-        <span class="wa-contact-meta">${c.type} · ${c.phone}</span>
-      </div>
-      <button class="wa-btn" onclick="sendWA('${c.phone}', document.getElementById('waMessageText').value)" title="שלח רק לאיש קשר זה">💬</button>
-    </div>`).join('');
+
+  // Phone (WA) section
+  const phoneSection = document.getElementById('waPhoneSection');
+  if (phones.length) {
+    phoneSection.style.display = '';
+    document.getElementById('waContactList').innerHTML = phones.map((c, i) => `
+      <div class="wa-contact-row">
+        <input type="checkbox" class="wa-contact-cb" id="wacb_${i}" data-phone="${c.phone}" checked>
+        <div class="wa-contact-info">
+          <span class="wa-contact-name">${c.name}</span>
+          <span class="wa-contact-meta">${c.type} · ${c.phone}</span>
+        </div>
+        <button class="wa-btn" onclick="sendWA('${c.phone}',document.getElementById('waMessageText').value)">💬</button>
+      </div>`).join('');
+  } else { phoneSection.style.display = 'none'; }
+
+  // Email section
+  const emailSection = document.getElementById('waEmailSection');
+  if (emails.length) {
+    emailSection.style.display = '';
+    document.getElementById('waEmailList').innerHTML = emails.map((c, i) => `
+      <div class="wa-contact-row">
+        <input type="checkbox" class="em-contact-cb" id="emcb_${i}" data-email="${c.email}" checked>
+        <div class="wa-contact-info">
+          <span class="wa-contact-name">${c.name}</span>
+          <span class="wa-contact-meta">${c.type} · ${c.email}</span>
+        </div>
+        <button class="wa-btn" onclick="sendEmail('${c.email}',document.getElementById('waMessageText').value)">📧</button>
+      </div>`).join('');
+  } else { emailSection.style.display = 'none'; }
 
   document.getElementById('waModal').classList.add('open');
 }
 
-// Sends to all checked contacts
+// Sends WA to all checked phone contacts
 function sendWAToSelected() {
   const msg = document.getElementById('waMessageText').value;
   const checked = [...document.querySelectorAll('.wa-contact-cb:checked')];
   if (!checked.length) { showSnack('יש לבחור לפחות איש קשר אחד'); return; }
-  checked.forEach((cb, i) => {
-    setTimeout(() => sendWA(cb.dataset.phone, msg), i * 600);
-  });
+  checked.forEach((cb, i) => setTimeout(() => sendWA(cb.dataset.phone, msg), i * 600));
+  closeModal('waModal');
+}
+
+// Sends email to all checked email contacts
+function sendEmailToSelected() {
+  const msg = document.getElementById('waMessageText').value;
+  const checked = [...document.querySelectorAll('.em-contact-cb:checked')];
+  if (!checked.length) { showSnack('יש לבחור לפחות איש קשר אחד'); return; }
+  checked.forEach((cb, i) => setTimeout(() => sendEmail(cb.dataset.email, msg), i * 800));
   closeModal('waModal');
 }
 
 function sendWA(phone, msg) {
   const clean = String(phone).replace(/[-\s\(\)]/g,'').replace(/^\+?972/,'972').replace(/^0/,'972');
   window.open(`https://wa.me/${clean}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+function sendEmail(email, msg) {
+  const subject = encodeURIComponent('ועד הבית — הודעה חשובה');
+  const body = encodeURIComponent(msg);
+  window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
 }
 
 // ═══════════════════════════════════════════════
