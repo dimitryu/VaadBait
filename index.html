@@ -18,7 +18,7 @@
 // ╔══════════════════════════════════════════════════════════╗
 // ║  APP CONFIGURATION                                        ║
 // ╚══════════════════════════════════════════════════════════╝
-const APP_VERSION = "1.3.1";
+const APP_VERSION = "1.3.2";
 const APP_NAME = "וועד בית";
 const GITHUB_REPO = "dimitryu/VaadBait";
 
@@ -2962,8 +2962,8 @@ function sendEmailManual(client) {
 //  CLOUD SYNC — Firebase Realtime Database REST
 //  No SDK needed — plain JSON GET/PUT requests
 //  Setup: create free Firebase project, enable
-//  Realtime Database, set rules to public,
-//  copy the DB URL (ends in .firebaseio.com)
+//  Realtime Database, set secure rules (see renderSyncSection),
+//  copy the DB URL (ends in .firebaseio.com or .firebasedatabase.app)
 // ═══════════════════════════════════════════════
 let syncPollTimer = null;
 
@@ -3042,10 +3042,25 @@ function renderSyncSection() {
         <div class="sync-help">
           שמור נתונים בענן וגישה מכל מכשיר. נדרש חשבון Firebase חינמי:<br>
           1. כנס ל-<b>firebase.google.com</b> → צור פרויקט<br>
-          2. לחץ <b>Realtime Database</b> → צור מסד נתונים<br>
-          3. ב-Rules הגדר: <code style="background:var(--accent-light);padding:1px 5px;border-radius:4px">".read":true,".write":true</code><br>
-          4. העתק את ה-URL והדבק כאן:
+          2. לחץ <b>Realtime Database</b> → צור מסד נתונים → Start in test mode<br>
+          3. ב-<b>Rules</b> החלף את הכל בכללים המאובטחים הבאים ולחץ Publish:
         </div>
+        <pre dir="ltr" style="font-size:0.62rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px;overflow-x:auto;line-height:1.5;margin:0 0 8px;color:var(--text)">{
+  "rules": {
+    "vaad_bait_sync": {
+      "$syncCode": {
+        ".read": "$syncCode.length >= 30",
+        ".write": "$syncCode.length >= 30",
+        ".validate": "newData.hasChildren(['data','updatedAt'])",
+        "data": { ".validate": "newData.isString() && newData.val().length < 500000" },
+        "updatedAt": { ".validate": "newData.isNumber()" },
+        "$other": { ".validate": false }
+      }
+    },
+    "$other": { ".read": false, ".write": false }
+  }
+}</pre>
+        <div class="sync-help" style="margin-top:0">4. העתק את ה-URL של המסד והדבק כאן:</div>
         <input type="url" id="syncDbUrlInput" class="form-input" placeholder="https://my-project-default-rtdb.firebaseio.com" dir="ltr">
         <button class="btn btn-primary" onclick="activateSync()">הפעל סנכרון</button>
       </div>`;
