@@ -18,7 +18,7 @@
 // ╔══════════════════════════════════════════════════════════╗
 // ║  APP CONFIGURATION                                        ║
 // ╚══════════════════════════════════════════════════════════╝
-const APP_VERSION = "1.3.2";
+const APP_VERSION = "1.3.3";
 const APP_NAME = "וועד בית";
 const GITHUB_REPO = "dimitryu/VaadBait";
 
@@ -1513,6 +1513,7 @@ function loadBuilding(id) {
 
 function saveBuilding() {
   if (currentBuilding) currentBuilding.updatedAt = Date.now();
+  _lastLocalSave = Date.now();
   saveBuildingData(currentBuildingId, currentBuilding);
   if (currentBuilding?.syncCode && getSyncDbUrl()) cloudPush();
 }
@@ -1785,8 +1786,8 @@ function renderDues() {
   const months = getMonths();
   let html = `<thead><tr><th class="month-col">${t('month_col')}</th>${apts.map(a=>`<th class="apt-col" style="cursor:pointer" onclick="openHistoryModal('${a.id}')" title="היסטוריה">${a.name} 📋</th>`).join('')}</tr></thead><tbody>`;
   for(let m=1;m<=12;m++) {
-    const cells = apts.map(a => { const p=!!(b.dues?.[a.id]?.[duesYear]?.[m]); return `<td class="${p?'paid':'unpaid'}" onclick="toggleDue('${a.id}',${duesYear},${m})" style="cursor:pointer">${p?'✓':'✗'}</td>`; });
-    html += `<tr><td style="font-weight:700;background:var(--bg-card);cursor:default">${months[m-1]}</td>${cells.join('')}</tr>`;
+    const cells = apts.map(a => { const p=!!(b.dues?.[a.id]?.[duesYear]?.[m]); return `<td class="${p?'paid':'unpaid'}">${p?'✓':'✗'}</td>`; });
+    html += `<tr><td style="font-weight:700;background:var(--bg-card)">${months[m-1]}</td>${cells.join('')}</tr>`;
   }
   html += '</tbody>';
   document.getElementById('duesGrid').innerHTML = html;
@@ -2966,6 +2967,7 @@ function sendEmailManual(client) {
 //  copy the DB URL (ends in .firebaseio.com or .firebasedatabase.app)
 // ═══════════════════════════════════════════════
 let syncPollTimer = null;
+let _lastLocalSave = 0; // tracks when WE last saved, to avoid overwriting fresh data
 
 function getSyncDbUrl() { return (localStorage.getItem('vb_sync_db') || '').replace(/\/$/, ''); }
 function setSyncDbUrl(url) { localStorage.setItem('vb_sync_db', url); }
@@ -2979,36 +2981,45 @@ async function cloudPush() {
   if (!b || !b.syncCode || !getSyncDbUrl()) return;
   try {
     updateSyncDot('busy');
+    const payload = { data: JSON.stringify(b), updatedAt: b.updatedAt || Date.now() };
     const resp = await fetch(cloudUrl(b.syncCode), {
       method: 'PUT',
-      body: JSON.stringify({ data: JSON.stringify(b), updatedAt: b.updatedAt || Date.now() }),
+      body: JSON.stringify(payload),
       headers: { 'Content-Type': 'application/json' }
     });
-    if (resp.ok) updateSyncDot('ok');
-    else updateSyncDot('err');
-  } catch { updateSyncDot('err'); }
+    if (resp.ok) { updateSyncDot('ok'); }
+    else {
+      const txt = await resp.text().catch(() => resp.status);
+      console.warn('cloudPush failed:', resp.status, txt);
+      updateSyncDot('err');
+    }
+  } catch(e) { console.warn('cloudPush error:', e); updateSyncDot('err'); }
 }
 
 async function cloudPull() {
   const b = currentBuilding;
   if (!b || !b.syncCode || !getSyncDbUrl()) return;
+  // Don't overwrite data we just saved locally (within 8 seconds)
+  if (Date.now() - _lastLocalSave < 8000) { updateSyncDot('ok'); return; }
   try {
     const resp = await fetch(cloudUrl(b.syncCode));
-    if (!resp.ok) return;
+    if (!resp.ok) { updateSyncDot('err'); return; }
     const json = await resp.json();
-    if (!json?.data) return;
+    if (!json?.data) { updateSyncDot('ok'); return; }
     const cloudAt = json.updatedAt || 0;
     const localAt = b.updatedAt || 0;
-    if (cloudAt > localAt) {
+    // Use !== instead of > to handle clock skew between devices
+    if (cloudAt !== localAt) {
       const cloudData = JSON.parse(json.data);
       currentBuilding = cloudData;
       saveBuildingData(currentBuildingId, cloudData);
       renderScreen(currentScreen);
       updateSyncDot('ok');
+      showSnack('נתונים עודכנו מהענן ✓');
     } else {
       updateSyncDot('ok');
     }
-  } catch { updateSyncDot('err'); }
+  } catch(e) { console.warn('cloudPull error:', e); updateSyncDot('err'); }
 }
 
 function updateSyncDot(state) {
@@ -3022,12 +3033,17 @@ function updateSyncDot(state) {
 function startSyncPoll() {
   stopSyncPoll();
   cloudPull();
-  syncPollTimer = setInterval(cloudPull, 30000);
+  syncPollTimer = setInterval(cloudPull, 15000); // poll every 15s
 }
 
 function stopSyncPoll() {
   if (syncPollTimer) { clearInterval(syncPollTimer); syncPollTimer = null; }
 }
+
+// Pull immediately when user switches back to the app tab/window
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && currentBuilding?.syncCode && getSyncDbUrl()) cloudPull();
+});
 
 function renderSyncSection() {
   const el = document.getElementById('cloudSyncGroup');
