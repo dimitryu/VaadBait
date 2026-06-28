@@ -18,7 +18,7 @@
 // ╔══════════════════════════════════════════════════════════╗
 // ║  APP CONFIGURATION                                        ║
 // ╚══════════════════════════════════════════════════════════╝
-const APP_VERSION = "1.3.6";
+const APP_VERSION = "1.3.7";
 const APP_NAME = "וועד בית";
 const GITHUB_REPO = "dimitryu/VaadBait";
 
@@ -3094,6 +3094,7 @@ function renderSyncSection() {
           <input type="text" id="importCodeInput" class="form-input" placeholder="קוד סנכרון מהמכשיר השני" dir="ltr" style="flex:1">
           <button class="btn btn-ghost btn-sm" onclick="importFromSyncCode()" style="flex:none;white-space:nowrap">ייבא</button>
         </div>
+        <div id="syncDiagMsg" style="display:none;font-size:0.72rem;padding:8px 10px;border-radius:8px;line-height:1.6;word-break:break-all"></div>
       </div>`;
   } else {
     el.innerHTML = `
@@ -3204,20 +3205,34 @@ function generateSyncCode() {
   });
 }
 
+function showSyncDiag(html, kind) {
+  const el = document.getElementById('syncDiagMsg');
+  if (!el) return;
+  el.style.display = 'block';
+  el.innerHTML = html;
+  el.style.background = kind === 'ok' ? 'var(--success-bg)' : kind === 'warn' ? 'var(--warning-bg)' : 'var(--danger-bg)';
+  el.style.color = kind === 'ok' ? 'var(--success)' : kind === 'warn' ? 'var(--warning)' : 'var(--danger)';
+}
+
 async function importFromSyncCode() {
   const code = (document.getElementById('importCodeInput')?.value || '').trim();
   if (!code) { showSnack('יש להזין קוד סנכרון'); return; }
+  const url = `${getSyncDbUrl()}/vaad_bait_sync/${code}.json`;
   updateSyncDot('busy');
+  showSyncDiag(`⏳ שולח בקשה ל:<br>${url}`, 'warn');
   try {
-    const resp = await fetch(`${getSyncDbUrl()}/vaad_bait_sync/${code}.json`);
+    const resp = await fetch(url);
     if (!resp.ok) {
       if (resp.status === 401 || resp.status === 403) {
-        throw new Error(`Firebase חסם גישה (שגיאה ${resp.status}) — עדכן Rules ל >= 10 ולחץ Publish`);
+        throw new Error(`❌ Firebase חסם גישה (שגיאה ${resp.status})<br>עדכן Rules ל <b>&gt;= 10</b> ולחץ Publish<br><br>נתיב שניסינו:<br>${url}`);
       }
-      throw new Error(`שגיאת שרת ${resp.status}`);
+      if (resp.status === 404) {
+        throw new Error(`❌ שגיאה 404 — הכתובת לא נמצאה.<br>בדוק שכתובת ה-Firebase תקינה ושווה בדיוק בין המכשירים:<br>${url}`);
+      }
+      throw new Error(`❌ שגיאת שרת ${resp.status}<br>${url}`);
     }
     const json = await resp.json();
-    if (!json?.data) throw new Error('קוד לא נמצא בענן — בדוק שהוזן נכון ושהמכשיר השני הפעיל סנכרון');
+    if (!json?.data) throw new Error(`❌ קוד לא נמצא בענן — בדוק שהוזן נכון ושהמכשיר השני הפעיל סנכרון<br>נתיב שבדקנו:<br>${url}`);
     const cloudData = JSON.parse(json.data);
     cloudData.syncCode = code;
     cloudData.updatedAt = json.updatedAt || Date.now();
@@ -3232,7 +3247,7 @@ async function importFromSyncCode() {
     showSnack('הבניין יובא בהצלחה מהענן ✓');
   } catch(e) {
     updateSyncDot('err');
-    showSnack(e.message || 'שגיאת חיבור לענן');
+    showSyncDiag(e.message || 'שגיאת חיבור לענן', 'err');
     console.warn('importFromSyncCode error:', e);
   }
 }
