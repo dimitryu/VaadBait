@@ -18,7 +18,7 @@
 // ╔══════════════════════════════════════════════════════════╗
 // ║  APP CONFIGURATION                                        ║
 // ╚══════════════════════════════════════════════════════════╝
-const APP_VERSION = "1.3.5";
+const APP_VERSION = "1.3.6";
 const APP_NAME = "וועד בית";
 const GITHUB_REPO = "dimitryu/VaadBait";
 
@@ -3210,9 +3210,14 @@ async function importFromSyncCode() {
   updateSyncDot('busy');
   try {
     const resp = await fetch(`${getSyncDbUrl()}/vaad_bait_sync/${code}.json`);
-    if (!resp.ok) throw new Error('network');
+    if (!resp.ok) {
+      if (resp.status === 401 || resp.status === 403) {
+        throw new Error(`Firebase חסם גישה (שגיאה ${resp.status}) — עדכן Rules ל >= 10 ולחץ Publish`);
+      }
+      throw new Error(`שגיאת שרת ${resp.status}`);
+    }
     const json = await resp.json();
-    if (!json?.data) throw new Error('no-data');
+    if (!json?.data) throw new Error('קוד לא נמצא בענן — בדוק שהוזן נכון ושהמכשיר השני הפעיל סנכרון');
     const cloudData = JSON.parse(json.data);
     cloudData.syncCode = code;
     cloudData.updatedAt = json.updatedAt || Date.now();
@@ -3227,7 +3232,8 @@ async function importFromSyncCode() {
     showSnack('הבניין יובא בהצלחה מהענן ✓');
   } catch(e) {
     updateSyncDot('err');
-    showSnack(e.message === 'no-data' ? 'קוד לא נמצא בענן — בדוק שהוזן נכון' : 'שגיאת חיבור לענן');
+    showSnack(e.message || 'שגיאת חיבור לענן');
+    console.warn('importFromSyncCode error:', e);
   }
 }
 
