@@ -18,7 +18,7 @@
 // ╔══════════════════════════════════════════════════════════╗
 // ║  APP CONFIGURATION                                        ║
 // ╚══════════════════════════════════════════════════════════╝
-const APP_VERSION = "1.4.0";
+const APP_VERSION = "1.4.1";
 const APP_NAME = "וועד בית";
 const GITHUB_REPO = "dimitryu/VaadBait";
 
@@ -3147,10 +3147,13 @@ async function cloudPull() {
     if (!json?.data) { updateSyncDot('ok'); return; }
     const cloudAt = json.updatedAt || 0;
     const localAt = b.updatedAt || 0;
-    // Use !== instead of > to handle clock skew between devices
-    if (cloudAt !== localAt) {
+    // Only apply cloud data if it is strictly newer than local.
+    // This prevents overwriting fresh local saves when push hasn't reached Firebase yet.
+    // Multi-device sync still works: the other device's push gives cloud a higher timestamp.
+    if (cloudAt > localAt) {
       const cloudData = JSON.parse(json.data);
       currentBuilding = cloudData;
+      _lastLocalSave = Date.now(); // guard against immediate re-pull after apply
       saveBuildingData(currentBuildingId, cloudData);
       renderScreen(currentScreen);
       updateSyncDot('ok');
@@ -4215,7 +4218,6 @@ function renderPollCard(poll, apts) {
     else if (v.vote==='yes') { badge='✓ בעד'; cls='vote-badge vote-yes filled'; }
     else if (v.vote==='no') { badge='✕ נגד'; cls='vote-badge vote-no filled'; }
     else { badge='— נמנע'; cls='vote-badge vote-abstain filled'; }
-    const contact = (b && b.apartments || []).find ? '' : '';
     const persons = (getBuilding()?.apartments||[]).find(x=>x.id===a.id);
     const nameStr = persons?.owner||persons?.tenant||'';
     return `<div class="poll-apt-row">
