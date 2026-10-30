@@ -18,7 +18,7 @@
 // ╔══════════════════════════════════════════════════════════╗
 // ║  APP CONFIGURATION                                        ║
 // ╚══════════════════════════════════════════════════════════╝
-const APP_VERSION = "1.4.1";
+const APP_VERSION = "1.4.2";
 const APP_NAME = "וועד בית";
 const GITHUB_REPO = "dimitryu/VaadBait";
 
@@ -602,6 +602,14 @@ body {
 .poll-badge-open { background:var(--success-bg); color:var(--success); }
 .poll-badge-closed { background:var(--border); color:var(--text-2); }
 .poll-actions { display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; }
+.collapse-btn { background:none; border:none; color:var(--text-2); cursor:pointer; font-size:1.1rem; padding:2px 6px; flex-shrink:0; transition:transform 0.25s; line-height:1; }
+.collapse-btn.open { transform:rotate(180deg); }
+.poll-summary-row { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+.poll-summary-chip { font-size:0.72rem; font-weight:700; padding:2px 8px; border-radius:20px; }
+.poll-summary-yes { background:var(--success-bg); color:var(--success); }
+.poll-summary-no { background:var(--danger-bg); color:var(--danger); }
+.poll-summary-abs { background:var(--warning-bg); color:var(--warning); }
+.poll-summary-pend { background:var(--accent-light); color:var(--accent); }
 </style>
 </head>
 <body>
@@ -2782,6 +2790,13 @@ document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click
 // ═══════════════════════════════════════════════
 //  PROJECTS
 // ═══════════════════════════════════════════════
+const _collapseProjects = {};
+
+function toggleProjectCollapse(projId) {
+  _collapseProjects[projId] = !_collapseProjects[projId];
+  renderProjects();
+}
+
 function renderProjects() {
   const b = getBuilding(); if (!b) return;
   const projects = b.projects || [];
@@ -2797,6 +2812,7 @@ function renderProjects() {
     const paidApts = apts.filter(a => proj.paid?.[a.id]);
     const collected = paidApts.length * perApt;
     const pct = proj.targetAmount ? Math.min(100, Math.round(collected / proj.targetAmount * 100)) : 0;
+    const isCollapsed = !!_collapseProjects[proj.id];
 
     const aptRows = apts.map(a => {
       const isPaid = !!(proj.paid?.[a.id]);
@@ -2811,21 +2827,24 @@ function renderProjects() {
     }).join('');
 
     return `<div class="proj-card">
-      <div class="proj-header">
-        <div>
+      <div class="proj-header" style="cursor:pointer" onclick="toggleProjectCollapse('${proj.id}')">
+        <div style="flex:1;min-width:0">
           <div class="proj-name">🎯 ${proj.name}</div>
-          <div class="proj-target">${fmt(proj.targetAmount)} · ${fmt(perApt)} לדירה${proj.note ? ' · '+proj.note : ''}</div>
+          <div class="proj-target">${fmt(proj.targetAmount)} · ${fmt(perApt)} לדירה${proj.note ? ' · '+proj.note : ''} · ${paidApts.length}/${apts.length} שולם</div>
         </div>
-        <div style="display:flex;gap:6px">
+        <div style="display:flex;gap:4px;align-items:center" onclick="event.stopPropagation()">
           <button class="btn btn-ghost btn-sm" onclick="openProjectModal('${proj.id}')">✏️</button>
           <button class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="deleteProject('${proj.id}')">🗑️</button>
+          <button class="collapse-btn ${isCollapsed?'':'open'}" onclick="toggleProjectCollapse('${proj.id}')">▼</button>
         </div>
       </div>
+      ${!isCollapsed ? `
       <div class="proj-progress-wrap">
         <div class="proj-progress-bar-bg"><div class="proj-progress-bar" style="width:${pct}%"></div></div>
-        <div class="proj-progress-lbl"><span>${t('proj_collected')}: ${fmt(collected)}</span><span>${pct}% · ${paidApts.length}/${apts.length}</span></div>
+        <div class="proj-progress-lbl"><span>${t('proj_collected')}: ${fmt(collected)}</span><span>${pct}%</span></div>
       </div>
       <div class="proj-apts">${aptRows}</div>
+      ` : ''}
     </div>`;
   }).join('');
 }
@@ -4186,6 +4205,13 @@ function restoreBackup(id) {
 // ═══════════════════════════════════════════════
 //  POLLS / VOTING
 // ═══════════════════════════════════════════════
+const _collapsePolls = {};
+
+function togglePollCollapse(pollId) {
+  _collapsePolls[pollId] = !_collapsePolls[pollId];
+  renderPolls();
+}
+
 function renderPolls() {
   const b = getBuilding(); if (!b) return;
   const polls = (b.polls || []).slice().reverse();
@@ -4208,9 +4234,20 @@ function renderPollCard(poll, apts) {
     else if (v.vote==='no') noCount++;
     else absCount++;
   });
+  const isCollapsed = !!_collapsePolls[poll.id];
   const statusBadge = poll.closed
     ? '<span class="poll-badge poll-badge-closed">סגורה</span>'
     : '<span class="poll-badge poll-badge-open">פתוחה</span>';
+
+  // Summary chips — always visible
+  const summaryRow = `<div class="poll-summary-row" style="margin-top:6px">
+    ${yesCount?`<span class="poll-summary-chip poll-summary-yes">✓ ${yesCount} בעד</span>`:''}
+    ${noCount?`<span class="poll-summary-chip poll-summary-no">✕ ${noCount} נגד</span>`:''}
+    ${absCount?`<span class="poll-summary-chip poll-summary-abs">— ${absCount} נמנע</span>`:''}
+    ${pendCount?`<span class="poll-summary-chip poll-summary-pend">⏳ ${pendCount} ממתין</span>`:''}
+  </div>`;
+
+  // Body — hidden when collapsed
   const aptRows = apts.map(a => {
     const v = votes[a.id];
     let badge, cls;
@@ -4218,8 +4255,8 @@ function renderPollCard(poll, apts) {
     else if (v.vote==='yes') { badge='✓ בעד'; cls='vote-badge vote-yes filled'; }
     else if (v.vote==='no') { badge='✕ נגד'; cls='vote-badge vote-no filled'; }
     else { badge='— נמנע'; cls='vote-badge vote-abstain filled'; }
-    const persons = (getBuilding()?.apartments||[]).find(x=>x.id===a.id);
-    const nameStr = persons?.owner||persons?.tenant||'';
+    const aptData = (getBuilding()?.apartments||[]).find(x=>x.id===a.id);
+    const nameStr = (aptData?.owners?.[0]?.name) || (aptData?.residents?.[0]?.name) || (aptData?.resident?.name) || '';
     return `<div class="poll-apt-row">
       <div class="poll-apt-name">${a.name||a.number||a.id}</div>
       <div class="poll-apt-info">
@@ -4231,26 +4268,30 @@ function renderPollCard(poll, apts) {
   }).join('');
 
   const waBtn = `<button class="wa-send-all" style="padding:8px;font-size:0.82rem;" onclick="sendPollWhatsApp('${poll.id}')">💬 שלח לדיירים ב-WhatsApp</button>`;
-  const toggleBtn = poll.closed
+  const toggleStatusBtn = poll.closed
     ? `<button class="btn btn-ghost btn-sm" onclick="togglePollStatus('${poll.id}')">פתח מחדש</button>`
     : `<button class="btn btn-ghost btn-sm" onclick="togglePollStatus('${poll.id}')">סגור הצבעה</button>`;
   const editBtn = `<button class="btn btn-ghost btn-sm" onclick="openEditPollModal('${poll.id}')">✏️ ערוך</button>`;
   const delBtn = `<button class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="deletePoll('${poll.id}')">🗑️</button>`;
 
   return `<div class="poll-card">
-    <div class="poll-card-header">
-      <div class="poll-title">${escHtml(poll.title)}</div>
-      ${statusBadge}
+    <div class="poll-card-header" style="cursor:pointer" onclick="togglePollCollapse('${poll.id}')">
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:6px">${statusBadge}<div class="poll-title">${escHtml(poll.title)}</div></div>
+        ${isCollapsed ? summaryRow : (poll.desc?`<div class="poll-desc" style="margin-top:4px;margin-bottom:0">${escHtml(poll.desc)}</div>`:'')}
+      </div>
+      <button class="collapse-btn ${isCollapsed?'':'open'}" onclick="event.stopPropagation();togglePollCollapse('${poll.id}')">▼</button>
     </div>
-    ${poll.desc?`<div class="poll-desc">${escHtml(poll.desc)}</div>`:''}
-    <div class="poll-stats">
+    ${!isCollapsed ? `
+    <div class="poll-stats" style="margin-top:10px">
       <div class="poll-stat poll-stat-yes"><span class="poll-stat-val">${yesCount}</span><span class="poll-stat-lbl">בעד</span></div>
       <div class="poll-stat poll-stat-no"><span class="poll-stat-val">${noCount}</span><span class="poll-stat-lbl">נגד</span></div>
       <div class="poll-stat poll-stat-abs"><span class="poll-stat-val">${absCount}</span><span class="poll-stat-lbl">נמנע</span></div>
       <div class="poll-stat poll-stat-pend"><span class="poll-stat-val">${pendCount}</span><span class="poll-stat-lbl">ממתין</span></div>
     </div>
     <div class="poll-apts-list">${aptRows}</div>
-    <div class="poll-actions">${waBtn}${toggleBtn}${editBtn}${delBtn}</div>
+    <div class="poll-actions">${waBtn}${toggleStatusBtn}${editBtn}${delBtn}</div>
+    ` : ''}
   </div>`;
 }
 
