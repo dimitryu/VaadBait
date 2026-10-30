@@ -18,7 +18,7 @@
 // ╔══════════════════════════════════════════════════════════╗
 // ║  APP CONFIGURATION                                        ║
 // ╚══════════════════════════════════════════════════════════╝
-const APP_VERSION = "1.3.8";
+const APP_VERSION = "1.4.0";
 const APP_NAME = "וועד בית";
 const GITHUB_REPO = "dimitryu/VaadBait";
 
@@ -561,6 +561,47 @@ body {
 .pres-row-unpaid td { background:rgba(244,67,54,0.1); }
 .pres-close-btn { position:fixed; top:14px; left:14px; background:rgba(255,255,255,0.15); border:none; color:white; border-radius:50%; width:36px; height:36px; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; }
 .pres-refresh-lbl { position:fixed; bottom:14px; right:14px; font-size:0.72rem; opacity:0.4; }
+
+/* ── Auto Backups ── */
+.backup-item { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border); }
+.backup-item:last-child { border-bottom:none; }
+.backup-meta { flex:1; min-width:0; }
+.backup-date { font-weight:600; font-size:0.88rem; }
+.backup-sub { font-size:0.72rem; color:var(--text-2); margin-top:1px; }
+.backup-actions { display:flex; gap:6px; flex-shrink:0; }
+
+/* ── Polls Screen ── */
+.poll-card { background:var(--bg-card); border-radius:14px; padding:14px; margin-bottom:10px; box-shadow:0 2px 8px var(--shadow); border:1px solid var(--border); }
+.poll-card-header { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; margin-bottom:6px; }
+.poll-title { font-size:1rem; font-weight:800; flex:1; }
+.poll-desc { font-size:0.82rem; color:var(--text-2); margin-bottom:10px; line-height:1.5; }
+.poll-stats { display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap; }
+.poll-stat { flex:1; min-width:60px; text-align:center; padding:7px 4px; border-radius:10px; }
+.poll-stat-yes { background:var(--success-bg); color:var(--success); }
+.poll-stat-no { background:var(--danger-bg); color:var(--danger); }
+.poll-stat-abs { background:var(--warning-bg); color:var(--warning); }
+.poll-stat-pend { background:var(--accent-light); color:var(--accent); }
+.poll-stat-val { font-size:1.2rem; font-weight:800; display:block; }
+.poll-stat-lbl { font-size:0.62rem; display:block; }
+.poll-apts-list { border-top:1px solid var(--border); margin-top:8px; padding-top:4px; }
+.poll-apt-row { display:flex; align-items:center; gap:8px; padding:7px 0; border-bottom:1px solid var(--border); }
+.poll-apt-row:last-child { border-bottom:none; }
+.poll-apt-name { font-weight:700; font-size:0.82rem; min-width:54px; }
+.poll-apt-info { flex:1; min-width:0; }
+.poll-apt-person { font-size:0.75rem; color:var(--text-2); }
+.poll-apt-comment { font-size:0.72rem; color:var(--text-2); font-style:italic; }
+.vote-badge { padding:3px 10px; border-radius:20px; border:1.5px solid; font-size:0.72rem; font-weight:700; white-space:nowrap; cursor:pointer; background:transparent; transition:all 0.15s; flex-shrink:0; }
+.vote-yes { border-color:var(--success); color:var(--success); }
+.vote-no { border-color:var(--danger); color:var(--danger); }
+.vote-abstain { border-color:var(--warning); color:var(--warning); }
+.vote-pending { border-color:var(--text-2); color:var(--text-2); }
+.vote-yes.filled { background:var(--success-bg); }
+.vote-no.filled { background:var(--danger-bg); }
+.vote-abstain.filled { background:var(--warning-bg); }
+.poll-badge { padding:3px 9px; border-radius:20px; font-size:0.68rem; font-weight:700; flex-shrink:0; }
+.poll-badge-open { background:var(--success-bg); color:var(--success); }
+.poll-badge-closed { background:var(--border); color:var(--text-2); }
+.poll-actions { display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; }
 </style>
 </head>
 <body>
@@ -777,6 +818,21 @@ body {
     </div>
   </div>
 
+  <div class="settings-group-title" style="margin-top:12px">📦 גיבוי אוטומטי שבועי</div>
+  <div class="settings-group">
+    <div class="settings-row">
+      <div>
+        <div class="settings-lbl">גיבויים אוטומטיים</div>
+        <div class="settings-sub" id="autoBackupStatus">בודק...</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="openBackupRestoreModal()">הצג</button>
+    </div>
+    <div class="settings-row">
+      <div class="settings-lbl">גיבוי עכשיו</div>
+      <button class="btn btn-ghost btn-sm" onclick="doAutoBackup(true)">גבה</button>
+    </div>
+  </div>
+
   <div class="settings-group-title" style="margin-top:12px">🔄 סנכרון בין מכשירים</div>
   <div class="settings-group" id="cloudSyncGroup"></div>
 
@@ -811,6 +867,15 @@ body {
   <div id="projectsList" style="padding:0 12px 8px;"></div>
 </div>
 
+
+<div id="screenPolls" class="screen">
+  <div class="section-header">
+    <span class="section-title">🗳️ הצבעות ונושאים</span>
+    <button class="btn btn-primary btn-sm" onclick="openNewPollModal()" style="padding:4px 10px;font-size:0.72rem;flex:none;border-radius:20px">+ נושא חדש</button>
+  </div>
+  <div id="pollsList" style="padding:0 12px 8px;"></div>
+</div>
+
 </div><!-- end appShell -->
 
 <!-- Bottom Navigation -->
@@ -832,6 +897,9 @@ body {
   </div>
   <div class="nav-item" data-screen="screenProjects" onclick="showScreen('screenProjects')">
     <span class="ni">🎯</span><span data-i18n="nav_projects">יעדים</span>
+  </div>
+  <div class="nav-item" data-screen="screenPolls" onclick="showScreen('screenPolls')">
+    <span class="ni">🗳️</span><span>הצבעות</span>
   </div>
 </nav>
 
@@ -1143,6 +1211,68 @@ body {
     </div>
     <div class="modal-actions" style="margin-top:8px">
       <button class="btn btn-ghost" onclick="closeModal('broadcastModal')">סגור</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Poll Modal -->
+<div class="modal-overlay" id="pollModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="pollModalTitle">📋 נושא חדש להצבעה</div>
+    <input type="hidden" id="pollEditId">
+    <div class="form-group">
+      <label class="form-label">כותרת הנושא</label>
+      <input type="text" class="form-input" id="pollTitle" placeholder="לדוגמה: ניקיון ביוב כללי">
+    </div>
+    <div class="form-group">
+      <label class="form-label">פירוט / שאלה לדיירים</label>
+      <textarea class="form-input wa-msg-area" id="pollDesc" style="min-height:80px" placeholder="תארו את הנושא ומה אתם מבקשים מהדיירים להחליט..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('pollModal')">ביטול</button>
+      <button class="btn btn-primary" onclick="savePoll()">שמור</button>
+    </div>
+  </div>
+</div>
+
+<!-- Vote Modal -->
+<div class="modal-overlay" id="voteModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="voteModalTitle">🗳️ הצבעה</div>
+    <input type="hidden" id="voteModalPollId">
+    <input type="hidden" id="voteModalAptId">
+    <div id="voteModalAptInfo" style="font-size:0.85rem;color:var(--text-2);margin-bottom:12px"></div>
+    <div class="form-group">
+      <label class="form-label">עמדה:</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="vote-badge vote-yes" id="voteBtnYes" onclick="selectVote('yes')">✓ בעד</button>
+        <button class="vote-badge vote-no" id="voteBtnNo" onclick="selectVote('no')">✕ נגד</button>
+        <button class="vote-badge vote-abstain" id="voteBtnAbstain" onclick="selectVote('abstain')">— נמנע</button>
+      </div>
+      <input type="hidden" id="voteChoice">
+    </div>
+    <div class="form-group">
+      <label class="form-label">הערה (אופציונלי):</label>
+      <input type="text" class="form-input" id="voteComment" placeholder="הוסף הערה...">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('voteModal')">ביטול</button>
+      <button class="btn btn-primary" onclick="saveVote()">שמור הצבעה</button>
+    </div>
+  </div>
+</div>
+
+<!-- Restore Backup Modal -->
+<div class="modal-overlay" id="backupRestoreModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📦 גיבויים אוטומטיים</div>
+    <div style="font-size:0.78rem;color:var(--text-2);margin-bottom:10px">נשמרים עד 8 גיבויים (חודשיים). לחץ על גיבוי לשחזר או הורד.</div>
+    <div id="backupRestoreList" style="max-height:300px;overflow-y:auto"></div>
+    <div class="modal-actions" style="margin-top:10px">
+      <button class="btn btn-ghost" onclick="closeModal('backupRestoreModal')">סגור</button>
     </div>
   </div>
 </div>
@@ -1608,6 +1738,8 @@ function showApp() {
   initInstallPrompt();
   // Feature 1: Check notifications
   initNotifications();
+  // Auto backup check
+  checkAutoBackup();
 }
 
 function switchUser() {
@@ -1680,6 +1812,7 @@ function renderScreen(id) {
   else if (id === 'screenContacts') renderContacts();
   else if (id === 'screenSettings') renderSettings();
   else if (id === 'screenProjects') renderProjects();
+  else if (id === 'screenPolls') renderPolls();
 }
 
 // ═══════════════════════════════════════════════
@@ -1976,6 +2109,7 @@ function renderSettings() {
   // Notification toggle
   const notifToggle = document.getElementById('notifToggle');
   if (notifToggle) notifToggle.checked = localStorage.getItem('vb_notif_enabled') !== 'false';
+  updateAutoBackupStatus();
 }
 
 // ═══════════════════════════════════════════════
@@ -3949,6 +4083,318 @@ if('serviceWorker' in navigator) {
 
 // ═══════════════════════════════════════════════
 //  INIT
+// ═══════════════════════════════════════════════
+//  AUTO WEEKLY BACKUP (8 backups = ~2 months)
+// ═══════════════════════════════════════════════
+const AUTO_BACKUP_KEY = 'vb_auto_backups';
+const AUTO_BACKUP_MAX = 8;
+const AUTO_BACKUP_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+function getAutoBackups() {
+  try { return JSON.parse(localStorage.getItem(AUTO_BACKUP_KEY) || '[]'); } catch(e) { return []; }
+}
+function saveAutoBackups(arr) { localStorage.setItem(AUTO_BACKUP_KEY, JSON.stringify(arr)); }
+
+function checkAutoBackup() {
+  const b = getBuilding(); if (!b) return;
+  const backups = getAutoBackups();
+  const myBackups = backups.filter(x => x.buildingId === currentBuildingId);
+  const lastBackup = myBackups.sort((a,c) => c.ts - a.ts)[0];
+  const now = Date.now();
+  if (!lastBackup || (now - lastBackup.ts) >= AUTO_BACKUP_INTERVAL_MS) {
+    doAutoBackup(false);
+  }
+}
+
+function doAutoBackup(manual) {
+  const b = getBuilding(); if (!b) return;
+  const backups = getAutoBackups();
+  const now = Date.now();
+  const entry = {
+    id: 'bk_' + now,
+    ts: now,
+    date: new Date(now).toLocaleDateString('he-IL', {weekday:'short', day:'numeric', month:'long', year:'numeric'}),
+    buildingId: currentBuildingId,
+    buildingName: b.name,
+    size: Math.round(JSON.stringify(b).length / 1024),
+    data: JSON.parse(JSON.stringify(b))
+  };
+  // Remove old backups for this building beyond max
+  const others = backups.filter(x => x.buildingId !== currentBuildingId);
+  let mine = backups.filter(x => x.buildingId === currentBuildingId);
+  mine.push(entry);
+  mine = mine.sort((a,c) => c.ts - a.ts).slice(0, AUTO_BACKUP_MAX);
+  saveAutoBackups([...others, ...mine]);
+  if (manual) showSnack('גיבוי נשמר בהצלחה ✓');
+  updateAutoBackupStatus();
+}
+
+function updateAutoBackupStatus() {
+  const el = document.getElementById('autoBackupStatus'); if (!el) return;
+  const backups = getAutoBackups().filter(x => x.buildingId === currentBuildingId);
+  if (!backups.length) { el.textContent = 'אין גיבויים עדיין'; return; }
+  const last = backups.sort((a,c) => c.ts - a.ts)[0];
+  el.textContent = `${backups.length} גיבויים · אחרון: ${last.date}`;
+}
+
+function openBackupRestoreModal() {
+  const backups = getAutoBackups().filter(x => x.buildingId === currentBuildingId).sort((a,c) => c.ts - a.ts);
+  const el = document.getElementById('backupRestoreList');
+  if (!backups.length) {
+    el.innerHTML = '<div style="text-align:center;color:var(--text-2);padding:20px;font-size:0.85rem">אין גיבויים עדיין</div>';
+  } else {
+    el.innerHTML = backups.map(bk => `
+      <div class="backup-item">
+        <div class="backup-meta">
+          <div class="backup-date">${bk.date}</div>
+          <div class="backup-sub">${bk.size} KB · ${bk.buildingName}</div>
+        </div>
+        <div class="backup-actions">
+          <button class="btn btn-ghost btn-sm" onclick="downloadBackup('${bk.id}')">הורד</button>
+          <button class="btn btn-primary btn-sm" onclick="restoreBackup('${bk.id}')">שחזר</button>
+        </div>
+      </div>`).join('');
+  }
+  document.getElementById('backupRestoreModal').classList.add('open');
+}
+
+function downloadBackup(id) {
+  const backups = getAutoBackups();
+  const bk = backups.find(x => x.id === id); if (!bk) return;
+  const data = {appName:APP_NAME,version:APP_VERSION,exportDate:new Date(bk.ts).toISOString(),building:bk.data};
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url;
+  a.download = `vaad-bait-${bk.buildingName.replace(/\s+/g,'-')}-backup-${new Date(bk.ts).toISOString().slice(0,10)}.json`;
+  a.click(); URL.revokeObjectURL(url);
+}
+
+function restoreBackup(id) {
+  if (!confirm('לשחזר את הגיבוי הזה? הנתונים הנוכחיים יוחלפו.')) return;
+  const backups = getAutoBackups();
+  const bk = backups.find(x => x.id === id); if (!bk) return;
+  saveBuildingData(bk.buildingId, bk.data);
+  loadBuilding(bk.buildingId);
+  closeModal('backupRestoreModal');
+  showApp();
+  showSnack('שוחזר בהצלחה ✓');
+}
+
+// ═══════════════════════════════════════════════
+//  POLLS / VOTING
+// ═══════════════════════════════════════════════
+function renderPolls() {
+  const b = getBuilding(); if (!b) return;
+  const polls = (b.polls || []).slice().reverse();
+  const apts = b.apartments || [];
+  const container = document.getElementById('pollsList');
+  if (!polls.length) {
+    container.innerHTML = '<div style="text-align:center;color:var(--text-2);padding:40px 20px"><div style="font-size:2.5rem;margin-bottom:10px">🗳️</div><div style="font-weight:700">אין נושאים עדיין</div><div style="font-size:0.85rem;margin-top:6px">הוסף נושא לדיון ותן לדיירים להצביע</div></div>';
+    return;
+  }
+  container.innerHTML = polls.map(poll => renderPollCard(poll, apts)).join('');
+}
+
+function renderPollCard(poll, apts) {
+  const votes = poll.votes || {};
+  let yesCount=0, noCount=0, absCount=0, pendCount=0;
+  apts.forEach(a => {
+    const v = votes[a.id];
+    if (!v || !v.vote) pendCount++;
+    else if (v.vote==='yes') yesCount++;
+    else if (v.vote==='no') noCount++;
+    else absCount++;
+  });
+  const statusBadge = poll.closed
+    ? '<span class="poll-badge poll-badge-closed">סגורה</span>'
+    : '<span class="poll-badge poll-badge-open">פתוחה</span>';
+  const aptRows = apts.map(a => {
+    const v = votes[a.id];
+    let badge, cls;
+    if (!v||!v.vote) { badge='המתנה'; cls='vote-badge vote-pending'; }
+    else if (v.vote==='yes') { badge='✓ בעד'; cls='vote-badge vote-yes filled'; }
+    else if (v.vote==='no') { badge='✕ נגד'; cls='vote-badge vote-no filled'; }
+    else { badge='— נמנע'; cls='vote-badge vote-abstain filled'; }
+    const contact = (b && b.apartments || []).find ? '' : '';
+    const persons = (getBuilding()?.apartments||[]).find(x=>x.id===a.id);
+    const nameStr = persons?.owner||persons?.tenant||'';
+    return `<div class="poll-apt-row">
+      <div class="poll-apt-name">${a.name||a.number||a.id}</div>
+      <div class="poll-apt-info">
+        ${nameStr?`<div class="poll-apt-person">${nameStr}</div>`:''}
+        ${v?.comment?`<div class="poll-apt-comment">"${v.comment}"</div>`:''}
+      </div>
+      <button class="${cls}" onclick="openVoteModal('${poll.id}','${a.id}')">${badge}</button>
+    </div>`;
+  }).join('');
+
+  const waBtn = `<button class="wa-send-all" style="padding:8px;font-size:0.82rem;" onclick="sendPollWhatsApp('${poll.id}')">💬 שלח לדיירים ב-WhatsApp</button>`;
+  const toggleBtn = poll.closed
+    ? `<button class="btn btn-ghost btn-sm" onclick="togglePollStatus('${poll.id}')">פתח מחדש</button>`
+    : `<button class="btn btn-ghost btn-sm" onclick="togglePollStatus('${poll.id}')">סגור הצבעה</button>`;
+  const editBtn = `<button class="btn btn-ghost btn-sm" onclick="openEditPollModal('${poll.id}')">✏️ ערוך</button>`;
+  const delBtn = `<button class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="deletePoll('${poll.id}')">🗑️</button>`;
+
+  return `<div class="poll-card">
+    <div class="poll-card-header">
+      <div class="poll-title">${escHtml(poll.title)}</div>
+      ${statusBadge}
+    </div>
+    ${poll.desc?`<div class="poll-desc">${escHtml(poll.desc)}</div>`:''}
+    <div class="poll-stats">
+      <div class="poll-stat poll-stat-yes"><span class="poll-stat-val">${yesCount}</span><span class="poll-stat-lbl">בעד</span></div>
+      <div class="poll-stat poll-stat-no"><span class="poll-stat-val">${noCount}</span><span class="poll-stat-lbl">נגד</span></div>
+      <div class="poll-stat poll-stat-abs"><span class="poll-stat-val">${absCount}</span><span class="poll-stat-lbl">נמנע</span></div>
+      <div class="poll-stat poll-stat-pend"><span class="poll-stat-val">${pendCount}</span><span class="poll-stat-lbl">ממתין</span></div>
+    </div>
+    <div class="poll-apts-list">${aptRows}</div>
+    <div class="poll-actions">${waBtn}${toggleBtn}${editBtn}${delBtn}</div>
+  </div>`;
+}
+
+function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function openNewPollModal() {
+  document.getElementById('pollEditId').value = '';
+  document.getElementById('pollModalTitle').textContent = '📋 נושא חדש להצבעה';
+  document.getElementById('pollTitle').value = '';
+  document.getElementById('pollDesc').value = '';
+  document.getElementById('pollModal').classList.add('open');
+  setTimeout(()=>document.getElementById('pollTitle').focus(), 300);
+}
+
+function openEditPollModal(pollId) {
+  const b = getBuilding(); if (!b) return;
+  const poll = (b.polls||[]).find(p=>p.id===pollId); if (!poll) return;
+  document.getElementById('pollEditId').value = pollId;
+  document.getElementById('pollModalTitle').textContent = '✏️ עריכת נושא';
+  document.getElementById('pollTitle').value = poll.title;
+  document.getElementById('pollDesc').value = poll.desc||'';
+  document.getElementById('pollModal').classList.add('open');
+}
+
+function savePoll() {
+  const title = document.getElementById('pollTitle').value.trim();
+  if (!title) { document.getElementById('pollTitle').focus(); return; }
+  const desc = document.getElementById('pollDesc').value.trim();
+  const editId = document.getElementById('pollEditId').value;
+  const b = getBuilding(); if (!b) return;
+  if (!b.polls) b.polls = [];
+  if (editId) {
+    const p = b.polls.find(x=>x.id===editId);
+    if (p) { p.title=title; p.desc=desc; }
+  } else {
+    b.polls.push({id:'poll_'+Date.now(), title, desc, createdAt:Date.now(), closed:false, votes:{}});
+  }
+  saveBuilding();
+  closeModal('pollModal');
+  renderPolls();
+  showSnack('נושא נשמר ✓');
+}
+
+function openVoteModal(pollId, aptId) {
+  const b = getBuilding(); if (!b) return;
+  const poll = (b.polls||[]).find(p=>p.id===pollId); if (!poll) return;
+  const apt = (b.apartments||[]).find(a=>a.id===aptId); if (!apt) return;
+  document.getElementById('voteModalPollId').value = pollId;
+  document.getElementById('voteModalAptId').value = aptId;
+  document.getElementById('voteModalTitle').textContent = `🗳️ הצבעה: ${poll.title}`;
+  const nameStr = apt.owner||apt.tenant||'';
+  document.getElementById('voteModalAptInfo').textContent = `דירה ${apt.name||apt.number||apt.id}${nameStr?' · '+nameStr:''}`;
+  const existing = (poll.votes||{})[aptId];
+  document.getElementById('voteChoice').value = existing?.vote||'';
+  document.getElementById('voteComment').value = existing?.comment||'';
+  ['yes','no','abstain'].forEach(v => {
+    const btn = document.getElementById('voteBtnYes'.replace('yes',v==='yes'?'Yes':v==='no'?'No':'Abstain'));
+    if(btn) btn.classList.toggle('filled', existing?.vote===v);
+  });
+  document.getElementById('voteBtnYes').classList.toggle('filled', existing?.vote==='yes');
+  document.getElementById('voteBtnNo').classList.toggle('filled', existing?.vote==='no');
+  document.getElementById('voteBtnAbstain').classList.toggle('filled', existing?.vote==='abstain');
+  document.getElementById('voteModal').classList.add('open');
+}
+
+function selectVote(v) {
+  document.getElementById('voteChoice').value = v;
+  document.getElementById('voteBtnYes').classList.toggle('filled', v==='yes');
+  document.getElementById('voteBtnNo').classList.toggle('filled', v==='no');
+  document.getElementById('voteBtnAbstain').classList.toggle('filled', v==='abstain');
+}
+
+function saveVote() {
+  const pollId = document.getElementById('voteModalPollId').value;
+  const aptId = document.getElementById('voteModalAptId').value;
+  const vote = document.getElementById('voteChoice').value;
+  const comment = document.getElementById('voteComment').value.trim();
+  if (!vote) { showSnack('בחר עמדה (בעד/נגד/נמנע)'); return; }
+  const b = getBuilding(); if (!b) return;
+  const poll = (b.polls||[]).find(p=>p.id===pollId); if (!poll) return;
+  if (!poll.votes) poll.votes={};
+  poll.votes[aptId] = {vote, comment, votedAt:Date.now()};
+  saveBuilding();
+  closeModal('voteModal');
+  renderPolls();
+  showSnack('הצבעה נשמרה ✓');
+}
+
+function togglePollStatus(pollId) {
+  const b = getBuilding(); if (!b) return;
+  const poll = (b.polls||[]).find(p=>p.id===pollId); if (!poll) return;
+  poll.closed = !poll.closed;
+  saveBuilding();
+  renderPolls();
+}
+
+function deletePoll(pollId) {
+  if (!confirm('למחוק נושא זה?')) return;
+  const b = getBuilding(); if (!b) return;
+  b.polls = (b.polls||[]).filter(p=>p.id!==pollId);
+  saveBuilding();
+  renderPolls();
+}
+
+function sendPollWhatsApp(pollId) {
+  const b = getBuilding(); if (!b) return;
+  const poll = (b.polls||[]).find(p=>p.id===pollId); if (!poll) return;
+  const apts = b.apartments || [];
+  const votes = poll.votes || {};
+
+  // Build results summary
+  let yesNames=[], noNames=[], absNames=[], pendNames=[];
+  apts.forEach(a => {
+    const v = votes[a.id];
+    const nm = a.owner||a.tenant||a.name||a.number||a.id;
+    if (!v||!v.vote) pendNames.push(nm);
+    else if (v.vote==='yes') yesNames.push(nm);
+    else if (v.vote==='no') noNames.push(nm);
+    else absNames.push(nm);
+  });
+
+  let msg = `*${poll.title}*\n`;
+  if (poll.desc) msg += `${poll.desc}\n`;
+  msg += `\n*תוצאות עד כה:*\n`;
+  msg += `✅ בעד (${yesNames.length}): ${yesNames.join(', ')||'—'}\n`;
+  msg += `❌ נגד (${noNames.length}): ${noNames.join(', ')||'—'}\n`;
+  msg += `⬜ נמנעים (${absNames.length}): ${absNames.join(', ')||'—'}\n`;
+  if (pendNames.length) msg += `⏳ טרם הצביעו: ${pendNames.join(', ')}\n`;
+
+  // Collect all phone numbers
+  const phones = [];
+  apts.forEach(a => {
+    (a.contacts||[]).forEach(c => { if(c.phone) phones.push(c.phone.replace(/\D/g,'')); });
+    if (a.phone) phones.push(a.phone.replace(/\D/g,''));
+  });
+
+  const encoded = encodeURIComponent(msg);
+  if (phones.length > 0) {
+    const ph = phones[0].replace(/^0/,'972');
+    window.open(`https://wa.me/${ph}?text=${encoded}`, '_blank');
+  } else {
+    window.open(`https://wa.me/?text=${encoded}`, '_blank');
+  }
+  showSnack('נפתח WhatsApp ✓');
+}
+
 // ═══════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', initApp);
 </script>

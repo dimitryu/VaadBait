@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vaad-bait-v1.3.8';
+const CACHE_NAME = 'vaad-bait-v1.4.0';
 const ASSETS = [
   './index.html',
   './manifest.json',
